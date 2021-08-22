@@ -1,0 +1,8 @@
+#scp
+#scpeng
+define:list,numlist
+define:int,x,123
+define:int,y,456
+numlist.append(x)
+numlist.append(y)
+numlist.show()

@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseOpt|Win32">
+      <Configuration>ReleaseOpt</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseOpt|x64">
+      <Configuration>ReleaseOpt</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D9791507-4F50-4871-93B7-D62A9C7FF9A8}</ProjectGuid>
+    <RootNamespace>ScriptEngineLib</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v120_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v120_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v120_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'">$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'" />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(SolutionDir)../inter/$(ProjectName)/$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>$(SolutionDir)../inter/$(ProjectName)/$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>./ThirdParty\Source\python3\;../ThirdParty\Source\jsoncpp-src-0.5.0\include\json\;../ThirdParty\Source\googlehashmap\;../ThirdParty\Source\regexp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>../ThirdParty\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>./ThirdParty\Source\python3\;../ThirdParty\Source\jsoncpp-src-0.5.0\include\json\;../ThirdParty\Source\googlehashmap\;../ThirdParty\Source\regexp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>../ThirdParty\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;BUILDING_LIBCURL;HTTP_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../ThirdParty\Source\googlehashmap\;../ThirdParty\Source\regexp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Lib>
+      <IgnoreSpecificDefaultLibraries>msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;BUILDING_LIBCURL;HTTP_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../ThirdParty\Source\googlehashmap\;../ThirdParty\Source\regexp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Lib>
+      <IgnoreSpecificDefaultLibraries>msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(OutDir);../ThirdParty\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ScpEncryptLib.lib;libcmt.lib;ws2_32.lib;advapi32.lib;iphlpapi.lib;psapi.lib;shell32.lib;userenv.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;BUILDING_LIBCURL;HTTP_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../ThirdParty\Source\googlehashmap\;../ThirdParty\Source\regexp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Lib>
+      <IgnoreSpecificDefaultLibraries>msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOpt|x64'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;BUILDING_LIBCURL;HTTP_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../ThirdParty\Source\googlehashmap\;../ThirdParty\Source\regexp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Lib>
+      <IgnoreSpecificDefaultLibraries>msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(OutDir);../ThirdParty\Bin64;../ThirdParty\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ScpEncryptLib.lib;advapi32.lib;iphlpapi.lib;psapi.lib;shell32.lib;userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\IsValidFileName.cpp" />
+    <ClCompile Include="..\EasyJson\EasyJson\CppEasyJson.cpp" />
+    <ClCompile Include="..\ScritpEngine\stdafx.cpp" />
+    <ClCompile Include="NumberHelp.cpp" />
+    <ClCompile Include="ScpArrayObject.cpp" />
+    <ClCompile Include="ScpAst.cpp" />
+    <ClCompile Include="ScpBigIntObject.cpp" />
+    <ClCompile Include="ScpByteCode.cpp" />
+    <ClCompile Include="ScpCFunctionObject.cpp" />
+    <ClCompile Include="ScpClassInstanceObject.cpp" />
+    <ClCompile Include="ScpClassObject.cpp" />
+    <ClCompile Include="ScpCObject.cpp" />
+    <ClCompile Include="ScpDirectoryObject.cpp" />
+    <ClCompile Include="ScpDoubleObject.cpp" />
+    <ClCompile Include="ScpExpressionAnalyser.cpp" />
+    <ClCompile Include="ScpExpressionBlock.cpp" />
+    <ClCompile Include="ScpExpressionsObject.cpp" />
+    <ClCompile Include="ScpExtendObjectMgr.cpp" />
+    <ClCompile Include="ScpFileObject.cpp" />
+    <ClCompile Include="ScpFunctionObject.cpp" />
+    <ClCompile Include="ScpGlobalCommandObject.cpp" />
+    <ClCompile Include="ScpGlobalCommands.cpp" />
+    <ClCompile Include="ScpGlobalObject.cpp" />
+    <ClCompile Include="ScpIfStatementObject.cpp" />
+    <ClCompile Include="ScpIntObject.cpp" />
+    <ClCompile Include="ScpJsonObject.cpp" />
+    <ClCompile Include="ScpLex.cpp" />
+    <ClCompile Include="ScpListObject.cpp" />
+    <ClCompile Include="ScpMapObject.cpp" />
+    <ClCompile Include="ScpMemoryObject.cpp" />
+    <ClCompile Include="ScpNullObject.cpp" />
+    <ClCompile Include="ScpObjectDefine.cpp" />
+    <ClCompile Include="ScpObjectFactory.cpp" />
+    <ClCompile Include="ScpObjectNammes.cpp" />
+    <ClCompile Include="ScpObjectSpace.cpp" />
+    <ClCompile Include="ScpOperationMgr.cpp" />
+    <ClCompile Include="ScpQueueObject.cpp" />
+    <ClCompile Include="ScpRandomNumberObject.cpp" />
+    <ClCompile Include="ScpRangeObject.cpp" />
+    <ClCompile Include="ScpRegExpObject.cpp" />
+    <ClCompile Include="ScpResourcePool.cpp" />
+    <ClCompile Include="ScpRuntime.cpp" />
+    <ClCompile Include="ScpRuntimeStack.cpp" />
+    <ClCompile Include="ScpScriptCommand.cpp" />
+    <ClCompile Include="ScpScriptLex.cpp" />
+    <ClCompile Include="ScpStackObject.cpp" />
+    <ClCompile Include="ScpStringArrayObject.cpp" />
+    <ClCompile Include="ScpStringObject.cpp" />
+    <ClCompile Include="ScpStructObject.cpp" />
+    <ClCompile Include="ScpTableObject.cpp" />
+    <ClCompile Include="ScpTimeObject.cpp" />
+    <ClCompile Include="ScpUserObject.cpp" />
+    <ClCompile Include="ScpWhileStatementObject.cpp" />
+    <ClCompile Include="ScriptByteCode.cpp" />
+    <ClCompile Include="ScriptFile.cpp" />
+    <ClCompile Include="ScriptScanner.cpp" />
+    <ClCompile Include="ScriptEngine.cpp" />
+    <ClCompile Include="UIMessage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\IsValidFileName.h" />
+    <ClInclude Include="..\Common\MapFindKeyByValue.hpp" />
+    <ClInclude Include="..\EasyJson\EasyJson\CppEasyJson.h" />
+    <ClInclude Include="..\ScritpEngine\stdafx.h" />
+    <ClInclude Include="..\ScritpEngine\targetver.h" />
+    <ClInclude Include="addin.h" />
+    <ClInclude Include="commanddefine.h" />
+    <ClInclude Include="commanddefine_uni.h" />
+    <ClInclude Include="mapobjects.h" />
+    <ClInclude Include="NumberHelp.h" />
+    <ClInclude Include="ScpArrayObject.h" />
+    <ClInclude Include="ScpAst.h" />
+    <ClInclude Include="ScpBigIntObject.h" />
+    <ClInclude Include="ScpByteCode.h" />
+    <ClInclude Include="ScpCFunctionObject.h" />
+    <ClInclude Include="ScpClassInstanceObject.h" />
+    <ClInclude Include="ScpClassObject.h" />
+    <ClInclude Include="ScpCObject.h" />
+    <ClInclude Include="ScpCommonObject.h" />
+    <ClInclude Include="ScpDebugger.h" />
+    <ClInclude Include="ScpDirectoryObject.h" />
+    <ClInclude Include="ScpDoubleObject.h" />
+    <ClInclude Include="ScpErrorCode_uni.h" />
+    <ClInclude Include="ScpExpressionAnalyser.h" />
+    <ClInclude Include="ScpExpressionBlock.h" />
+    <ClInclude Include="ScpExpressionsObject.h" />
+    <ClInclude Include="ScpExtendObjectMgr.h" />
+    <ClInclude Include="ScpFileObject.h" />
+    <ClInclude Include="ScpFunctionObject.h" />
+    <ClInclude Include="ScpGlobalCommandObject.h" />
+    <ClInclude Include="ScpGlobalCommands.h" />
+    <ClInclude Include="ScpGlobalObject.h" />
+    <ClInclude Include="ScpIfStatementObject.h" />
+    <ClInclude Include="ScpIntObject.h" />
+    <ClInclude Include="ScpJsonObject.h" />
+    <ClInclude Include="ScpLex.h" />
+    <ClInclude Include="ScpListObject.h" />
+    <ClInclude Include="ScpMapObject.h" />
+    <ClInclude Include="ScpMemoryObject.h" />
+    <ClInclude Include="ScpNullObject.h" />
+    <ClInclude Include="ScpObject.h" />
+    <ClInclude Include="ScpObjectDefine.h" />
+    <ClInclude Include="ScpObjectFactory.h" />
+    <ClInclude Include="ScpObjectNammes.h" />
+    <ClInclude Include="ScpObjectSpace.h" />
+    <ClInclude Include="ScpObject_uni.h" />
+    <ClInclude Include="ScpOperationMgr.h" />
+    <ClInclude Include="ScpQueueObject.h" />
+    <ClInclude Include="ScpRandomNumberObject.h" />
+    <ClInclude Include="ScpRangeObject.h" />
+    <ClInclude Include="ScpRegExpObject.h" />
+    <ClInclude Include="ScpResourcePool.h" />
+    <ClInclude Include="ScpRuntime.h" />
+    <ClInclude Include="ScpRuntimeStack.h" />
+    <ClInclude Include="ScpScriptCommand.h" />
+    <ClInclude Include="ScpScriptLex.h" />
+    <ClInclude Include="ScpStackObject.h" />
+    <ClInclude Include="ScpStringArrayObject.h" />
+    <ClInclude Include="ScpStringObject.h" />
+    <ClInclude Include="ScpStructObject.h" />
+    <ClInclude Include="ScpTableObject.h" />
+    <ClInclude Include="ScpTimeObject.h" />
+    <ClInclude Include="ScpUserObject.h" />
+    <ClInclude Include="ScpWhileStatementObject.h" />
+    <ClInclude Include="ScriptByteCode.h" />
+    <ClInclude Include="ScriptEngine.h" />
+    <ClInclude Include="ScriptFile.h" />
+    <ClInclude Include="ScriptScanner.h" />
+    <ClInclude Include="stdstringext.hpp" />
+    <ClInclude Include="UIMessage.h" />
+    <ClInclude Include="vectorobjects.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

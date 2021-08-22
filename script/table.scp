@@ -1,0 +1,8 @@
+#scp
+#scpeng
+define:table,t1
+t1.show()
+define:int,xxx,1024
+t1.insert(xxx)
+t1.show()
+

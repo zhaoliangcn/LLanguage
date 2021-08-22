@@ -1,0 +1,8 @@
+LIBRARY "OsAddin"
+	EXPORTS
+		GetObjectCount
+		GetObjectNameId
+		GetUniqObjectIdEx
+		GetObjFactoryEx
+		ExtObjCommandCount
+		ExtObjCommandRegisterFunction

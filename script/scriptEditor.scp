@@ -1,0 +1,6 @@
+#scp
+#scpeng
+define:function,main
+	define:string,s,"ScriptEditor"
+	s.show()
+end

@@ -1,0 +1,8 @@
+#scp
+#scpeng
+define:list,todolist
+define:string,s,"learn"
+todolist.append(s)
+todolist.show()
+s.show()
+

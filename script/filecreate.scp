@@ -1,0 +1,8 @@
+#scp
+#scpeng
+define:file,file1,"/home/n1/2/bin/temp/test.txt"
+file1.create()
+file1.write("123456")
+file1.show()
+file1.close()
+

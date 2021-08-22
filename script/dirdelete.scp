@@ -1,0 +1,4 @@
+#scp
+#scpeng
+define:directory,d,"/home/n1/2/bin/temp/"
+d.delete()

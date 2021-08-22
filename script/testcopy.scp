@@ -1,0 +1,8 @@
+#scp
+#scpeng
+define:file,f1,"/home/coder/ScpLinux/ScritpEngine/hello.scp"
+f1.open()
+f1.show()
+f1.copy("/home/coder/ScpLinux/ScritpEngine/hello2.scp")
+f1.close()
+

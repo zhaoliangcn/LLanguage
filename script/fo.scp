@@ -1,0 +1,6 @@
+#scp
+#scpeng
+define:file,fo
+fo.open("/tmp/test.txt")
+fo<<"test"
+fo.close()

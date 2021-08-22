@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=lscript editor
+Comment=lscript editor  
+Exec=/usr/local/bin/qeditor.sh %F
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=
+Categories=Development
+

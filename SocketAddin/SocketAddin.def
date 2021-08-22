@@ -1,0 +1,8 @@
+LIBRARY "SocketAddin"
+	EXPORTS
+	GetObjectCount
+	GetObjectNameId
+	GetUniqObjectIdEx
+	GetObjFactoryEx
+	ExtObjCommandCount
+	ExtObjCommandRegisterFunction

@@ -1,0 +1,38 @@
+LIBRARY ScriptEngineDll.dll
+	EXPORTS
+	ScriptEngineDoString @1
+	ScriptEngineDoScriptFile @2
+	ScriptEngineDebugScriptFile @3
+	ScriptEngineDebugMemoryScript @4
+	CreateScriptEngine @5
+	LoadScript @6
+	ScriptObjectToWString @7
+	ScriptObjectToInt @8
+	ScriptObjectToDouble @9
+	ScriptObjectToInt64 @10
+	ScriptCallFunction @11
+	CloseScriptEngine @12
+	ScriptRegisterUICallBack @13
+	ScriptRegisterUIStepCallBack @14
+	ScriptGetCurrentCommandLine @15
+	ScriptEnumObjects @16
+	ScriptDoScript @17
+	ScriptDebugMemoryScript @18
+	ScriptAddBreakPoints @19
+	ScriptEraseBreakPoint @20
+	ScriptDumpObject @21
+	ScriptDumpScript @22
+	ScriptSetDebugEvent @23
+	ScriptReadScript @24
+	ScriptReleaseScript @25
+	ScriptReleaseObjects @26
+	ScriptRegisterGlobalCommand @27
+	ScriptDoByteCode @28
+	ScriptSetJit @29
+	ScriptDumpByteCode @30
+	ScriptDoString @31
+	ScriptSetDebugger @32
+	ScriptSetScriptFileName @33
+	ScriptGetObjectType @34
+	ScriptGetObjectFuncList @35
+	

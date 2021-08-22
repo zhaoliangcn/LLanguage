@@ -1,0 +1,10 @@
+#scp
+#scpeng
+load:extobj,os
+define:osinfo,info_aarch64
+(info_aarch64.get(ip)).show()
+
+(info_aarch64.get(ip,"wlan0")).show()
+
+(info_aarch64.get(ip,"ens33")).show()
+

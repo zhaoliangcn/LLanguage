@@ -1,0 +1,7 @@
+#scp
+#scpeng
+define:directory,d,"/home/n1/2/bin/temp/"
+define:string,d2,"/home/n1/2/bin/temp1/"
+d.open()
+d.copy(d2)
+

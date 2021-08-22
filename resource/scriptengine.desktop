@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=lscript engine
+Comment=lscript virtual machine 
+Exec=/usr/local/bin/engine.sh %F
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=
+Categories=Development
+

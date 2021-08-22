@@ -1,0 +1,11 @@
+#scp
+#scpeng
+define:int,x,1000
+define:int,y,25
+define:int,count,10000
+while(count>0)
+	(x*y-count).show()
+	count--
+end
+
+

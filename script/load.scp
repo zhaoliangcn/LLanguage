@@ -1,0 +1,6 @@
+#scp
+#scpeng
+load:extobj,Zip
+define:ZipPackage,zip1
+zip1.show()
+

@@ -1,0 +1,6 @@
+#scp
+#scpeng
+load:extobj,os
+define:computer,com
+com.shutdown()
+

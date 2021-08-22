@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-scp">
+    <comment>lscript source</comment>
+    <glob pattern="*.scp"/>
+  </mime-type>
+	<mime-type type="application/x-scpb">
+    <comment>lscript bytecode</comment>
+    <glob pattern="*.scpb"/>
+  </mime-type>
+</mime-info>

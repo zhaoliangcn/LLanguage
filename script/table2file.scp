@@ -1,0 +1,37 @@
+#scp
+#scpeng
+define:table,t1
+t1.show()
+define:int,xxx,1024
+t1.insert(xxx)
+define:string,sss,"byte"
+t1.insert(sss)
+//t1.show()
+
+define:file,ft1,"/home/n1/2/bin/temp/tablecontent.txt"
+ft1.create()
+//this will make an plain text file
+ft1<<xxx.transform(string)
+ft1<<sss
+ft1.show()
+ft1.close()
+
+define:file,ft2,"/home/n1/2/bin/temp/binaryfile"
+ft2.create()
+//this will make an binary file
+ft2<<xxx
+ft2<<xxx*2
+ft2.seek(0)
+define:int,x2
+define:int,x3
+ft2.read(x2)
+//ft2.seek(4)
+ft2.read(x3)
+//ft2.show()
+x2.show()
+x3.show()
+
+
+
+
+
