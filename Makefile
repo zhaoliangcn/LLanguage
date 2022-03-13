@@ -20,6 +20,14 @@ dist:
 	sudo cp ./resource/*.desktop /usr/share/applications
 	sudo cp ./resource/*.sh /usr/local/bin
 	sudo update-mime-database /usr/share/mime
+bin:
+	mkdir -p bin/Addin
+	cp ./ScritpEngine/scriptengine ./bin
+	cp ./ScriptEngineDll/libScriptEngineDll.so ./bin
+	cp ./SocketAddin/libsocketAddin.so ./bin/Addin
+	cp ./OsInfoAddin/libosAddin.so ./bin/Addin
+test:
+	bin/scriptengine script/hello.scp
 clean:
 	make clean -C ./EasyJson/EasyJson
 	rm -f ./ScriptEngineLib/ScpNumberObject.cpp ./ScriptEngineLib/ScpStateObject.cpp ./ScriptEngineLib/ScpScriptTranslate.cpp ./ScriptEngineLib/ScpDebugger.cpp 
