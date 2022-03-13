@@ -17,4 +17,10 @@ jobs:
       run: make clean
     - name: make
       run: make
+    - name: make bin
+      run: make bin
+    - name: make test
+      run: make test
+      
+      
 
