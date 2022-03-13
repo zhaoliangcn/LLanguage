@@ -7,6 +7,7 @@ all:
 	make -C ./ScriptEngineDll
 	#make -C ./QScriptEditor -f QMakefile
 	make -C ./SocketAddin
+	make -C ./OsInfoAddin
 	#make -C ./ZipAddin
 dist:
 	mkdir -p bin/Addin
