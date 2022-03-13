@@ -10,7 +10,7 @@ all:
 	#make -C ./ZipAddin
 dist:
 	mkdir -p bin/Addin
-	cp ./ScritpEngine/scriptengine ./bin
+	cp ./ScriptEngine/scriptengine ./bin
 	cp ./ScriptEngineDll/libScriptEngineDll.so ./bin
 	cp ./SocketAddin/libsocketAddin.so ./bin/Addin
 	#cp ./ZipAddin/libZipAddin.so ./bin/Addin
@@ -22,7 +22,7 @@ dist:
 	sudo update-mime-database /usr/share/mime
 bin:
 	mkdir -p bin/Addin
-	cp ./ScritpEngine/scriptengine ./bin
+	cp ./ScriptEngine/scriptengine ./bin
 	cp ./ScriptEngineDll/libScriptEngineDll.so ./bin
 	cp ./SocketAddin/libsocketAddin.so ./bin/Addin
 	cp ./OsInfoAddin/libosAddin.so ./bin/Addin
