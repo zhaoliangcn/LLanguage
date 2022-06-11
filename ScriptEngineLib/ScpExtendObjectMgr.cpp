@@ -395,7 +395,7 @@ BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalComm
 
 	get_executable_path(ExtensionPath, NULL, 4096);
 	strcat(ExtensionPath, "Addin/");
-	char chBuf[4096];
+	char chBuf[PATH_MAX*2];
 	DIR * dir = NULL;
 	struct dirent *ptr;
 	int ret = 0;
@@ -418,7 +418,7 @@ BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalComm
 		}
 		if (strcasecmp(ptr->d_name, STDSTRINGEXT::W2UTF(szModuleFullName).c_str()) == 0)
 		{
-			snprintf(chBuf, 4096, "%s/%s", ExtensionPath, ptr->d_name);
+			snprintf(chBuf, PATH_MAX*2, "%s/%s", ExtensionPath, ptr->d_name);
 			bRet = LoadExtensions(STDSTRINGEXT::UTF2W(chBuf).c_str(), scpglobalcommands);
 		}
 	}
