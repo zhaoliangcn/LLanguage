@@ -148,7 +148,7 @@ std::string Int64ToString(__int64 value)
 #ifdef _WIN32			
 		sprintf(Buffer,"%I64d",value);
 #else 
-		sprintf(Buffer,"%I64d",value);
+		sprintf(Buffer,"%ld",value);
 #endif
 	temp=Buffer;
 	return temp;
