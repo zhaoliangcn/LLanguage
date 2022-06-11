@@ -1,13 +1,13 @@
 all:
-	make -C ./EasyJson/EasyJson
+	$(MAKE) -C ./EasyJson/EasyJson
 	rm -f ./ScriptEngineLib/ScpNumberObject.cpp ./ScriptEngineLib/ScpStateObject.cpp ./ScriptEngineLib/ScpScriptTranslate.cpp ./ScriptEngineLib/ScpDebugger.cpp 
-	make -C ./ScriptEngineLib
-	make -C ./ScriptEngine
+	$(MAKE) -C ./ScriptEngineLib
+	$(MAKE) -C ./ScriptEngine
 	rm -f ./ScriptEngineDll/dllmain.cpp
-	make -C ./ScriptEngineDll
+	$(MAKE) -C ./ScriptEngineDll
 	#make -C ./QScriptEditor -f QMakefile
-	make -C ./SocketAddin
-	make -C ./OsInfoAddin
+	$(MAKE) -C ./SocketAddin
+	$(MAKE) -C ./OsInfoAddin
 	#make -C ./ZipAddin
 dist:
 	mkdir -p bin/Addin
@@ -30,14 +30,14 @@ bin:
 test:
 	bin/scriptengine script/hello.scp
 clean:
-	make clean -C ./EasyJson/EasyJson
+	$(MAKE) clean -C ./EasyJson/EasyJson
 	rm -f ./ScriptEngineLib/ScpNumberObject.cpp ./ScriptEngineLib/ScpStateObject.cpp ./ScriptEngineLib/ScpScriptTranslate.cpp ./ScriptEngineLib/ScpDebugger.cpp 
-	make clean -C ./ScriptEngineLib
-	make clean -C ./ScriptEngine
+	$(MAKE) clean -C ./ScriptEngineLib
+	$(MAKE) clean -C ./ScriptEngine
 	rm -f ./ScriptEngineDll/dllmain.cpp
-	make clean -C ./ScriptEngineDll
+	$(MAKE) clean -C ./ScriptEngineDll
 	#make clean -C ./QScriptEditor -f QMakefile
-	make clean -C ./SocketAddin
+	$(MAKE) clean -C ./SocketAddin
 	#make clean -C ./ZipAddin
-	make clean -C ./OsInfoAddin
+	$(MAKE) clean -C ./OsInfoAddin
 	rm -fr ./bin
