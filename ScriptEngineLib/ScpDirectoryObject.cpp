@@ -143,8 +143,8 @@ bool copy_dir(const char * source,const char * dest)
 
         while((p_dirent=readdir(p_dir)) != NULL)
         {
-            char read_buffer[PATH_MAX];
-            char write_buffer[PATH_MAX];
+            char read_buffer[PATH_MAX*2];
+            char write_buffer[PATH_MAX*2];
             sprintf(read_buffer,"%s%s", read_buf, p_dirent->d_name);
             sprintf(write_buffer,"%s%s", write_buf, p_dirent->d_name);
             if( is_dir(read_buffer) && 0 != strcmp(p_dirent->d_name, ".") && 0 != strcmp(p_dirent->d_name, "..") )
