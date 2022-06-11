@@ -1,0 +1,3 @@
+[submodule "EasyJson"]
+	path = EasyJson
+	url = https://github.com/zhaoliangcn/CppEasyJson.git
