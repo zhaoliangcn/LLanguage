@@ -1,3 +1,4 @@
+BUILD?=DEBUG
 all:
 	$(MAKE) -C ./EasyJson/EasyJson
 	rm -f ./ScriptEngineLib/ScpNumberObject.cpp ./ScriptEngineLib/ScpStateObject.cpp ./ScriptEngineLib/ScpScriptTranslate.cpp ./ScriptEngineLib/ScpDebugger.cpp 

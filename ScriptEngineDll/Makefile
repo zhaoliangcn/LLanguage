@@ -1,5 +1,9 @@
+BUILD?=DEBUG
 CC := g++
-CFLAGS := -std=c++11 -g -Wno-attributes -Wno-deprecated -fPIC
+CFLAGS := -std=c++11 -Wno-attributes -Wno-deprecated -fPIC
+ifeq ($(BUILD),DEBUG)
+CFLAGS+= -g 
+endif
 TARGET := libScriptEngineDll.so
 SRCS := $(wildcard *.cpp)
 OBJS := $(patsubst %cpp,%o,$(SRCS))

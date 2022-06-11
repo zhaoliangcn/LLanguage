@@ -1,6 +1,10 @@
-CPPFLAGS:=-g -Wno-attributes -fPIC -std=c++11 -Wno-deprecated
+BUILD?=DEBUG
+CPPFLAGS:=-Wno-attributes -fPIC -std=c++11 -Wno-deprecated
+ifeq ($(BUILD),DEBUG)
+CPPFLAGS+=-g
+endif
 all:OsInfoAddin.o ScpOsInfoObject.o ScpOsInfoObject.o ScpComputerObject.o ScpClipboardObject.o ScpPipeObject.o ScpProcObject.o ScpShareMemoryObject.o ScpThreadObject.o ScpTimerObject.o
-	g++ -g -Wno-attributes -fPIC -shared -std=c++11 -o libosAddin.so OsInfoAddin.o ScpOsInfoObject.o ScpComputerObject.o ScpClipboardObject.o ScpPipeObject.o ScpProcObject.o ScpShareMemoryObject.o ScpThreadObject.o ScpTimerObject.o ../ScriptEngineLib/libScriptEngineLib.a
+	g++ $(CPPFLAGS) -shared -o libosAddin.so OsInfoAddin.o ScpOsInfoObject.o ScpComputerObject.o ScpClipboardObject.o ScpPipeObject.o ScpProcObject.o ScpShareMemoryObject.o ScpThreadObject.o ScpTimerObject.o ../ScriptEngineLib/libScriptEngineLib.a
 OsInfoAddin.o:OsInfoAddin.cpp OsInfoAddin.h
 	g++ $(CPPFLAGS) -c OsInfoAddin.cpp
 ScpOsInfoObject.o:ScpOsInfoObject.cpp ScpOsInfoObject.h
