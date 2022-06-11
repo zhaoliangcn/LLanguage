@@ -34,6 +34,25 @@ public:
 	typedef void (__stdcall *STDAPICAll5_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD);
 	typedef void (__stdcall *STDAPICAll6_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
 #else
+#ifdef Linux64
+	typedef unsigned long long QWORD;
+	typedef QWORD (__stdcall *STDAPICAll0)();
+	typedef QWORD (__stdcall *STDAPICAll1)(QWORD);
+	typedef QWORD (__stdcall *STDAPICAll2)(QWORD, QWORD);
+	typedef QWORD (__stdcall *STDAPICAll3)(QWORD, QWORD, QWORD);
+	typedef QWORD (__stdcall *STDAPICAll4)(QWORD, QWORD, QWORD, QWORD);
+	typedef QWORD (__stdcall *STDAPICAll5)(QWORD, QWORD, QWORD, QWORD, QWORD);
+	typedef QWORD (__stdcall *STDAPICAll6)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
+
+
+	typedef void (__stdcall *STDAPICALL0_NORET)();
+	typedef void (__stdcall *STDAPICALL1_NORET)(QWORD);
+	typedef void (__stdcall *STDAPICALL2_NORET)(QWORD, QWORD);
+	typedef void (__stdcall *STDAPICAll3_NORET)(QWORD, QWORD, QWORD);
+	typedef void (__stdcall *STDAPICAll4_NORET)(QWORD, QWORD, QWORD, QWORD);
+	typedef void (__stdcall *STDAPICAll5_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD);
+	typedef void (__stdcall *STDAPICAll6_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
+#else
 	typedef DWORD(__stdcall *STDAPICAll0)();
 	typedef DWORD(__stdcall *STDAPICAll1)(DWORD);
 	typedef DWORD(__stdcall *STDAPICAll2)(DWORD, DWORD);
@@ -51,7 +70,7 @@ public:
 	typedef void(__stdcall *STDAPICAll5_NORET)(DWORD, DWORD, DWORD, DWORD, DWORD);
 	typedef void(__stdcall *STDAPICAll6_NORET)(DWORD, DWORD, DWORD, DWORD, DWORD, DWORD);
 #endif
-
+#endif
 	ScpCFunctionObject();
 	~ScpCFunctionObject();
 	virtual void Show(CScriptEngine * engine);

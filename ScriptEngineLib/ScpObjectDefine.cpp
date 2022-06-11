@@ -242,7 +242,11 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			else if (ObjHandle == type)
 			{
 				ScpObjHandle *obj = new ScpObjHandle;
+#ifdef Linux64
+				obj->Value = (HANDLE)StringToInt64(content);
+#else
 				obj->Value = (HANDLE)StringToInt(content);
+#endif
 				currentObjectSpace->AddObject(userobjname, obj);
 			}
 			else if (ObjPointerofChar == type)
@@ -284,7 +288,11 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			else if (ObjPointer == type)
 			{
 				ScpObjPointer *obj = new ScpObjPointer;
+#ifdef Linux64
+				obj->Value = (void *)StringToInt64(content);
+#else
 				obj->Value = (void *)StringToInt(content);
+#endif
 				currentObjectSpace->AddObject(userobjname, obj);
 			}
 			else if (ObjCChar == type)
