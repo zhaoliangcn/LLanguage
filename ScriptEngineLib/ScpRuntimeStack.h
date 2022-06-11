@@ -25,9 +25,9 @@ public:
 		ScpObject * obj = objstack.top();
 		return obj;
 	}
-	void IsEmpty()
+	bool IsEmpty()
 	{
-		objstack.empty();
+		return objstack.empty();
 	}
 	void Clear()
 	{
