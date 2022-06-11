@@ -41,12 +41,12 @@ unsigned long ScpResourcePool::scpFindResource(const std::wstring & resource)
 	}
 	return -1;
 }
-std::wstring & ScpResourcePool::scpGetResource(unsigned long id)
+const wchar_t * ScpResourcePool::scpGetResource(unsigned long id)
 {
-	std::wstring temp;
+	
 	if(id>=0 && id< pool.size())
-		return pool.at(id);
-	return temp;
+		return pool.at(id).c_str();
+	return nullptr;
 }
 
 void ScpResourcePool::unMapResource(unsigned long id)

@@ -10,7 +10,7 @@ public:
     ~ScpResourcePool();
     unsigned long AppendResource(const std::wstring & resource);
     unsigned long scpFindResource(const std::wstring & resource);
-    std::wstring & scpGetResource(unsigned long id);
+    const wchar_t * scpGetResource(unsigned long id);
     void unMapResource(unsigned long id);
     void setMappedObject(unsigned long id, ScpObject * obj);
     ScpObject * getMappedObject(unsigned long id);

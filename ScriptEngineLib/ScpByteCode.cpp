@@ -687,7 +687,7 @@ unsigned char * ScpByteCode::DoLoad(unsigned char * pByteCode)
 	unsigned int  resid2 = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID);
 	if (objtype == ObjExt)
 	{
-		engine->extend_obj_mgr.LoadExtension(respool.scpGetResource(resid2).c_str(), &engine->globalcommand);
+		engine->extend_obj_mgr.LoadExtension(respool.scpGetResource(resid2), &engine->globalcommand);
 	}
 
 	return nextByteCode;
