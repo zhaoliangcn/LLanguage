@@ -8,7 +8,7 @@
 ```shell
 apt install make g++
 
-git clone https://github.com/zhaoliangcn/llanguage.git
+git clone https://github.com/zhaoliangcn/llanguage.git --recursive
 
 cd llanguage
 
