@@ -5,8 +5,8 @@
 #include "../ScriptEngineLib/ScpObjectNammes.h"
 #include "../ScriptEngineLib/commanddefine_uni.h"
 
-const static std::wstring scpConnectionTypeTCP = L"TCP";
-const static std::wstring scpConnectionTypeUDP = L"UDP";
+const static char * scpConnectionTypeTCP = "TCP";
+const static char * scpConnectionTypeUDP = "UDP";
 #ifdef _WIN32
 #pragma comment (lib,"ws2_32.lib")
 #else
@@ -22,22 +22,21 @@ ScpObject *  __stdcall NetConnectionObjFactory(VTPARAMETERS * paramters, CScript
 		ScpObject * netcoon = new ScpNetConnectionObject();
 		((ScpNetConnectionObject*)netcoon)->connectionType = paramters->at(2);
 		return netcoon;
-	}
-	return NULL;	
+	}	
 }
 BOOL WINAPI NetConnection_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 {
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 1)
 	{
-		std::wstring text = vtparameters->at(0);
+		std::string text = vtparameters->at(0);
 
 		ScpObject *obj = (ScpObject *)currentObjectSpace->FindObject(text);
 		if (obj)
 		{
 			if (obj->GetType() == ObjNetConnection)
 			{
-				std::wstring func = scpcommand_en_shutdown;
+				std::string func = scpcommand_en_shutdown;
 				((ScpNetConnectionObject*)obj)->CallInnerFunction(func, NULL, engine);
 				return TRUE;
 			}
@@ -45,15 +44,15 @@ BOOL WINAPI NetConnection_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptE
 	}
 	else if (vtparameters->size() == 2)
 	{
-		std::wstring strobj = vtparameters->at(0);
-		std::wstring text = vtparameters->at(1);
+		std::string strobj = vtparameters->at(0);
+		std::string text = vtparameters->at(1);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 		if (ObjNetConnection == type)
 		{
 			ScpNetConnectionObject *netconn = (ScpNetConnectionObject*)currentObjectSpace->FindObject(text);
 			if (netconn)
 			{
-				std::wstring func = scpcommand_en_shutdown;
+				std::string func = scpcommand_en_shutdown;
 				((ScpNetConnectionObject*)netconn)->CallInnerFunction(func, NULL, engine);
 				return TRUE;
 			}
@@ -66,8 +65,8 @@ BOOL WINAPI NetConnection_Connect_Command(VTPARAMETERS * vtparameters, CScriptEn
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring strobj1 = vtparameters->at(0);
-		std::wstring strobj2 = vtparameters->at(1);
+		std::string strobj1 = vtparameters->at(0);
+		std::string strobj2 = vtparameters->at(1);
 		ScpObject *obj1 = currentObjectSpace->FindObject(strobj1);
 		if (obj1)
 		{
@@ -76,7 +75,7 @@ BOOL WINAPI NetConnection_Connect_Command(VTPARAMETERS * vtparameters, CScriptEn
 				ScpObject *addrobj = currentObjectSpace->FindObject(strobj2);
 				if (addrobj->GetType() == ObjAddress)
 				{
-					std::wstring func = scpcommand_en_connect;
+					std::string func = scpcommand_en_connect;
 					VTPARAMETERS param;
 					param.push_back(strobj2);
 					((ScpNetConnectionObject *)obj1)->CallInnerFunction(func, &param, engine);
@@ -93,12 +92,12 @@ BOOL WINAPI NetConnection_Send_Command(VTPARAMETERS * vtparameters, CScriptEngin
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring conn = vtparameters->at(0);
-		std::wstring content = vtparameters->at(1);
+		std::string conn = vtparameters->at(0);
+		std::string content = vtparameters->at(1);
 		ScpNetConnectionObject *connobj = (ScpNetConnectionObject *)currentObjectSpace->FindObject(conn);
 		if (connobj)
 		{
-			//std::wstring func = scpcommand_en_send;
+			//std::string func = scpcommand_en_send;
 			//VTPARAMETERS param;
 			//param.push_back(content);
 			//connobj->CallInnerFunction(func, &param, engine);
@@ -128,12 +127,12 @@ BOOL WINAPI NetConnection_Receive_Command(VTPARAMETERS * vtparameters, CScriptEn
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring conn = vtparameters->at(0);
-		std::wstring content = vtparameters->at(1);
+		std::string conn = vtparameters->at(0);
+		std::string content = vtparameters->at(1);
 		ScpNetConnectionObject *connobj = (ScpNetConnectionObject *)currentObjectSpace->FindObject(conn);
 		if (connobj)
 		{
-			//std::wstring func = scpcommand_en_receive;
+			//std::string func = scpcommand_en_receive;
 			//VTPARAMETERS param;
 			//param.push_back(content);
 			//connobj->CallInnerFunction(func, &param, engine);
@@ -164,12 +163,12 @@ BOOL WINAPI NetConnection_Watch_Command(VTPARAMETERS * vtparameters, CScriptEngi
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring conn = vtparameters->at(0);
-		std::wstring content = vtparameters->at(1);
+		std::string conn = vtparameters->at(0);
+		std::string content = vtparameters->at(1);
 		ScpNetConnectionObject *connobj = (ScpNetConnectionObject *)currentObjectSpace->FindObject(conn);
 		if (connobj)
 		{
-			//std::wstring func = scpcommand_en_watch;
+			//std::string func = scpcommand_en_watch;
 			//VTPARAMETERS param;
 			//param.push_back(content);
 			//((ScpNetConnectionObject *)connobj)->CallInnerFunction(func, &param, engine);
@@ -215,8 +214,8 @@ ScpNetConnectionObject::ScpNetConnectionObject(void)
 	int Ret;
 	if ((Ret = WSAStartup(MAKEWORD(2,2), &wsaData)) != 0)
 	{
-		std::wstring text;
-		text=STDSTRINGEXT::Format(L"WSAStartup failed with error %d\n", Ret);
+		std::string text;
+		text=STDSTRINGEXT::Format("WSAStartup failed with error %d\n", Ret);
 		if(_engine)
 		_engine->PrintError(text);
 
@@ -236,8 +235,8 @@ ScpNetConnectionObject::~ScpNetConnectionObject(void)
 #ifdef _WIN32
 	if (WSACleanup() == SOCKET_ERROR)
 	{
-		std::wstring text;
-		text=STDSTRINGEXT::Format(L"WSACleanup failed with error %d\n", WSAGetLastError());
+		std::string text;
+		text=STDSTRINGEXT::Format("WSACleanup failed with error %d\n", WSAGetLastError());
 		if(_engine)
 		_engine->PrintError(text);
 
@@ -249,8 +248,8 @@ void ScpNetConnectionObject::Show(CScriptEngine * engine)
 {
 	LocalAddress.Show(engine);
 	RemoteAddress.Show(engine);
-	std::wstring text;
-	text=STDSTRINGEXT::Format(L"%s",connectionType.c_str());
+	std::string text;
+	text=STDSTRINGEXT::Format("%s",connectionType.c_str());
 	engine->PrintError(text);
 }
 
@@ -272,7 +271,7 @@ int ScpNetConnectionObject::Watch(ScpAddressObject *local)
 		{
 			struct sockaddr_in salocaladdr;
 			salocaladdr.sin_family = AF_INET;
-			salocaladdr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(local->GetIp()).c_str());
+			salocaladdr.sin_addr.s_addr = inet_addr(local->GetIp().c_str());
 			salocaladdr.sin_port = htons(local->GetPort());
 			struct sockaddr_in saremoteaddr;
 #ifdef _WIN32
@@ -326,13 +325,13 @@ int ScpNetConnectionObject::Watch(ScpAddressObject *local)
 			}
 			else
 			{
-				RemoteAddress.ip = STDSTRINGEXT::AToW(inet_ntoa(saremoteaddr.sin_addr));
-				wchar_t wport[10]={0};
+				RemoteAddress.ip = inet_ntoa(saremoteaddr.sin_addr);
+				char wport[10]={0};
 				//_itow_s(ntohs(saremoteaddr.sin_port),wport,10);
-				swprintf(wport,10,L"%d",ntohs(saremoteaddr.sin_port));
+				sprintf(wport,"%d",ntohs(saremoteaddr.sin_port));
 				RemoteAddress.port = wport;
 
-				//windows ·Ç×èÈû
+				//windows éžé˜»å¡ž
 				//ULONG mode=1;
 				//ioctlsocket(sock,FIONBIO,&mode);
 
@@ -344,7 +343,7 @@ int ScpNetConnectionObject::Watch(ScpAddressObject *local)
 			LocalAddress = *local;
 			struct sockaddr_in salocaladdr;
 			salocaladdr.sin_family = AF_INET;
-			salocaladdr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(LocalAddress.ip).c_str());
+			salocaladdr.sin_addr.s_addr = inet_addr(LocalAddress.ip.c_str());
 			salocaladdr.sin_port = htons(StringToInt(LocalAddress.port.c_str()));
 			sock = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 			ret = bind(sock, (struct sockaddr *)&salocaladdr, sizeof(salocaladdr));
@@ -361,7 +360,7 @@ int ScpNetConnectionObject::Watch(ScpAddressObject *local)
 	if(ret==-1)
 	{
 		
-		std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorCannotListening.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+		std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorCannotListening,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 		if(_engine)
 		_engine->PrintError(errormessage);
 		//engine->PrintError(scpErrorConnectionTimeOut);
@@ -380,7 +379,7 @@ int ScpNetConnectionObject::Connect(ScpAddressObject * remote)
 		sock = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 		struct sockaddr_in saremoteaddr;
 		saremoteaddr.sin_family = AF_INET;
-		saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(RemoteAddress.GetIp()).c_str());
+		saremoteaddr.sin_addr.s_addr = inet_addr(RemoteAddress.GetIp().c_str());
 		saremoteaddr.sin_port = htons(RemoteAddress.GetPort());
 		ret = connect(sock,(struct sockaddr*)&saremoteaddr,sizeof saremoteaddr);
 	}
@@ -403,7 +402,7 @@ int ScpNetConnectionObject::Send(ScpStringObject * strsrc)
 	{
 		if(sock)
 		{
-			std::string content=STDSTRINGEXT::WToA(strsrc->content);
+			std::string content=strsrc->content;
 			len =send(sock,(const char * )content.c_str(),content.length(),0);
 			if(len==-1)
 			{
@@ -414,9 +413,9 @@ int ScpNetConnectionObject::Send(ScpStringObject * strsrc)
 #else
 				shutdown(sock,2);
 #endif
-				sock = 0;
+				sock=NULL;
 				
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 				if (_engine)
 					_engine->PrintError(errormessage);
 				//engine->PrintError(scpErrorSendFail);
@@ -432,10 +431,10 @@ int ScpNetConnectionObject::Send(ScpStringObject * strsrc)
 		}
 		struct sockaddr_in saremoteaddr;
 		saremoteaddr.sin_family = AF_INET;
-		saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(RemoteAddress.ip).c_str());
+		saremoteaddr.sin_addr.s_addr = inet_addr(RemoteAddress.ip.c_str());
 		saremoteaddr.sin_port = htons(StringToInt(RemoteAddress.port.c_str()));
-		//×Ö·û´®³¤¶È´óÓÚ64KµÄÊ±ºòÐèÒª·Ö¿é´«Êä
-		std::string content=STDSTRINGEXT::WToA(strsrc->content);
+		//å­—ç¬¦ä¸²é•¿åº¦å¤§äºŽ64Kçš„æ—¶å€™éœ€è¦åˆ†å—ä¼ è¾“
+		std::string content=strsrc->content;
 		len=sendto(sock,(const char *)content.c_str(),content.length(),0,(sockaddr*)&saremoteaddr,sizeof saremoteaddr);
 	}
 
@@ -466,9 +465,9 @@ int ScpNetConnectionObject::Send(ScpMemoryObject * memsrc)
 #else
 				shutdown(sock,2);
 #endif
-				sock = 0;
+				sock=NULL;
 				
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 				if (_engine)
 					_engine->PrintError(errormessage);
 				//engine->PrintError(scpErrorSendFail);
@@ -484,7 +483,7 @@ int ScpNetConnectionObject::Send(ScpMemoryObject * memsrc)
 		}
 		struct sockaddr_in saremoteaddr;
 		saremoteaddr.sin_family = AF_INET;
-		saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(RemoteAddress.ip).c_str());
+		saremoteaddr.sin_addr.s_addr = inet_addr(RemoteAddress.ip.c_str());
 		saremoteaddr.sin_port = htons(StringToInt(RemoteAddress.port.c_str()));
 		len=sendto(sock,(char *)memsrc->Address,memsrc->GetSize(),0,(sockaddr*)&saremoteaddr,sizeof saremoteaddr);
 	}
@@ -527,9 +526,9 @@ int ScpNetConnectionObject::Receive(ScpMemoryObject * memdst)
 #else
 				shutdown(sock,2);
 #endif
-				sock = 0 ;	
+				sock=NULL;	
 				
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 				if(error==10054)
 				{
 					if (_engine)
@@ -547,7 +546,7 @@ int ScpNetConnectionObject::Receive(ScpMemoryObject * memdst)
 	}
 	else if(scpConnectionTypeUDP==connectionType)
 	{
-		//UDPÐ­ÒéÒ»´Î½ÓÊÕµÄÊý¾Ý±ØÐëÐ¡ÓÚ65535×Ö½Ú
+		//UDPåè®®ä¸€æ¬¡æŽ¥æ”¶çš„æ•°æ®å¿…é¡»å°äºŽ65535å­—èŠ‚
 		struct sockaddr_in saremoteaddr;
 		char * buffer = new char[BufferSize];
 		memset(buffer,0,BufferSize);
@@ -570,10 +569,10 @@ int ScpNetConnectionObject::Receive(ScpMemoryObject * memdst)
 					memcpy(memdst->Address,buffer,len);
 				}				
 			}
-			RemoteAddress.ip = STDSTRINGEXT::AToW(inet_ntoa(saremoteaddr.sin_addr));
-			wchar_t wport[10]={0};
+			RemoteAddress.ip =inet_ntoa(saremoteaddr.sin_addr);
+			char wport[10]={0};
 			//_itow_s(ntohs(saremoteaddr.sin_port),wport,10);
-			swprintf(wport,10,L"%d",ntohs(saremoteaddr.sin_port));
+			sprintf(wport,"%d",ntohs(saremoteaddr.sin_port));
 			RemoteAddress.port = wport;
 			delete[] buffer;
 
@@ -600,7 +599,7 @@ int ScpNetConnectionObject::Receive(ScpStringObject * strdst)
 					if(len>0)
 					{
 						buffer[len]=0;
-						strdst->content=STDSTRINGEXT::AToW(std::string(buffer));
+						strdst->content=std::string(buffer);
 					}	
 					else
 					{
@@ -621,11 +620,11 @@ int ScpNetConnectionObject::Receive(ScpStringObject * strdst)
 #else
 				shutdown(sock,2);
 #endif
-				sock = 0;
+				sock=NULL;
 				if(strdst && strdst->GetType()==ObjString)
-					strdst->content=L"";
+					strdst->content="";
 				
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 				if(error==10054)
 				{
 					if (_engine)
@@ -664,7 +663,7 @@ int ScpNetConnectionObject::Receive(ScpStringObject * strdst)
 				if(len>0)
 				{
 					buffer[len]=0;
-					strdst->content=STDSTRINGEXT::AToW(buffer);	
+					strdst->content=buffer;	
 				}
 				else
 				{
@@ -673,9 +672,9 @@ int ScpNetConnectionObject::Receive(ScpStringObject * strdst)
 					error = WSAGetLastError();
 #endif
 					if(strdst && strdst->GetType()==ObjString)
-						strdst->content=L"";	
+						strdst->content="";	
 					
-					std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+					std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 					if(error==10054)
 					{
 						if (_engine)
@@ -688,10 +687,10 @@ int ScpNetConnectionObject::Receive(ScpStringObject * strdst)
 					}
 				}
 			}
-			RemoteAddress.ip = STDSTRINGEXT::AToW(inet_ntoa(saremoteaddr.sin_addr));
-			wchar_t wport[10]={0};
+			RemoteAddress.ip = inet_ntoa(saremoteaddr.sin_addr);
+			char wport[10]={0};
 			//_itow_s(ntohs(saremoteaddr.sin_port),wport,10);
-			swprintf(wport,10,L"%d",ntohs(saremoteaddr.sin_port));
+			sprintf(wport,"%d",ntohs(saremoteaddr.sin_port));
 			RemoteAddress.port = wport;
 			delete[] buffer;
 
@@ -735,9 +734,9 @@ int  ScpNetConnectionObject::Send(ScpObject * srcObj)
 #else
 				shutdown(sock,2);
 #endif
-				sock = 0;
+				sock=NULL;
 				
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 				if (_engine)
 					_engine->PrintError(errormessage);
 				//engine->PrintError(scpErrorSendFail);
@@ -753,7 +752,7 @@ int  ScpNetConnectionObject::Send(ScpObject * srcObj)
 		}
 		struct sockaddr_in saremoteaddr;
 		saremoteaddr.sin_family = AF_INET;
-		saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(RemoteAddress.ip).c_str());
+		saremoteaddr.sin_addr.s_addr = inet_addr(RemoteAddress.ip.c_str());
 		saremoteaddr.sin_port = htons(StringToInt(RemoteAddress.port.c_str()));
 		if(srcObj->GetType()==ObjFile)
 		{
@@ -806,9 +805,9 @@ int  ScpNetConnectionObject::Receive(ScpObject * destObj)
 #else
 				shutdown(sock,2);
 #endif
-				sock = 0;		
+				sock=NULL;		
 				
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 				if(error==10054)
 				{
 					if (_engine)
@@ -846,10 +845,10 @@ int  ScpNetConnectionObject::Receive(ScpObject * destObj)
 				ScpFileObject * FileObj = (ScpFileObject *)destObj;
 				FileObj->write(0, len,FileObj->content);
 			}			
-			RemoteAddress.ip = STDSTRINGEXT::AToW(inet_ntoa(saremoteaddr.sin_addr));
-			wchar_t wport[10]={0};
+			RemoteAddress.ip = inet_ntoa(saremoteaddr.sin_addr);
+			char wport[10]={0};
 			//_itow_s(ntohs(saremoteaddr.sin_port),wport,10);
-			swprintf(wport,10,L"%d",ntohs(saremoteaddr.sin_port));
+			sprintf(wport,"%d",ntohs(saremoteaddr.sin_port));
 			RemoteAddress.port = wport;
 			delete[] buffer;
 
@@ -857,7 +856,7 @@ int  ScpNetConnectionObject::Receive(ScpObject * destObj)
 	}
 	return len;
 }
-ScpObject * ScpNetConnectionObject::Clone(std::wstring strObjName)
+ScpObject * ScpNetConnectionObject::Clone(std::string strObjName)
 {
 	ScpNetConnectionObject * obj = new ScpNetConnectionObject;
 	if (obj)
@@ -869,9 +868,9 @@ ScpObject * ScpNetConnectionObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpNetConnectionObject::ToString()
+std::string ScpNetConnectionObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 
 	temp = LocalAddress.ToString();
 	temp +=RemoteAddress.ToString();
@@ -883,7 +882,7 @@ void ScpNetConnectionObject::Release()
 {
 	delete this;
 }
-bool ScpNetConnectionObject::IsInnerFunction(std::wstring & functionname)
+bool ScpNetConnectionObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -891,7 +890,7 @@ bool ScpNetConnectionObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpNetConnectionObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpNetConnectionObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	ScpObjectNames::GetSingleInsatnce()->SelectLanguage(engine->GetLanguge());
 
@@ -910,10 +909,10 @@ int ScpNetConnectionObject::DisConnect()
 	{
 #ifdef WIN32
 		ret =  closesocket(sock);
-#else
+		#else
 		ret = close(sock);
-#endif
-		sock = 0;
+		#endif
+		sock=NULL;
 	}	
 	if(nsock)
 	{
@@ -923,7 +922,7 @@ int ScpNetConnectionObject::DisConnect()
 		#else
 		ret = close(nsock);
 		#endif
-		nsock = 0;
+		nsock=NULL;
 	}
 	return ret;
 }
@@ -938,7 +937,7 @@ ScpObject * ScpNetConnectionObject::InnerFunction_Get(ScpObject * thisObject, VT
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -967,24 +966,24 @@ ScpObject * ScpNetConnectionObject::InnerFunction_send(ScpObject * thisObject, V
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpObject * addrobj = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (addrobj && addrobj->GetType() == ObjString)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Send((ScpStringObject *)addrobj);
 			return obj;
 		}
 		else if (addrobj && addrobj->GetType() == ObjMemory)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Send((ScpMemoryObject *)addrobj);
 			return obj;
 		}
 		else if (addrobj && addrobj->GetType() == ObjFile)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Send((ScpFileObject *)addrobj);
 			return obj;
 		}
@@ -996,24 +995,24 @@ ScpObject * ScpNetConnectionObject::InnerFunction_receive(ScpObject * thisObject
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpStringObject * addrobj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (addrobj && addrobj->GetType() == ObjString)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Receive((ScpStringObject *)addrobj);
 			return obj;
 		}
 		else if (addrobj && addrobj->GetType() == ObjMemory)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Receive((ScpMemoryObject *)addrobj);
 			return obj;
 		}
 		else if (addrobj && addrobj->GetType() == ObjFile)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Receive((ScpFileObject *)addrobj);
 			return obj;
 		}
@@ -1025,12 +1024,12 @@ ScpObject * ScpNetConnectionObject::InnerFunction_watch(ScpObject * thisObject, 
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpAddressObject * addrobj = (ScpAddressObject *)engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (addrobj && addrobj->GetType() == ObjAddress)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject *)(ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Watch(addrobj);
 			return obj;
 		}
@@ -1042,12 +1041,12 @@ ScpObject * ScpNetConnectionObject::InnerFunction_connect(ScpObject * thisObject
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpAddressObject * addrobj = (ScpAddressObject *)engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (addrobj && addrobj->GetType() == ObjAddress)
 		{
-			ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+			ScpIntObject * obj = (ScpIntObject *)(ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 			obj->value = ((ScpNetConnectionObject*)thisObject)->Connect(addrobj);
 			return obj;
 		}
@@ -1057,7 +1056,7 @@ ScpObject * ScpNetConnectionObject::InnerFunction_connect(ScpObject * thisObject
 
 ScpObject * ScpNetConnectionObject::InnerFunction_shutdown(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
-	ScpIntObject * obj = (ScpIntObject *)BaseObjectFactory(ObjInt);
+	ScpIntObject * obj = (ScpIntObject *)(ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 	obj->value = ((ScpNetConnectionObject*)thisObject)->DisConnect();
 	return obj;
 

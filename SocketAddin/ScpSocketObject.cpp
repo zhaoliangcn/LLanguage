@@ -12,6 +12,7 @@
 #else
 #define INVALID_SOCKET (-1)
 #define wcsicmp wcscasecmp
+#define _stricmp strcasecmp
 #endif
 ScpObject *  __stdcall SocketObjFactory(VTPARAMETERS * paramters, CScriptEngine * engine)
 {
@@ -54,6 +55,9 @@ ScpSocketObject::ScpSocketObject(void):sock(0),_engine(NULL)
 
 	BindObjectInnerFuction(scpcommand_cn_shutdown, InnerFunction_shutdown);
 	BindObjectInnerFuction(scpcommand_en_shutdown, InnerFunction_shutdown);
+
+	BindObjectInnerFuction(scpcommand_cn_close, InnerFunction_shutdown);
+	BindObjectInnerFuction(scpcommand_en_close, InnerFunction_shutdown);
 	
 	BindObjectInnerFuction(scpcommand_cn_listen, InnerFunction_listen);
 	BindObjectInnerFuction(scpcommand_en_listen, InnerFunction_listen);
@@ -67,8 +71,8 @@ ScpSocketObject::ScpSocketObject(void):sock(0),_engine(NULL)
 	int Ret;
 	if ((Ret = WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0)
 	{
-		std::wstring text;
-		text = STDSTRINGEXT::Format(L"WSAStartup failed with error %d\n", Ret);
+		std::string text;
+		text = STDSTRINGEXT::Format("WSAStartup failed with error %d\n", Ret);
 		if(_engine)
 			_engine->PrintError(text);
 
@@ -90,8 +94,8 @@ ScpSocketObject::~ScpSocketObject(void)
 	}
 	if (WSACleanup() == SOCKET_ERROR)
 	{
-		std::wstring text;
-		text = STDSTRINGEXT::Format(L"WSACleanup failed with error %d\n", WSAGetLastError());
+		std::string text;
+		text = STDSTRINGEXT::Format("WSACleanup failed with error %d\n", WSAGetLastError());
 		if(_engine)
 			_engine->PrintError(text);
 	}
@@ -106,9 +110,9 @@ ScpSocketObject::~ScpSocketObject(void)
 
 void ScpSocketObject::Show(CScriptEngine * engine)  
 {
-	engine->PrintError(L"SOCKET OBJECT EXT");
+	engine->PrintError("SOCKET OBJECT EXT");
 }
-ScpObject * ScpSocketObject::Clone(std::wstring strObjName)
+ScpObject * ScpSocketObject::Clone(std::string strObjName)
 {
 	ScpSocketObject * obj = new ScpSocketObject;
 	if (obj)
@@ -120,15 +124,15 @@ ScpObject * ScpSocketObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }
-std::wstring ScpSocketObject::ToString()
+std::string ScpSocketObject::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 void ScpSocketObject::Release() 
 {
 	delete this;
 }
-bool ScpSocketObject::IsInnerFunction(std::wstring & functionname)
+bool ScpSocketObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -136,7 +140,7 @@ bool ScpSocketObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpSocketObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpSocketObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	_engine = engine;
 	ScpObjectNames::GetSingleInsatnce()->SelectLanguage(engine->GetLanguge());
@@ -161,9 +165,9 @@ int ScpSocketObject::Send(std::string & content,CScriptEngine * engine)
 		{
 			struct sockaddr_in saremoteaddr;
 			saremoteaddr.sin_family = AF_INET;
-			saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(remoteAddress.GetIp()).c_str());
+			saremoteaddr.sin_addr.s_addr = inet_addr(remoteAddress.GetIp().c_str());
 			saremoteaddr.sin_port = htons(remoteAddress.GetPort());
-			//×Ö·û´®³¤¶È´óÓÚ64KµÄÊ±ºòÐèÒª·Ö¿é´«Êä
+			//å­—ç¬¦ä¸²é•¿åº¦å¤§äºŽ64Kçš„æ—¶å€™éœ€è¦åˆ†å—ä¼ è¾“
 			len = sendto(sock, (const char *)content.c_str(), content.length(), 0, (sockaddr*)&saremoteaddr, sizeof saremoteaddr);
 		}
 		if(len==-1)
@@ -175,9 +179,9 @@ int ScpSocketObject::Send(std::string & content,CScriptEngine * engine)
 #else
 			shutdown(sock,2);
 #endif
-			sock = 0;
+			sock=NULL;
 			
-			std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(),error);
+			std::string errormessage = STDSTRINGEXT::Format("%s%s%d",ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail,ScpObjectNames::GetSingleInsatnce()->scpErrorCode,error);
 			engine->PrintError(errormessage);
 			//engine->PrintError(scpErrorSendFail);
 
@@ -202,9 +206,9 @@ int ScpSocketObject::Send(ScpObject * contentobj, CScriptEngine * engine)
 			{
 				struct sockaddr_in saremoteaddr;
 				saremoteaddr.sin_family = AF_INET;
-				saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(remoteAddress.GetIp()).c_str());
+				saremoteaddr.sin_addr.s_addr = inet_addr(remoteAddress.GetIp().c_str());
 				saremoteaddr.sin_port = htons(remoteAddress.GetPort());
-				//×Ö·û´®³¤¶È´óÓÚ64KµÄÊ±ºòÐèÒª·Ö¿é´«Êä
+				//å­—ç¬¦ä¸²é•¿åº¦å¤§äºŽ64Kçš„æ—¶å€™éœ€è¦åˆ†å—ä¼ è¾“
 				len = sendto(sock, (const char *)mem->Address, mem->GetSize(), 0, (sockaddr*)&saremoteaddr, sizeof saremoteaddr);
 			}
 			if (len == -1)
@@ -216,9 +220,9 @@ int ScpSocketObject::Send(ScpObject * contentobj, CScriptEngine * engine)
 #else
 				shutdown(sock, 2);
 #endif
-				sock = 0;
+				sock = NULL;
 
-				std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d", ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(), error);
+				std::string errormessage = STDSTRINGEXT::Format("%s%s%d", ScpObjectNames::GetSingleInsatnce()->scpErrorSendFail, ScpObjectNames::GetSingleInsatnce()->scpErrorCode, error);
 				engine->PrintError(errormessage);
 				//engine->PrintError(scpErrorSendFail);
 
@@ -232,17 +236,17 @@ int ScpSocketObject::Send(ScpObject * contentobj, CScriptEngine * engine)
 int ScpSocketObject::Send(std::wstring & content,CScriptEngine * engine)
 {
 	int len=-1;
-	std::wstring text = STDSTRINGEXT::Format(L"SOCKET OBJECT SEND CONTENT %s",content.c_str());
+	std::string text = STDSTRINGEXT::Format("SOCKET OBJECT SEND CONTENT %s",content.c_str());
 	engine->PrintError(text);
 	std::string realcontent;
-	ScpObject * obj =engine->GetCurrentObjectSpace()->FindObject(content);
+	ScpObject * obj =engine->GetCurrentObjectSpace()->FindObject(STDSTRINGEXT::W2UTF(content));
 	if(obj)
 	{
-		realcontent=STDSTRINGEXT::WToA(((ScpStringObject*)obj)->content);
+		realcontent=((ScpStringObject*)obj)->content;
 	}
 	else
 	{
-		realcontent = STDSTRINGEXT::WToA(content);
+		realcontent = STDSTRINGEXT::W2UTF(content);
 	}	
 	len=Send(realcontent,engine);
 	return len;
@@ -255,7 +259,7 @@ int ScpSocketObject::Bind(ScpObject *  addrobj,CScriptEngine * engine)
 	{
 		struct sockaddr_in salocaladdr;
 		salocaladdr.sin_family = AF_INET;
-		salocaladdr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(local->GetIp()).c_str());
+		salocaladdr.sin_addr.s_addr = inet_addr(local->GetIp().c_str());
 		salocaladdr.sin_port = htons(local->GetPort());
 
 		ret = bind(sock, (struct sockaddr*)&salocaladdr, sizeof salocaladdr);
@@ -264,7 +268,7 @@ int ScpSocketObject::Bind(ScpObject *  addrobj,CScriptEngine * engine)
 	{
 		struct sockaddr_in salocaladdr;
 		salocaladdr.sin_family = AF_INET;
-		salocaladdr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(local->GetIp()).c_str());
+		salocaladdr.sin_addr.s_addr = inet_addr(local->GetIp().c_str());
 		salocaladdr.sin_port = htons(local->GetPort());
 		ret = bind(sock, (struct sockaddr *)&salocaladdr, sizeof(salocaladdr));
 	}
@@ -281,7 +285,7 @@ int ScpSocketObject::Bind(ScpObject *  addrobj,CScriptEngine * engine)
 	address = *local;	
 	return ret;
 }
-int ScpSocketObject::Bind(std::wstring addrobjname,CScriptEngine * engine)
+int ScpSocketObject::Bind(std::string addrobjname,CScriptEngine * engine)
 {
 	int ret = -1;
 	ScpObject * obj=engine->GetCurrentObjectSpace()->FindObject(addrobjname);
@@ -313,7 +317,7 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 					{
 						len = recv(sock, (char *)buffer, BufferSize, 0);
 						buffer[len] = 0;
-						contentstr->content = STDSTRINGEXT::AToW(std::string(buffer));
+						contentstr->content = std::string(buffer);
 					} while (0);
 
 					int error;
@@ -331,9 +335,9 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 #else
 						shutdown(sock, 2);
 #endif
-						sock = 0;
-						contentstr->content = L"";
-						std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d", ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(), error);
+						sock = NULL;
+						contentstr->content = "";
+						std::string errormessage = STDSTRINGEXT::Format("%s%s%d", ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail, ScpObjectNames::GetSingleInsatnce()->scpErrorCode, error);
 						if (error == 10054)
 						{
 							engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorConnectionClosed);
@@ -347,7 +351,7 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 				}
 				else if (scpConnectionTypeUDP == connectionType)
 				{
-					//UDPÐ­ÒéÒ»´Î½ÓÊÕµÄÊý¾Ý±ØÐëÐ¡ÓÚ65535×Ö½Ú
+					//UDPåè®®ä¸€æ¬¡æŽ¥æ”¶çš„æ•°æ®å¿…é¡»å°äºŽ65535å­—èŠ‚
 					struct sockaddr_in saremoteaddr;
 #ifdef _WIN32
 					int addrlen = sizeof saremoteaddr;
@@ -358,11 +362,11 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 					if (len > 0)
 					{
 						buffer[len] = 0;
-						contentstr->content = STDSTRINGEXT::AToW(std::string(buffer));
+						contentstr->content = std::string(buffer);
 					}
-					remoteAddress.ip = STDSTRINGEXT::AToW(inet_ntoa(saremoteaddr.sin_addr));
-					wchar_t wport[10] = { 0 };
-					swprintf(wport, 10, L"%d", ntohs(saremoteaddr.sin_port));
+					remoteAddress.ip =inet_ntoa(saremoteaddr.sin_addr);
+					char wport[10] = { 0 };
+					sprintf(wport, "%d", ntohs(saremoteaddr.sin_port));
 					remoteAddress.port = wport;					
 				}
 
@@ -412,8 +416,8 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 #else
 						shutdown(sock, 2);
 #endif
-						sock = 0;
-						std::wstring errormessage = STDSTRINGEXT::Format(L"%s%s%d", ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorCode.c_str(), error);
+						sock = NULL;
+						std::string errormessage = STDSTRINGEXT::Format("%s%s%d", ScpObjectNames::GetSingleInsatnce()->scpErrorReceiveFail, ScpObjectNames::GetSingleInsatnce()->scpErrorCode, error);
 						if (error == 10054)
 						{
 							engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorConnectionClosed);
@@ -427,7 +431,7 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 				}
 				else if (scpConnectionTypeUDP == connectionType)
 				{
-					//UDPÐ­ÒéÒ»´Î½ÓÊÕµÄÊý¾Ý±ØÐëÐ¡ÓÚ65535×Ö½Ú
+					//UDPåè®®ä¸€æ¬¡æŽ¥æ”¶çš„æ•°æ®å¿…é¡»å°äºŽ65535å­—èŠ‚
 					struct sockaddr_in saremoteaddr;
 #ifdef _WIN32
 					int addrlen = sizeof saremoteaddr;
@@ -442,9 +446,9 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 						contentmemory->Extend(len);
 						contentmemory->Write(buffer, pos, len);
 					}
-					remoteAddress.ip = STDSTRINGEXT::AToW(inet_ntoa(saremoteaddr.sin_addr));
-					wchar_t wport[10] = { 0 };
-					swprintf(wport, 10, L"%d", ntohs(saremoteaddr.sin_port));
+					remoteAddress.ip = inet_ntoa(saremoteaddr.sin_addr);
+					char wport[10] = { 0 };
+					sprintf(wport, "%d", ntohs(saremoteaddr.sin_port));
 					remoteAddress.port = wport;
 				}
 
@@ -454,7 +458,7 @@ int ScpSocketObject::Receive(ScpObject * contentobj,CScriptEngine *engine)
 	}
 	return len;
 }
-int ScpSocketObject::Receive(std::wstring contentobj,CScriptEngine *engine)
+int ScpSocketObject::Receive(std::string contentobj,CScriptEngine *engine)
 {
 	int len=-1;
 	ScpObject * obj=engine->GetCurrentObjectSpace()->FindObject(contentobj);
@@ -474,12 +478,12 @@ int  ScpSocketObject::Accept(ScpObject * sockobj,CScriptEngine *engine)
 		connsock->sock=	accept(sock,(struct sockaddr*)&saremoteaddr,&addrlen);
 		if(connsock->sock!=INVALID_SOCKET)
 		{
-			connsock->connectionType = L"TCP";
+			connsock->connectionType = "TCP";
 			ret=0;
 		}
 		return ret;
 }
-int ScpSocketObject::Accept(std::wstring sockobjname,CScriptEngine *engine)
+int ScpSocketObject::Accept(std::string sockobjname,CScriptEngine *engine)
 {
 	int ret = -1;
 	ScpSocketObject * connsock=(ScpSocketObject * )engine->GetCurrentObjectSpace()->FindObject(sockobjname);
@@ -492,15 +496,15 @@ int ScpSocketObject::Accept(std::wstring sockobjname,CScriptEngine *engine)
 int  ScpSocketObject::Listen(CScriptEngine * engine)
 {
 	int ret = -1;
-	std::wstring text ;
-	std::wstring ip=address.GetIp();
+	std::string text ;
+	std::string ip=address.GetIp();
 	int port =address.GetPort();
 	ret = listen(sock,0);
-	text = STDSTRINGEXT::Format(L"SOCKET OBJECT Listen addr %s %d",ip.c_str(),port);	
+	text = STDSTRINGEXT::Format("SOCKET OBJECT Listen addr %s %d",ip.c_str(),port);	
 	engine->PrintError(text);	
 	return ret;
 }
-int ScpSocketObject::Connect(std::wstring addrobjname,CScriptEngine * engine)
+int ScpSocketObject::Connect(std::string addrobjname,CScriptEngine * engine)
 {
 	int ret=0;
 	ScpAddressObject * RemoteAddress=(ScpAddressObject *)engine->GetCurrentObjectSpace()->FindObject(addrobjname);
@@ -511,15 +515,20 @@ int ScpSocketObject::Connect(std::wstring addrobjname,CScriptEngine * engine)
 		{
 			struct sockaddr_in saremoteaddr;
 			saremoteaddr.sin_family = AF_INET;
-			saremoteaddr.sin_addr.s_addr = inet_addr(STDSTRINGEXT::WToA(RemoteAddress->GetIp()).c_str());
+			saremoteaddr.sin_addr.s_addr = inet_addr(RemoteAddress->GetIp().c_str());
 			saremoteaddr.sin_port = htons(RemoteAddress->GetPort());
 			ret = connect(sock, (struct sockaddr*)&saremoteaddr, sizeof saremoteaddr);
+			if (ret == -1)
+			{
+				std::string errormessage = STDSTRINGEXT::Format("%s", "connect fail");
+				engine->PrintError(errormessage);
+			}
 		}
 
 	}
 	return ret;
 }
-int ScpSocketObject::Create(std::wstring type)
+int ScpSocketObject::Create(std::string type)
 {
 	int ret =-1;
 	connectionType = type;
@@ -570,7 +579,7 @@ ScpObject * ScpSocketObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -599,9 +608,9 @@ ScpObject * ScpSocketObject::InnerFunction_set(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 2)
 	{
-		//ÉèÖÃÒ»Ð©SocketÑ¡Ïî
-		std::wstring optionname = parameters->at(0);
-		std::wstring optionvalue = parameters->at(1);
+		//è®¾ç½®ä¸€äº›Socketé€‰é¡¹
+		std::string optionname = parameters->at(0);
+		std::string optionvalue = parameters->at(1);
 		StringStripQuote(optionname);
 		StringStripQuote(optionvalue);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(optionname);
@@ -615,8 +624,8 @@ ScpObject * ScpSocketObject::InnerFunction_set(ScpObject * thisObject, VTPARAMET
 			optionvalue = ((ScpStringObject *)objparam1)->content;
 		}
 		int opt = 0;
-		if (wcsicmp(optionvalue.c_str(), L"true") == 0 ||
-			wcsicmp(optionvalue.c_str(), L"1") == 0)
+		if (_stricmp(optionvalue.c_str(), "true") == 0 ||
+			_stricmp(optionvalue.c_str(), "1") == 0)
 		{
 			opt = 1;
 		}
@@ -624,41 +633,41 @@ ScpObject * ScpSocketObject::InnerFunction_set(ScpObject * thisObject, VTPARAMET
 		{
 			opt = StringToInt(optionvalue);
 		}
-		if (wcsicmp(optionname.c_str(), L"TCP_NODELAY") == 0)
+		if (_stricmp(optionname.c_str(), "TCP_NODELAY") == 0)
 		{
 #ifdef _WIN32
-			//ÉèÖÃsocket Ñ¡Ïî £¬½ûÓÃnegaleËã·¨ 
+			//è®¾ç½®socket é€‰é¡¹ ï¼Œç¦ç”¨negaleç®—æ³• 
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&opt, sizeof(opt));
 #else
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, O_NDELAY, (const char *)&opt, sizeof(opt));
 			
 #endif
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_REUSEADDR") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_REUSEADDR") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_SNDTIMEO") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_SNDTIMEO") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_SNDTIMEO, (const char *)&opt, sizeof(opt));
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_RCVTIMEO") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_RCVTIMEO") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_RCVTIMEO, (const char *)&opt, sizeof(opt));
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_SNDBUF") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_SNDBUF") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_SNDBUF, (const char *)&opt, sizeof(opt));
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_RCVBUF") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_RCVBUF") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_RCVBUF, (const char *)&opt, sizeof(opt));
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_KEEPALIVE") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_KEEPALIVE") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_KEEPALIVE, (const char *)&opt, sizeof(opt));
 		}
-		else if (wcsicmp(optionname.c_str(), L"SO_OOBINLINE") == 0)
+		else if (_stricmp(optionname.c_str(), "SO_OOBINLINE") == 0)
 		{
 			setsockopt(((ScpSocketObject*)thisObject)->sock, IPPROTO_TCP, SO_OOBINLINE, (const char *)&opt, sizeof(opt));
 		}
@@ -674,7 +683,7 @@ ScpObject * ScpSocketObject::InnerFunction_send(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring content = parameters->at(0);
+		std::string content = parameters->at(0);
 		StringStripQuote(content);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(parameters->at(0));
 		if (obj && obj->GetType() == ObjString)
@@ -695,7 +704,7 @@ ScpObject * ScpSocketObject::InnerFunction_receive(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring content = parameters->at(0);
+		std::string content = parameters->at(0);
 		StringStripQuote(content);
 		ScpIntObject * len = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		int ret = ((ScpSocketObject*)thisObject)->Receive(content, engine);
@@ -721,7 +730,7 @@ ScpObject * ScpSocketObject::InnerFunction_bind(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		((ScpSocketObject*)thisObject)->Bind(param0, engine);
 	}
@@ -732,7 +741,7 @@ ScpObject * ScpSocketObject::InnerFunction_connect(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		((ScpSocketObject*)thisObject)->Connect(param0, engine);
 	}
@@ -747,7 +756,7 @@ ScpObject * ScpSocketObject::InnerFunction_create(ScpObject * thisObject, VTPARA
 	}
 	else if (parameters->size() == 1)
 	{
-		std::wstring conntype = parameters->at(0);
+		std::string conntype = parameters->at(0);
 		StringStripQuote(conntype);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(conntype);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -775,7 +784,7 @@ ScpObject * ScpSocketObject::InnerFunction_accept(ScpObject * thisObject, VTPARA
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		((ScpSocketObject*)thisObject)->Accept(param0, engine);
 	}

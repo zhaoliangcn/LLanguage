@@ -8,11 +8,11 @@
 const static ScpObjectType	ObjNet = 4;
 const static ScpObjectType	ObjNetConnection = 38;
 
-const static wchar_t * str_CN_ObjNet = L"网络";
-const static wchar_t * str_CN_ObjNetConnection = L"网络连接";
+const static char * str_CN_ObjNet = "网络";
+const static char * str_CN_ObjNetConnection = "网络连接";
 
-const static wchar_t * str_EN_ObjNet = L"network";
-const static wchar_t * str_EN_ObjNetConnection = L"netconnection";
+const static char * str_EN_ObjNet = "network";
+const static char * str_EN_ObjNetConnection = "netconnection";
 class ScpNetConnectionObject :
 	public ScpObject
 {
@@ -21,11 +21,11 @@ public:
 	~ScpNetConnectionObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release();
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	int Connect(ScpAddressObject * remote);
 	int Watch(ScpAddressObject *local);
@@ -52,7 +52,7 @@ public:
 	int nsock;
 #endif
 	CScriptEngine * _engine;
-	std::wstring connectionType;
+	std::string connectionType;
 	static const size_t MaxNetBufferSize = 1024*32;
 	   
 

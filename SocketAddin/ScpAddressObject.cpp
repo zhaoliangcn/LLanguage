@@ -25,9 +25,9 @@ BOOL WINAPI AddressObject_Set_Command(VTPARAMETERS * vtparameters, CScriptEngine
 	BOOL ret = FALSE;
 	if (vtparameters->size() == 3)
 	{
-		std::wstring objname1 = vtparameters->at(0);
-		std::wstring objname2 = vtparameters->at(1);
-		std::wstring objname3 = vtparameters->at(2);
+		std::string objname1 = vtparameters->at(0);
+		std::string objname2 = vtparameters->at(1);
+		std::string objname3 = vtparameters->at(2);
 		
 		ScpObject * obj = (ScpObject *)currentObjectSpace->FindObject(objname1);
 		if (obj && obj->GetType() == ObjAddress)
@@ -48,9 +48,9 @@ BOOL WINAPI AddressObject_Set_Command(VTPARAMETERS * vtparameters, CScriptEngine
 ScpAddressObject::ScpAddressObject(void)
 {
 	objecttype = ObjAddress;
-	addressname = L"";
-	ip=L"";
-	port=L"";
+	addressname = "";
+	ip="";
+	port="";
 	BindObjectInnerFuction(scpcommand_en_show, InnerFunction_Show);
 	BindObjectInnerFuction(scpcommand_cn_show, InnerFunction_Show);
 
@@ -69,21 +69,21 @@ ScpAddressObject::~ScpAddressObject(void)
 
 void ScpAddressObject::Show(CScriptEngine * engine) 
 {
-	std::wstring text;
-	text=STDSTRINGEXT::Format(L"%s %s %s",addressname.c_str(),ip.c_str(),port.c_str());
+	std::string text;
+	text=STDSTRINGEXT::Format("%s %s %s",addressname.c_str(),ip.c_str(),port.c_str());
 	engine->PrintError(text);
 }
-std::wstring ScpAddressObject::ToString()
+std::string ScpAddressObject::ToString()
 {
-	std::wstring temp;
-	temp=STDSTRINGEXT::Format(L"%s %s %s",addressname.c_str(),ip.c_str(),port.c_str());
+	std::string temp;
+	temp=STDSTRINGEXT::Format("%s %s %s",addressname.c_str(),ip.c_str(),port.c_str());
 	return temp;
 }
 void ScpAddressObject::Release() 
 {
 	delete this;
 }
-bool ScpAddressObject::IsInnerFunction(std::wstring & functionname)
+bool ScpAddressObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -91,7 +91,7 @@ bool ScpAddressObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpAddressObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpAddressObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -100,7 +100,7 @@ ScpObject * ScpAddressObject::CallInnerFunction(std::wstring & functionname,VTPA
 	}
 	return NULL;
 }
-ScpObject * ScpAddressObject::Clone(std::wstring strObjName)
+ScpObject * ScpAddressObject::Clone(std::string strObjName)
 {
 	ScpAddressObject *obj = new ScpAddressObject;
 	if (obj)
@@ -113,15 +113,15 @@ ScpObject * ScpAddressObject::Clone(std::wstring strObjName)
 	return NULL;
 }	
 
-void ScpAddressObject::SetIp(std::wstring strip)
+void ScpAddressObject::SetIp(std::string strip)
 {
 	ip = strip;
 }
-void ScpAddressObject::SetPort(std::wstring strport)
+void ScpAddressObject::SetPort(std::string strport)
 {
 	port = strport;
 }
-std::wstring ScpAddressObject::GetIp()
+std::string ScpAddressObject::GetIp()
 {
 	return ip;
 }
@@ -138,7 +138,7 @@ ScpObject * ScpAddressObject::InnerFunction_Get(ScpObject * thisObject,  VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -196,7 +196,7 @@ ScpObject * ScpAddressObject::InnerFunction_Set(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 2)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -212,7 +212,7 @@ ScpObject * ScpAddressObject::InnerFunction_Set(ScpObject * thisObject, VTPARAME
 			if (((ScpStringObject *)objparam0)->content == str_CN_ScpAddressParameterIp ||
 				((ScpStringObject *)objparam0)->content == str_EN_ScpAddressParameterIp)
 			{
-				std::wstring ip = parameters->at(1);
+				std::string ip = parameters->at(1);
 				StringStripQuote(ip);
 				ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(ip);
 				if (obj && obj->GetType() == ObjString)
@@ -226,7 +226,7 @@ ScpObject * ScpAddressObject::InnerFunction_Set(ScpObject * thisObject, VTPARAME
 			else if (((ScpStringObject *)objparam0)->content == str_CN_ScpAddressParameterPort || 
 				((ScpStringObject *)objparam0)->content == str_EN_ScpAddressParameterPort)
 			{
-				std::wstring port = parameters->at(1);
+				std::string port = parameters->at(1);
 				StringStripQuote(port);
 				ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(port);
 				if (obj && obj->GetType() == ObjString)
@@ -240,7 +240,7 @@ ScpObject * ScpAddressObject::InnerFunction_Set(ScpObject * thisObject, VTPARAME
 		}
 		if (parameters->at(0) == str_CN_ScpAddressParameterIp || parameters->at(0) == str_EN_ScpAddressParameterIp)
 		{
-			std::wstring ip = parameters->at(1);
+			std::string ip = parameters->at(1);
 			ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(ip);
 			if (obj && obj->GetType() == ObjString)
 			{
@@ -251,7 +251,7 @@ ScpObject * ScpAddressObject::InnerFunction_Set(ScpObject * thisObject, VTPARAME
 		}
 		else if (parameters->at(0) == str_CN_ScpAddressParameterPort || parameters->at(0) == str_EN_ScpAddressParameterPort)
 		{
-			std::wstring port = parameters->at(1);
+			std::string port = parameters->at(1);
 			ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(port);
 			if (obj && obj->GetType() == ObjString)
 			{
@@ -263,7 +263,16 @@ ScpObject * ScpAddressObject::InnerFunction_Set(ScpObject * thisObject, VTPARAME
 	}
 	return nullptr;
 }
-std::wstring ScpAddressObject::GetPortStr()
+std::string ScpAddressObject::GetPortStr()
 {
 	return port;
+}
+ScpObject* WINAPI BinaryOpertaionAssign(ScpObject* x, ScpObject* y, ScpObjectSpace* objectSpace)
+{
+	ScpAddressObject* a = (ScpAddressObject*)x;
+	ScpAddressObject* b = (ScpAddressObject*)y;
+	a->addressname = b->addressname;
+	a->ip = b->ip;
+	a->port = b->port;
+	return x;
 }

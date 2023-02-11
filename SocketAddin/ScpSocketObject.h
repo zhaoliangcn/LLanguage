@@ -1,19 +1,19 @@
 ﻿#pragma once
 #include "../ScriptEngineLib/ScpObject.h"
 #include "ScpAddressObject.h"
-const static wchar_t * scpConnectionTypeTCP = L"TCP";
-const static wchar_t * scpConnectionTypeUDP = L"UDP";
+const static char * scpConnectionTypeTCP = "TCP";
+const static char * scpConnectionTypeUDP = "UDP";
 const static ScpObjectType ObjSocket = 300;
 
-const static wchar_t * str_CN_ObjSocket = L"套接字";
-const static wchar_t * scpcommand_cn_bind = L"绑定";
-const static wchar_t * scpcommand_cn_listen = L"侦听";
-const static wchar_t * scpcommand_cn_accept = L"接受";
+const static char * str_CN_ObjSocket = "套接字";
+const static char * scpcommand_cn_bind = "绑定";
+const static char * scpcommand_cn_listen = "侦听";
+const static char * scpcommand_cn_accept = "接受";
 
-const static wchar_t * str_EN_ObjSocket = L"socket";
-const static wchar_t * scpcommand_en_bind = L"bind";
-const static wchar_t * scpcommand_en_listen = L"listen";
-const static wchar_t * scpcommand_en_accept = L"accept";
+const static char * str_EN_ObjSocket = "socket";
+const static char * scpcommand_en_bind = "bind";
+const static char * scpcommand_en_listen = "listen";
+const static char * scpcommand_en_accept = "accept";
 #include "../ScriptEngineLib/ScriptEngine.h"
 class ScpSocketObject :
 	public ScpObject
@@ -25,23 +25,23 @@ public:
 
 
 	virtual void Show(CScriptEngine * engine) ;
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
-	int Bind(std::wstring addrobjname,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	int Bind(std::string addrobjname,CScriptEngine * engine);
 	int Bind(ScpObject *  addrobj,CScriptEngine * engine);
-	int Connect(std::wstring addrobjname,CScriptEngine * engine);
+	int Connect(std::string addrobjname,CScriptEngine * engine);
 	int Send(std::wstring & content,CScriptEngine * engine);
 	int Send(std::string &content,CScriptEngine * engine);
 	int Send(ScpObject * contentobj, CScriptEngine *engine);
 	int Listen(CScriptEngine * engine);
-	int Receive(std::wstring contentobj,CScriptEngine *engine);
+	int Receive(std::string contentobj,CScriptEngine *engine);
 	int Receive(ScpObject * contentobj,CScriptEngine *engine);
-	int Create(std::wstring type= scpConnectionTypeTCP);
+	int Create(std::string type= scpConnectionTypeTCP);
 	int ShutDown();
-	int Accept(std::wstring sockobjname,CScriptEngine *engine);
+	int Accept(std::string sockobjname,CScriptEngine *engine);
 	int Accept(ScpObject * sockobj,CScriptEngine *engine);
 	ScpAddressObject address;
 	ScpAddressObject remoteAddress;
@@ -52,7 +52,7 @@ public:
 #else 
 	int sock;
 #endif
-	std::wstring connectionType;
+	std::string connectionType;
 
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

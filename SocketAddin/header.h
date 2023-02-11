@@ -21,14 +21,17 @@ extern "C" {
 #endif 
 
 DWORD WINAPI GetObjectCount();
-BOOL WINAPI GetObjectNameId(DWORD dwIndex, wchar_t * ObjTypeNameCn, DWORD ObjTypeNameCnSize, wchar_t * ObjTypeNameEn, DWORD ObjTypeNameEnSize, DWORD * dwObjectId);
+BOOL WINAPI GetObjectNameId(DWORD dwIndex, char * ObjTypeNameCn, DWORD ObjTypeNameCnSize, char * ObjTypeNameEn, DWORD ObjTypeNameEnSize, DWORD * dwObjectId);
 
 
-DWORD WINAPI GetUniqObjectIdEx(const wchar_t * ObjTypeName);
-ExtObjCreateFactoryFunction WINAPI GetObjFactoryEx(const wchar_t * ObjTypeName);
+DWORD WINAPI GetUniqObjectIdEx(const char * ObjTypeName);
+ExtObjCreateFactoryFunction WINAPI GetObjFactoryEx(const char * ObjTypeName);
 
-DWORD WINAPI ExtObjCommandCount(const wchar_t * ObjTypeName);
-BOOL WINAPI ExtObjCommandRegisterFunction(const wchar_t * ObjTypeName, DWORD dwIndex, DWORD *dwObjectId, DWORD* dwCommandId, wchar_t * CommandNameCn, wchar_t *CommandNameEn, ExtObjectCommandFunction *command);
+DWORD WINAPI ExtObjCommandCount(const char * ObjTypeName);
+BOOL WINAPI ExtObjCommandRegisterFunction(const char * ObjTypeName, DWORD dwIndex, DWORD *dwObjectId, DWORD* dwCommandId, char * CommandNameCn, char *CommandNameEn, ExtObjectCommandFunction *command);
+
+DWORD WINAPI GetBinaryOperationCount();
+BOOL WINAPI BinaryOperationRegister(DWORD dwIndex, wchar_t* Operation, DWORD OperationSize, ScpObjectType& obj1Type, ScpObjectType& obj2Type, pBinaryOpertaion* op);
 
 #ifdef __cplusplus
 }

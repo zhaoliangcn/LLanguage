@@ -6,3 +6,5 @@ LIBRARY "SocketAddin"
 	GetObjFactoryEx
 	ExtObjCommandCount
 	ExtObjCommandRegisterFunction
+	GetBinaryOperationCount
+	BinaryOperationRegister
