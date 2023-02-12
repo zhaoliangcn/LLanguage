@@ -2,9 +2,11 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ utf8 ]
+    branches: [ master ,  utf8 ]
   pull_request:
-    branches: [ utf8 ]
+    branches: [ master ,  utf8 ]
+  delete:
+    branches: [ master ,  utf8 ]
 
 jobs:
   build:
