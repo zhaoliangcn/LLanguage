@@ -20,6 +20,6 @@ ScpThreadObject.o:ScpThreadObject.h ScpThreadObject.cpp
 ScpTimerObject.o:ScpTimerObject.h ScpTimerObject.cpp
 	g++ $(CFLAGS) -c ScpTimerObject.cpp
 clean:
-	rm *.o *.so
+	rm -f *.o *.so
 
 
