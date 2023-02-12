@@ -3,7 +3,7 @@
 #include "ScpObject.h"
 class ScpObjectSpace;
 class CScriptEngine;
-typedef std::pair< std::wstring, ScpObject *> NamedPOBJECTS;
+typedef std::pair< std::string, ScpObject *> NamedPOBJECTS;
 typedef std::vector<NamedPOBJECTS> VTNamedPOBJECTS;
 typedef std::vector<NamedPOBJECTS>::iterator ITNamedPOBJECTS;
 
@@ -15,11 +15,11 @@ public:
 	~ScpListObject();
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release();
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
 
 
 	ULONG GetSize();
@@ -27,18 +27,18 @@ public:
 	void Assign(ScpObject * tbl);
 	void Exclude(ScpObject * tbl);
 	void Intersection(ScpObject * tbl);
-	BOOL AddElement(std::wstring elementname, ScpObject * obj);
-	BOOL AddElement(std::wstring elementname, ScpObjectSpace * objectSpace);
-	BOOL InsertElement(int index,std::wstring elementname, ScpObject * obj);
-	BOOL DeleteElement(std::wstring elementname);
+	BOOL AddElement(std::string elementname, ScpObject * obj);
+	BOOL AddElement(std::string elementname, ScpObjectSpace * objectSpace);
+	BOOL InsertElement(int index,std::string elementname, ScpObject * obj);
+	BOOL DeleteElement(std::string elementname);
 	void EmptyElement();
-	ScpObject * GetElement(std::wstring elementname);
-	ScpObjectType GetElementType(std::wstring elementname);
+	ScpObject * GetElement(std::string elementname);
+	ScpObjectType GetElementType(std::string elementname);
 	BOOL DeleteElement(ULONG elementindex);
 	ScpObject * GetElement(ULONG elementindex);
 	ScpObjectType GetElementType(ULONG elementindex);
 
-	std::wstring listname;
+	std::string listname;
 	VTNamedPOBJECTS members;
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

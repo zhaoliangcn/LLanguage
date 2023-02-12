@@ -40,8 +40,8 @@ ScpStringObject::ScpStringObject()
 	BindObjectInnerFuction(scpcommand_cn_getsubstring, InnerFunction_getsubstring);
 	BindObjectInnerFuction(scpcommand_en_getsubstring, InnerFunction_getsubstring);
 
-	BindObjectInnerFuction(scpcommand_cn_hash, InnerFunction_hash);
-	BindObjectInnerFuction(scpcommand_en_hash, InnerFunction_hash);
+	//BindObjectInnerFuction(scpcommand_cn_hash, InnerFunction_hash);
+	//BindObjectInnerFuction(scpcommand_en_hash, InnerFunction_hash);
 
 	BindObjectInnerFuction(scpcommand_cn_format, InnerFunction_format);
 	BindObjectInnerFuction(scpcommand_en_format, InnerFunction_format);
@@ -51,6 +51,9 @@ ScpStringObject::ScpStringObject()
 
 	BindObjectInnerFuction(scpcommand_cn_find, InnerFunction_find);
 	BindObjectInnerFuction(scpcommand_en_find, InnerFunction_find);
+
+	BindObjectInnerFuction(scpcommand_cn_rfind, InnerFunction_rfind);
+	BindObjectInnerFuction(scpcommand_en_rfind, InnerFunction_rfind);	
 
 	BindObjectInnerFuction(scpcommand_cn_insert, InnerFunction_insert);
 	BindObjectInnerFuction(scpcommand_en_insert, InnerFunction_insert);
@@ -80,21 +83,25 @@ ScpStringObject::ScpStringObject()
 	BindObjectInnerFuction(str_CN_Length, InnerFunction_Length);
 	BindObjectInnerFuction(str_EN_Length, InnerFunction_Length);
 
+	BindObjectInnerFuction(scpcommand_cn_contains, InnerFunction_contains);
+	BindObjectInnerFuction(scpcommand_en_contains, InnerFunction_contains);
+	
+
 }
 ScpStringObject::~ScpStringObject()
 {
 }
 
-ScpObject * ScpStringObject::Clone(std::wstring strObjName)
+ScpObject * ScpStringObject::Clone(std::string strObjName)
 {
 	ScpObject *tmp = new ScpStringObject;
 	((ScpStringObject*)tmp)->objname = strObjName;
 	((ScpStringObject*)tmp)->content = this->content;
 	return tmp;
 }	
-std::wstring ScpStringObject::ToString()
+std::string ScpStringObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp = content;
 	return temp;
 }
@@ -102,7 +109,7 @@ void ScpStringObject::Release()
 {
 	delete this;
 }
-bool ScpStringObject::IsInnerFunction(std::wstring & functionname)
+bool ScpStringObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -110,7 +117,7 @@ bool ScpStringObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpStringObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpStringObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -128,13 +135,13 @@ ScpStringObject * ScpStringObject::Reverse(ScpStringObject * str1)
 ScpStringObject * ScpStringObject::ToUpper(ScpStringObject * str1)
 {
 	if(str1)
-		str1->content = STDSTRINGEXT::ToUpperW(str1->content);
+		str1->content = STDSTRINGEXT::ToUpperA(str1->content);
 	return str1;
 }
 ScpStringObject * ScpStringObject::ToLower(ScpStringObject * str1)
 {
 	if(str1)
-		str1->content = STDSTRINGEXT::ToLowerW(str1->content);
+		str1->content = STDSTRINGEXT::ToLowerA(str1->content);
 	return str1;
 }
 ScpStringObject * ScpStringObject::ToHex(ScpStringObject * str1)
@@ -169,82 +176,82 @@ ScpStringObject * ScpStringObject::SubStr(ULONG start, CScriptEngine * engine)
 }
 
 
-ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t * strForm,VTPARAMETERS &parameters)
+ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const char * strForm,VTPARAMETERS &parameters)
 {
 	if(parameters.size()==0)
 	{
-		wchar_t Buffer[4096]={0};
+		char Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm);
+		sprintf(Buffer,strForm);
 #else 
-		swprintf(Buffer,4096,strForm);
+		sprintf(Buffer,strForm);
 #endif
 		str1->content=Buffer;
 	}
 	else if (parameters.size()==1)
 	{
-		std::wstring temp = parameters.at(0);
+		std::string temp = parameters.at(0);
 
-		wchar_t Buffer[4096]={0};
+		char Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,temp.c_str());
+		sprintf(Buffer,strForm,temp.c_str());
 #else 
-		swprintf(Buffer,4096,strForm,temp.c_str());
+		sprintf(Buffer,strForm,temp.c_str());
 #endif
 		str1->content=Buffer;
 	}
 	else if (parameters.size()==2)
 	{
-		wchar_t Buffer[4096]={0};
+		char Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),parameters.at(1).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str());
 #endif
 		str1->content=Buffer;
 	}
 	else if (parameters.size()==3)
 	{
-		wchar_t Buffer[4096]={0};
+		char Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str());
 #endif
 		str1->content=Buffer;
 	}
 	else if (parameters.size()==4)
 	{
-		wchar_t Buffer[4096]={0};
+		char Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str());
 #endif
 		str1->content=Buffer;
 	}
 	else if (parameters.size()==5)
 	{
-		wchar_t Buffer[4096]={0};
+		char  Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str(),parameters.at(4).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str(),parameters.at(4).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str(),parameters.at(4).c_str());
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),parameters.at(1).c_str(),parameters.at(2).c_str(),parameters.at(3).c_str(),parameters.at(4).c_str());
 #endif
 		str1->content=Buffer;
 	}
 	else if (parameters.size()==6)
 	{
-		wchar_t Buffer[4096]={0};
+		char  Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
 			parameters.at(4).c_str(),
 			parameters.at(5).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -255,9 +262,9 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 	}
 	else if (parameters.size()==7)
 	{
-		wchar_t Buffer[4096]={0};
+		char  Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -265,7 +272,7 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 			parameters.at(5).c_str(),
 			parameters.at(6).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -277,9 +284,9 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 	}
 	else if (parameters.size()==8)
 	{
-		wchar_t Buffer[4096]={0};
+		char  Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -288,7 +295,7 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 			parameters.at(6).c_str(),
 			parameters.at(7).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -301,9 +308,9 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 	}
 	else if (parameters.size()==9)
 	{
-		wchar_t Buffer[4096]={0};
+		char  Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -313,7 +320,7 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 			parameters.at(7).c_str(),
 			parameters.at(8).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -327,9 +334,9 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 	}
 	else if (parameters.size()==10)
 	{
-		wchar_t Buffer[4096]={0};
+		char  Buffer[4096]={0};
 #ifdef _WIN32
-		swprintf(Buffer,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -340,7 +347,7 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 			parameters.at(8).c_str(),
 			parameters.at(9).c_str());
 #else 
-		swprintf(Buffer,4096,strForm,parameters.at(0).c_str(),
+		sprintf(Buffer,strForm,parameters.at(0).c_str(),
 			parameters.at(1).c_str(),
 			parameters.at(2).c_str(),
 			parameters.at(3).c_str(),
@@ -355,13 +362,18 @@ ScpStringObject*  ScpStringObject::Format(ScpStringObject * str1,const wchar_t *
 	}
 	return str1;
 }
+ScpStringObject* ScpStringObject::SetString(const char* str)
+{
+	content = str;
+	return this;
+}
 void ScpStringObject::Show(CScriptEngine * engine)
 {
 	engine->PrintError(content);
 }
 void ScpStringObject::Clear()
 {
-	content=L"";
+	content="";
 }
 ULONG ScpStringObject::GetSize()
 {
@@ -371,7 +383,7 @@ ULONG ScpStringObject::GetLength()
 {
 	return content.length();
 }
-ScpStringObject* Connect(ScpStringObject * str1, ScpStringObject * str2, ScpStringObject* result)
+ScpStringObject* ScpStringObject::Connect(ScpStringObject * str1, ScpStringObject * str2, ScpStringObject* result)
 {
 	ScpStringObject* ret = (ScpStringObject*)result;
 	ret->content = str1->content + str2->content;
@@ -382,9 +394,9 @@ ScpObject * __stdcall ScpStringObjectFactory(VTPARAMETERS * paramters, CScriptEn
 {
 	if (paramters->size() >= 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
-		std::wstring content;
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
+		std::string content;
 		if (paramters->size() == 3)
 			content = paramters->at(2);
 		ScpStringObject *obj = new ScpStringObject;
@@ -409,7 +421,7 @@ ScpObject * ScpStringObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -438,8 +450,8 @@ ScpObject * ScpStringObject::InnerFunction_transform(ScpObject * thisObject, VTP
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring transtype = parameters->at(0);
-		std::wstring param0 = parameters->at(0);
+		std::string transtype = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -475,7 +487,7 @@ ScpObject * ScpStringObject::InnerFunction_transform(ScpObject * thisObject, VTP
 			}
 			else
 			{
-				std::wstring ErrorMessage = STDSTRINGEXT::Format(L"%s %s", ((ScpStringObject*)thisObject)->content.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorNotInt.c_str());
+				std::string ErrorMessage = STDSTRINGEXT::Format("%s %s", ((ScpStringObject*)thisObject)->content.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorNotInt);
 				engine->PrintError(ErrorMessage);
 			}
 			return obj1;
@@ -493,7 +505,7 @@ ScpObject * ScpStringObject::InnerFunction_transform(ScpObject * thisObject, VTP
 			}
 			else
 			{
-				std::wstring ErrorMessage = STDSTRINGEXT::Format(L"%s %s", ((ScpStringObject*)thisObject)->content.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorNotNumber.c_str());
+				std::string ErrorMessage = STDSTRINGEXT::Format("%s %s", ((ScpStringObject*)thisObject)->content.c_str(), ScpObjectNames::GetSingleInsatnce()->scpErrorNotNumber);
 				engine->PrintError(ErrorMessage);
 			}
 			return obj1;
@@ -516,14 +528,14 @@ ScpObject * ScpStringObject::InnerFunction_getsize(ScpObject * thisObject, VTPAR
 ScpObject * ScpStringObject::InnerFunction_clear(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	((ScpStringObject*)thisObject)->Clear();
-	return nullptr;
+	return thisObject;
 }
 
 ScpObject * ScpStringObject::InnerFunction_getsubstring(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring strstart = parameters->at(0);
+		std::string strstart = parameters->at(0);
 		StringStripQuote(strstart);
 		ScpIntObject *objs = (ScpIntObject *)engine->GetCurrentObjectSpace()->FindObject(strstart);
 		ScpStringObject *subobj = NULL;
@@ -543,8 +555,8 @@ ScpObject * ScpStringObject::InnerFunction_getsubstring(ScpObject * thisObject, 
 	{
 		int istart = 0;
 		int ilength = 0;
-		std::wstring strstart = parameters->at(0);
-		std::wstring strlength = parameters->at(1);
+		std::string strstart = parameters->at(0);
+		std::string strlength = parameters->at(1);
 		ScpIntObject *objs = (ScpIntObject *)engine->GetCurrentObjectSpace()->FindObject(strstart);
 		ScpIntObject *objl = (ScpIntObject *)engine->GetCurrentObjectSpace()->FindObject(strlength);
 		if (objs)
@@ -570,37 +582,37 @@ ScpObject * ScpStringObject::InnerFunction_getsubstring(ScpObject * thisObject, 
 	return nullptr;
 }
 
-ScpObject * ScpStringObject::InnerFunction_hash(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
-{
-	/*if (parameters->size() == 1)
-	{
-		std::wstring hashtype = parameters->at(0);
-		StringStripQuote(hashtype);
-		ScpStringObject * strobjhashtype = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(hashtype);
-		if (strobjhashtype)
-		{
-			hashtype = strobjhashtype->content;
-		}
-		ScpStringObject * strobj2 = new ScpStringObject;
-		if (strobj2)
-		{
-			ScpEncryptLib encryptlib;
-			strobj2->content = encryptlib.HashString(((ScpStringObject*)thisObject)->content, hashtype);
-			strobj2->istemp = false;
-			return strobj2;
-		}
-	}*/
-	return nullptr;
-}
+//ScpObject * ScpStringObject::InnerFunction_hash(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+//{
+//	/*if (parameters->size() == 1)
+//	{
+//		std::string hashtype = parameters->at(0);
+//		StringStripQuote(hashtype);
+//		ScpStringObject * strobjhashtype = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(hashtype);
+//		if (strobjhashtype)
+//		{
+//			hashtype = strobjhashtype->content;
+//		}
+//		ScpStringObject * strobj2 = new ScpStringObject;
+//		if (strobj2)
+//		{
+//			ScpEncryptLib encryptlib;
+//			strobj2->content = encryptlib.HashString(((ScpStringObject*)thisObject)->content, hashtype);
+//			strobj2->istemp = false;
+//			return strobj2;
+//		}
+//	}*/
+//	return nullptr;
+//}
 
 ScpObject * ScpStringObject::InnerFunction_format(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (parameters->size() >= 1)
 	{
-		std::wstring wstrForm;
+		std::string wstrForm;
 		wstrForm = parameters->at(0);
 		StringStripQuote(wstrForm);
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -615,7 +627,7 @@ ScpObject * ScpStringObject::InnerFunction_format(ScpObject * thisObject, VTPARA
 				ScpObject * obj = (ScpObject*)engine->GetCurrentObjectSpace()->FindObject(parameters->at(i));
 				if (obj)
 				{
-					std::wstring temp = obj->ToString();
+					std::string temp = obj->ToString();
 					param.push_back(temp);
 				}
 				else
@@ -634,8 +646,8 @@ ScpObject * ScpStringObject::InnerFunction_replace(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 2)
 	{
-		std::wstring substrname = parameters->at(0);
-		std::wstring substrname2 = parameters->at(1);
+		std::string substrname = parameters->at(0);
+		std::string substrname2 = parameters->at(1);
 		StringStripQuote(substrname);
 		StringStripQuote(substrname2);
 		ScpStringObject *subobj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(substrname);
@@ -645,7 +657,7 @@ ScpObject * ScpStringObject::InnerFunction_replace(ScpObject * thisObject, VTPAR
 			substrname2 = subobj2->content;
 		ScpIntObject * replaceret = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		size_t pos = ((ScpStringObject*)thisObject)->content.find(subobj->content);
-		if (pos != std::wstring::npos)
+		if (pos != std::string::npos)
 		{
 			((ScpStringObject*)thisObject)->content.replace(pos, substrname2.length(), substrname2);
 			replaceret->value = 1;
@@ -664,7 +676,7 @@ ScpObject * ScpStringObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring substrname = parameters->at(0);
+		std::string substrname = parameters->at(0);
 		StringStripQuote(substrname);
 		ScpStringObject *subobj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(substrname);
 		if (subobj)
@@ -672,7 +684,7 @@ ScpObject * ScpStringObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 			substrname = subobj->content;
 		}
 		ScpIntObject * findret = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
-		if (((ScpStringObject*)thisObject)->content.find(substrname) != std::wstring::npos)
+		if (((ScpStringObject*)thisObject)->content.find(substrname) != std::string::npos)
 		{
 			findret->value = ((ScpStringObject*)thisObject)->content.find(substrname);
 		}
@@ -685,8 +697,8 @@ ScpObject * ScpStringObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 	}
 	else if (parameters->size() == 2)
 	{
-		std::wstring substrname = parameters->at(0);
-		std::wstring substrpos = parameters->at(1);
+		std::string substrname = parameters->at(0);
+		std::string substrpos = parameters->at(1);
 		StringStripQuote(substrname);
 		StringStripQuote(substrpos);
 		int pos = 0;
@@ -705,7 +717,7 @@ ScpObject * ScpStringObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 			pos = StringToInt(substrpos);
 		}
 		ScpIntObject * findret = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
-		if (((ScpStringObject*)thisObject)->content.find(substrname, pos) != std::wstring::npos)
+		if (((ScpStringObject*)thisObject)->content.find(substrname, pos) != std::string::npos)
 		{
 			findret->value = ((ScpStringObject*)thisObject)->content.find(substrname, pos);
 		}
@@ -719,12 +731,89 @@ ScpObject * ScpStringObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 	return nullptr;
 }
 
+ScpObject * ScpStringObject::InnerFunction_rfind(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string substrname = parameters->at(0);
+		StringStripQuote(substrname);
+		ScpStringObject *subobj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(substrname);
+		if (subobj)
+		{
+			substrname = subobj->content;
+		}
+		ScpIntObject * findret = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
+		if (((ScpStringObject*)thisObject)->content.rfind(substrname) != std::string::npos)
+		{
+			findret->value = ((ScpStringObject*)thisObject)->content.rfind(substrname);
+		}
+		else
+		{
+			findret->value = -1;
+		}
+		findret->istemp = true;
+		return findret;
+	}
+	else if (parameters->size() == 2)
+	{
+		std::string substrname = parameters->at(0);
+		std::string substrpos = parameters->at(1);
+		StringStripQuote(substrname);
+		StringStripQuote(substrpos);
+		int pos = 0;
+		ScpStringObject *subobj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(substrname);
+		if (subobj)
+		{
+			substrname = subobj->content;
+		}
+		ScpIntObject * subobjpoos = (ScpIntObject *)engine->GetCurrentObjectSpace()->FindObject(substrpos);
+		if (subobjpoos)
+		{
+			pos = subobjpoos->value;
+		}
+		else
+		{
+			pos = StringToInt(substrpos);
+		}
+		ScpIntObject * findret = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
+		if (((ScpStringObject*)thisObject)->content.rfind(substrname, pos) != std::string::npos)
+		{
+			findret->value = ((ScpStringObject*)thisObject)->content.rfind(substrname, pos);
+		}
+		else
+		{
+			findret->value = -1;
+		}
+		findret->istemp = true;
+		return findret;
+	}
+	return nullptr;
+}
+
+ScpObject * ScpStringObject::InnerFunction_contains(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	ScpObject * ret = InnerFunction_find(thisObject, parameters, engine);
+	if (ret && ret->GetType() == ObjInt)
+	{
+		if (((ScpIntObject *)ret)->value >= 0)
+		{
+			((ScpIntObject *)ret)->value = 1;
+		}
+		else
+		{
+			((ScpIntObject *)ret)->value = 0;
+		}			
+		return ret;
+	}
+	return nullptr;
+}
+
 ScpObject * ScpStringObject::InnerFunction_insert(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (parameters->size() == 2)
 	{
-		std::wstring substrname = parameters->at(2);
-		std::wstring posname = parameters->at(3);
+		std::string substrname = parameters->at(1);
+		std::string posname = parameters->at(0);
 		StringStripQuote(substrname);
 		StringStripQuote(posname);
 		ScpStringObject * substrobj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(substrname);
@@ -749,7 +838,7 @@ ScpObject * ScpStringObject::InnerFunction_insert(ScpObject * thisObject, VTPARA
 //{
 	//if (parameters->size() == 1)
 	//{
-	//	std::wstring wsencodetype = parameters->at(0);
+	//	std::string wsencodetype = parameters->at(0);
 	//	if (wsencodetype == encodetypebase64)
 	//	{
 	//		ScpStringObject * obj2 = (ScpStringObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
@@ -767,7 +856,7 @@ ScpObject * ScpStringObject::InnerFunction_insert(ScpObject * thisObject, VTPARA
 //{
 	/*if (parameters->size() == 1)
 	{
-		std::wstring wsdecodetype = parameters->at(0);
+		std::string wsdecodetype = parameters->at(0);
 		if (wsdecodetype == encodetypebase64)
 		{
 			ScpStringObject * obj2 = (ScpStringObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
@@ -785,8 +874,8 @@ ScpObject * ScpStringObject::InnerFunction_split(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring objname1 = ((ScpStringObject*)thisObject)->content;
-		std::wstring objname2 = parameters->at(0);
+		std::string objname1 = ((ScpStringObject*)thisObject)->content;
+		std::string objname2 = parameters->at(0);
 		StringStripQuote(objname2);
 		ScpStringObject * strobj2 = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(objname2);
 		if (strobj2)
@@ -794,9 +883,9 @@ ScpObject * ScpStringObject::InnerFunction_split(ScpObject * thisObject, VTPARAM
 			objname2 = strobj2->content;
 			ScpTableObject * tableobj = new ScpTableObject;
 			size_t pos = objname1.find(objname2);
-			while (pos != std::wstring::npos)
+			while (pos != std::string::npos)
 			{
-				std::wstring temp = objname1.substr(0, pos);
+				std::string temp = objname1.substr(0, pos);
 				ScpStringObject *  tempstrobj = new ScpStringObject;
 				tempstrobj->content = temp;
 				engine->GetCurrentObjectSpace()->AddObject(temp, tempstrobj);
@@ -806,7 +895,7 @@ ScpObject * ScpStringObject::InnerFunction_split(ScpObject * thisObject, VTPARAM
 			}
 			if (!objname1.empty())
 			{
-				std::wstring temp = objname1;
+				std::string temp = objname1;
 				ScpStringObject *  tempstrobj = new ScpStringObject;
 				tempstrobj->content = temp;
 				engine->GetCurrentObjectSpace()->AddObject(temp, tempstrobj);
@@ -823,7 +912,7 @@ ScpObject * ScpStringObject::InnerFunction_split(ScpObject * thisObject, VTPARAM
 //{
 	//if (parameters->size() == 1)
 	//{
-	//	std::wstring key = parameters->at(0);
+	//	std::string key = parameters->at(0);
 	//	StringStripQuote(key);
 	//	ScpStringObject * strobj1 = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(key);
 	//	if (strobj1 && strobj1->GetType() == ObjString)
@@ -841,7 +930,7 @@ ScpObject * ScpStringObject::InnerFunction_split(ScpObject * thisObject, VTPARAM
 //{
 	//if (parameters->size() == 1)
 	//{
-	//	std::wstring key = parameters->at(0);
+	//	std::string key = parameters->at(0);
 	//	StringStripQuote(key);
 	//	ScpStringObject * strobj1 = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(key);
 	//	if (strobj1 && strobj1->GetType() == ObjString)
@@ -859,7 +948,7 @@ ScpObject * ScpStringObject::InnerFunction_compare(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring str1 = parameters->at(0);
+		std::string str1 = parameters->at(0);
 		StringStripQuote(str1);
 		ScpIntObject * compare_ret = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		compare_ret->value = 0;
@@ -887,7 +976,7 @@ ScpObject * ScpStringObject::InnerFunction_connect(ScpObject * thisObject, VTPAR
 	{
 		for (int i = 0;i < parameters->size();i++)
 		{
-			std::wstring strobj = parameters->at(i);
+			std::string strobj = parameters->at(i);
 			StringStripQuote(strobj);
 			ScpObject *obj2 = engine->GetCurrentObjectSpace()->FindObject(strobj);
 			if (obj2)

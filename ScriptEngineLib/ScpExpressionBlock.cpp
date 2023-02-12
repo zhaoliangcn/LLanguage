@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//±í´ïÊ½¿éµÄ×éÖ¯¹ÜÀí
+//è¡¨è¾¾å¼å—çš„ç»„ç»‡ç®¡ç†
 */
 #include "ScpExpressionBlock.h"
 #include "ScriptEngine.h"
@@ -26,14 +26,14 @@ void ScpExpressionBlock::Show(CScriptEngine * engine)
 {
 }
 
-ScpObject * ScpExpressionBlock::Clone(std::wstring strObjName)
+ScpObject * ScpExpressionBlock::Clone(std::string strObjName)
 {
 	return NULL;
 }
 
-std::wstring ScpExpressionBlock::ToString()
+std::string ScpExpressionBlock::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 
 void ScpExpressionBlock::Release()
@@ -41,24 +41,24 @@ void ScpExpressionBlock::Release()
 	delete this;
 }
 
-bool ScpExpressionBlock::IsInnerFunction(std::wstring & functionname)
+bool ScpExpressionBlock::IsInnerFunction(std::string & functionname)
 {
 	return false;
 }
 
-ScpObject * ScpExpressionBlock::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpExpressionBlock::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	return NULL;
 }
 
-void ScpExpressionBlock::Append(std::wstring & expression,int line, CScriptEngine * engine)
+void ScpExpressionBlock::Append(std::string & expression,int line, CScriptEngine * engine)
 {
 	ScpExpressionBlock * block = new ScpExpressionBlock;
 	if (block)
 	{
 		block->orgexpression = expression;
 		block->linenumber = line;
-		std::wstring & wcommandline = expression;
+		std::string & wcommandline = expression;
 		ScpScriptLex lex;
 		lex.Attach(engine);
 		lex.ParseCommandLine(wcommandline, block->ulcommand, block->vt_command_parameters);

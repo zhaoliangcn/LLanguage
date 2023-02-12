@@ -7,7 +7,7 @@
 #define _H_SCPRUNTIME
 #include "ScpObject.h"
 #include "ScpObjectSpace.h"
-//ÄÚÖÃÔËËã·û
+//å†…ç½®è¿ç®—ç¬¦
 
 ScpObject * Add(ScpObject * x, ScpObject * y, CScriptEngine * engine);
 ScpObject * Sub(ScpObject * x, ScpObject * y, CScriptEngine * engine);

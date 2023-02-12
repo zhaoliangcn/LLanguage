@@ -50,11 +50,11 @@ ULONG ScpTableObject::GetSize()
 {
 	return tableobjects.GetSize();
 }
-BOOL ScpTableObject::AddElement(std::wstring elementname,ScpObject * obj)
+BOOL ScpTableObject::AddElement(std::string elementname,ScpObject * obj)
 {
 	return tableobjects.MapObject(elementname,obj);
 }
-BOOL ScpTableObject::AddElement(std::wstring elementname,ScpObjectSpace * objectSpace)
+BOOL ScpTableObject::AddElement(std::string elementname,ScpObjectSpace * objectSpace)
 {
 
 	ScpObject * obj = objectSpace->FindObject(elementname);
@@ -66,7 +66,7 @@ BOOL ScpTableObject::AddElement(std::wstring elementname,ScpObjectSpace * object
 
 	return FALSE;
 }
-BOOL ScpTableObject::DeleteElement(std::wstring elementname)
+BOOL ScpTableObject::DeleteElement(std::string elementname)
 {
 	if(tableobjects.IsInMap(elementname))
 	{
@@ -82,7 +82,7 @@ void ScpTableObject::EmptyElement()
 		tableobjects.UnMapObject(0);
 	}
 }
-ScpObject * ScpTableObject::GetElement(std::wstring elementname)
+ScpObject * ScpTableObject::GetElement(std::string elementname)
 {
 	if(tableobjects.IsInMap(elementname))
 	{
@@ -90,7 +90,7 @@ ScpObject * ScpTableObject::GetElement(std::wstring elementname)
 	}
 	return NULL;
 }
-ScpObjectType ScpTableObject::GetElementType(std::wstring elementname)
+ScpObjectType ScpTableObject::GetElementType(std::string elementname)
 {
 	return tableobjects.GetType(elementname);
 }
@@ -161,22 +161,22 @@ void ScpTableObject::Combine(ScpObject * tbl)
 		}		
 	}
 }
-ScpObject * ScpTableObject::Clone(std::wstring strObjName)
+ScpObject * ScpTableObject::Clone(std::string strObjName)
 {
 	ScpTableObject * tmpobj=new ScpTableObject;
 	tmpobj->tableobjname=strObjName;
 	tmpobj->Combine(this);
 	return tmpobj;
 }	
-std::wstring ScpTableObject::ToString()
+std::string ScpTableObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	ULONG size = GetSize();
 	for(ULONG i=0;i<size;i++)
 	{
 		ScpObject * element = (ScpObject *)GetElement(i);
 		temp +=element->ToString();
-		temp+=L",";
+		temp+=",";
 	}
 	return temp;
 }
@@ -184,7 +184,7 @@ void ScpTableObject::Release()
 {
 	delete this;
 }
-bool ScpTableObject::IsInnerFunction(std::wstring & functionname)
+bool ScpTableObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -192,7 +192,7 @@ bool ScpTableObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpTableObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpTableObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -213,7 +213,7 @@ ScpObject * ScpTableObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -253,8 +253,8 @@ ScpObject * ScpTableObject::InnerFunction_insert(ScpObject * thisObject, VTPARAM
 {
 	for (int i = 0;i < parameters->size();i++)
 	{
-		//ÓÉÓÚ¿ÉÄÜÊÇÔÚº¯ÊýÖÐµ÷ÓÃ£¬²»ÄÜ°ó¶¨ÎªÐÎÊ½²ÎÊýµÄÃû³Æ£¬ÐèÒªÏòÉÏµÝ¹é²éÕÒµ½ÕæÊµÃû³Æ
-		std::wstring name = parameters->at(i);
+		//ç”±äºŽå¯èƒ½æ˜¯åœ¨å‡½æ•°ä¸­è°ƒç”¨ï¼Œä¸èƒ½ç»‘å®šä¸ºå½¢å¼å‚æ•°çš„åç§°ï¼Œéœ€è¦å‘ä¸Šé€’å½’æŸ¥æ‰¾åˆ°çœŸå®žåç§°
+		std::string name = parameters->at(i);
 		StringStripQuote(name);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 		if (obj)
@@ -310,7 +310,7 @@ ScpObject * ScpTableObject::InnerFunction_traverse(ScpObject * thisObject, VTPAR
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (parameters->size() == 1)
 	{
-		std::wstring funcname = parameters->at(0);
+		std::string funcname = parameters->at(0);
 		StringStripQuote(funcname);
 		ScpTableObject * tableobj = (ScpTableObject * )thisObject;
 		ScpFunctionObject * func = (ScpFunctionObject*)currentObjectSpace->FindObject(funcname);
@@ -323,13 +323,13 @@ ScpObject * ScpTableObject::InnerFunction_traverse(ScpObject * thisObject, VTPAR
 				ScpObject * elementobj = tableobj->GetElement(index);
 				if (elementobj)
 				{
-					std::wstring elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
+					std::string elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
 
 					BOOL Clone = FALSE;
-					std::wstring OldName;
+					std::string OldName;
 					if (currentObjectSpace->IsMyParentSpace(func->FunctionObjectSpace) || currentObjectSpace == func->FunctionObjectSpace)
 					{
-						//	//ËµÃ÷ÊÇµÝ¹éµÄº¯Êýµ÷ÓÃ		
+						//	//è¯´æ˜Žæ˜¯é€’å½’çš„å‡½æ•°è°ƒç”¨		
 						Clone = TRUE;
 					}
 					ScpObjectSpace * OldObjectSpace = NULL;
@@ -383,7 +383,7 @@ ScpObject * ScpTableObject::InnerFunction_getelement(ScpObject * thisObject, VTP
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring &indexstr = parameters->at(0);
+		std::string &indexstr = parameters->at(0);
 		StringStripQuote(indexstr);
 		ScpObject * elementobj = ((ScpTableObject*)thisObject)->GetElement(indexstr);
 		if (elementobj)
@@ -424,7 +424,7 @@ ScpObject * ScpTableObject::InnerFunction_delete(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (obj)
@@ -443,7 +443,7 @@ ScpObject * ScpTableObject::InnerFunction_erase(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (obj)

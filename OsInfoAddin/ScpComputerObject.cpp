@@ -20,7 +20,7 @@ BOOL WINAPI Computer_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngine
 	{
 		if (vtparameters->size() == 1)
 		{
-			std::wstring text = vtparameters->at(0);
+			std::string text = vtparameters->at(0);
 			ScpObject *obj = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(text);
 			if (obj)
 			{
@@ -48,7 +48,7 @@ BOOL WINAPI Computer_Reboot_Command(VTPARAMETERS * vtparameters, CScriptEngine *
 	{
 		if (vtparameters->size() == 1)
 		{
-			std::wstring text = vtparameters->at(0);
+			std::string text = vtparameters->at(0);
 			ScpObject *obj = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(text);
 			if (obj)
 			{
@@ -77,7 +77,7 @@ BOOL WINAPI Computer_Suspend_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 	{
 		if (vtparameters->size() == 1)
 		{
-			std::wstring text = vtparameters->at(0);
+			std::string text = vtparameters->at(0);
 			ScpObject *obj = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(text);
 			if (obj)
 			{
@@ -147,22 +147,22 @@ void	ScpComputerObject::Show(CScriptEngine * engine)
 {
 
 }
-ScpObject *	ScpComputerObject::Clone(std::wstring strObjName)
+ScpObject *	ScpComputerObject::Clone(std::string strObjName)
 {
 	ScpComputerObject *obj = new ScpComputerObject;
 	return obj;
 	
 }
-std::wstring 	ScpComputerObject::ToString()
+std::string 	ScpComputerObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void 	ScpComputerObject::Release()
 {
 	delete this;
 }
-bool ScpComputerObject::IsInnerFunction(std::wstring & functionname)
+bool ScpComputerObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -170,7 +170,7 @@ bool ScpComputerObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpComputerObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpComputerObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -234,7 +234,7 @@ ScpObject * ScpComputerObject::InnerFunction_Get(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)

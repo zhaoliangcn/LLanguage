@@ -87,14 +87,14 @@ int ScpByteCode::Do()
 	int ret = -1;
 	respool.pool.clear();
 	respool.ResObjMap.clear();
-	std::wstring temp(L"");
+	std::string temp("");
 	respool.AppendResource(temp);
-	respool.AppendResource(std::wstring(L"show"));
-	respool.AppendResource(std::wstring(L"int"));
-	respool.AppendResource(std::wstring(L"int64"));
-	respool.AppendResource(std::wstring(L"double"));
-	respool.AppendResource(std::wstring(L"string"));
-	respool.AppendResource(std::wstring(L"file"));
+	respool.AppendResource(std::string("show"));
+	respool.AppendResource(std::string("int"));
+	respool.AppendResource(std::string("int64"));
+	respool.AppendResource(std::string("double"));
+	respool.AppendResource(std::string("string"));
+	respool.AppendResource(std::string("file"));
 
 	ScpIntObject * obj0 = new ScpIntObject();
 	obj0->value = 0;
@@ -128,71 +128,71 @@ int ScpByteCode::Do()
 	respool.setMappedObject(residnine, obj9);
 	
 	{
-		std::wstring numname = L"gl_";
-		numname += L"zero";
+		std::string numname = "gl_";
+		numname += "zero";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj0);
 		}
 
-		numname = L"gl_";
-		numname += L"one";
+		numname = "gl_";
+		numname += "one";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj1);
 		}
 
-		numname = L"gl_";
-		numname += L"two";
+		numname = "gl_";
+		numname += "two";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj2);
 		}
 
-		numname = L"gl_";
-		numname += L"three";
+		numname = "gl_";
+		numname += "three";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj3);
 		}
 
-		numname = L"gl_";
-		numname += L"four";
+		numname = "gl_";
+		numname += "four";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj4);
 		}
 
-		numname = L"gl_";
-		numname += L"five";
+		numname = "gl_";
+		numname += "five";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj5);
 		}
 
-		numname = L"gl_";
-		numname += L"six";
+		numname = "gl_";
+		numname += "six";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj6);
 		}
 
-		numname = L"gl_";
-		numname += L"seven";
+		numname = "gl_";
+		numname += "seven";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj7);
 		}
 
-		numname = L"gl_";
-		numname += L"eight";
+		numname = "gl_";
+		numname += "eight";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj8);
 		}
 
-		numname = L"gl_";
-		numname += L"nine";
+		numname = "gl_";
+		numname += "nine";
 		if (!engine->GetCurrentObjectSpace()->FindObject(numname))
 		{
 			engine->GetCurrentObjectSpace()->AddObject(numname, obj9);
@@ -200,7 +200,7 @@ int ScpByteCode::Do()
 
 	}
 	
-	std::wstring timename = L"currenttime";
+	std::string timename = "currenttime";
 	if (!engine->GetCurrentObjectSpace()->FindObject(timename))
 	{
 		//Create Global Time Object
@@ -474,7 +474,7 @@ unsigned char * ScpByteCode::DoResInit(unsigned char * pByteCode, unsigned int& 
 {
 	unsigned int  reslen = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND);
 	unsigned char * nextByteCode = pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_RESOURCELEN + reslen;
-	std::wstring res = STDSTRINGEXT::UTF2W((char *)(pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_RESOURCELEN));
+	std::string res = (char *)(pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_RESOURCELEN);
 	resid = respool.AppendResource(res);
 	return nextByteCode;
 }
@@ -492,7 +492,7 @@ unsigned char *  ScpByteCode::DoObjectDefine(unsigned char * pByteCode)
 	VTPARAMETERS param;
 	unsigned int  resid1 = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID);
 	unsigned int  resid2 = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID + SIZE_OF_RESOURCEID);
-	std::wstring name;
+	std::string name;
 	if (engine->extend_obj_mgr.IsExtendObject(objTypeId))
 	{
 		name = engine->extend_obj_mgr.GetExtendObjectName(objTypeId);
@@ -528,7 +528,7 @@ unsigned char * ScpByteCode::DoCall(unsigned char * pByteCode)
 		}
 
 		BOOL bRecurseCall = FALSE;
-		ScpObjectSpace * oldparentspace = func->FunctionObjectSpace->parentspace;  //½â¾öµİ¹éµ÷ÓÃµÄÎÊÌâ
+		ScpObjectSpace * oldparentspace = func->FunctionObjectSpace->parentspace;  //è§£å†³é€’å½’è°ƒç”¨çš„é—®é¢˜
 		if (func->FunctionObjectSpace == engine->GetCurrentObjectSpace() || engine->GetCurrentObjectSpace()->IsMyParentSpace(func->FunctionObjectSpace))
 		{
 			bRecurseCall = TRUE;
@@ -551,7 +551,7 @@ unsigned char * ScpByteCode::DoCall(unsigned char * pByteCode)
 			}
 		}
 		func->UnBindParameters(engine);
-		//»¹ĞèÒª½â³ıÊµ¼Ê²ÎÊıÔÚ×ÊÔ´³ØÖĞµÄÓ³Éä¹ØÏµ£¬·ñÔòÏÂÒ»´Îµ÷ÓÃ´«µİµÄ²ÎÊı¾Í°ó¶¨´íÁË
+		//è¿˜éœ€è¦è§£é™¤å®é™…å‚æ•°åœ¨èµ„æºæ± ä¸­çš„æ˜ å°„å…³ç³»ï¼Œå¦åˆ™ä¸‹ä¸€æ¬¡è°ƒç”¨ä¼ é€’çš„å‚æ•°å°±ç»‘å®šé”™äº†
 		for (int i = 0;i < func->FormalParameters.size();i++)
 		{
 			ULONG resid = engine->scpbytecode.respool.scpFindResource(func->FormalParameters.at(i));
@@ -617,7 +617,7 @@ unsigned char *  ScpByteCode::DoCallInner(unsigned char * pByteCode)
 				}
 
 				BOOL bRecurseCall = FALSE;
-				ScpObjectSpace * oldparentspace = func->FunctionObjectSpace->parentspace;  //½â¾öµİ¹éµ÷ÓÃµÄÎÊÌâ
+				ScpObjectSpace * oldparentspace = func->FunctionObjectSpace->parentspace;  //è§£å†³é€’å½’è°ƒç”¨çš„é—®é¢˜
 				if (func->FunctionObjectSpace == engine->GetCurrentObjectSpace() || engine->GetCurrentObjectSpace()->IsMyParentSpace(func->FunctionObjectSpace))
 				{
 					bRecurseCall = TRUE;
@@ -651,14 +651,14 @@ unsigned char *  ScpByteCode::DoCallInner(unsigned char * pByteCode)
 			}
 			else
 			{	
-				//²»ÊÇ×Ô¶¨Òå³ÉÔ±º¯Êı£¬¶øÊÇÄÚÖÃº¯Êı
+				//ä¸æ˜¯è‡ªå®šä¹‰æˆå‘˜å‡½æ•°ï¼Œè€Œæ˜¯å†…ç½®å‡½æ•°
 				VTPARAMETERS param;
 				for (int i = 0;i < paramcount;i++)
 				{
 					unsigned int  resid = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_RESOURCEID + SIZE_OF_RESOURCEID + SIZE_OF_PARAMCOUNT + i * SIZE_OF_RESOURCEID);
 					param.push_back(respool.scpGetResource(resid));
 				}
-				std::wstring functionname = respool.scpGetResource(resid2);
+				std::string functionname = respool.scpGetResource(resid2);
 				object->CallInnerFunction(functionname, &param, engine);		
 			}
 			
@@ -671,7 +671,7 @@ unsigned char *  ScpByteCode::DoCallInner(unsigned char * pByteCode)
 				unsigned int  resid = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_RESOURCEID + SIZE_OF_RESOURCEID + SIZE_OF_PARAMCOUNT + i * SIZE_OF_RESOURCEID);
 				param.push_back(respool.scpGetResource(resid));
 			}
-			std::wstring functionname = respool.scpGetResource(resid2);
+			std::string functionname = respool.scpGetResource(resid2);
 			object->CallInnerFunction(functionname, &param, engine);
 		}
 
@@ -687,7 +687,7 @@ unsigned char * ScpByteCode::DoLoad(unsigned char * pByteCode)
 	unsigned int  resid2 = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID);
 	if (objtype == ObjExt)
 	{
-		engine->extend_obj_mgr.LoadExtension(respool.scpGetResource(resid2), &engine->globalcommand);
+		engine->extend_obj_mgr.LoadExtension(respool.scpGetResource(resid2).c_str(), &engine->globalcommand);
 	}
 
 	return nextByteCode;
@@ -1104,14 +1104,14 @@ unsigned char * ScpByteCode::DoLoop(unsigned char * pByteCode)
 	unsigned char * nextByteCode = pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_LOOPCOUNT;
 	unsigned char * nextLine = pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_LOOPCOUNT;
 	unsigned int  loopcount = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND);
-	int consumed = 0;//»ñµÃÏÂÒ»ÌõÖ¸ÁîµÄÊµ¼Ê³¤¶È
+	int consumed = 0;//è·å¾—ä¸‹ä¸€æ¡æŒ‡ä»¤çš„å®é™…é•¿åº¦
 	while (loopcount > 0)
 	{
-		//Ö´ĞĞÏÂÒ»ÌõÖ¸Áî,nextLineÖ¸ÕëÃ»ÓĞ±ä»¯£¬ÈÔÖ¸ÏòÏÂÒ»ÌõÖ¸Áî
+		//æ‰§è¡Œä¸‹ä¸€æ¡æŒ‡ä»¤,nextLineæŒ‡é’ˆæ²¡æœ‰å˜åŒ–ï¼Œä»æŒ‡å‘ä¸‹ä¸€æ¡æŒ‡ä»¤
 		DoByteCode(nextLine, 1, &consumed);
 		loopcount--;
 	}
-	//·µ»ØÏÂÏÂÒ»ÌõÖ¸ÁîµÄµØÖ·
+	//è¿”å›ä¸‹ä¸‹ä¸€æ¡æŒ‡ä»¤çš„åœ°å€
 	nextByteCode += consumed;
 	return nextByteCode;
 }
@@ -1133,8 +1133,8 @@ unsigned char * ScpByteCode::DoObjectFunctionDefine(unsigned char * pByteCode)
 			unsigned int  resid = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID + SIZE_OF_RESOURCEID + SIZE_OF_RESOURCEID + SIZE_OF_PARAMCOUNT + i * SIZE_OF_RESOURCEID);
 			param.push_back(respool.scpGetResource(resid));
 		}
-		std::wstring functionname = respool.scpGetResource(resid1);
-		std::wstring parentobjectname = respool.scpGetResource(residparentobj);
+		std::string functionname = respool.scpGetResource(resid1);
+		std::string parentobjectname = respool.scpGetResource(residparentobj);
 
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();		
 		ScpFunctionObject * funcobj = new ScpFunctionObject;
@@ -1152,7 +1152,7 @@ unsigned char * ScpByteCode::DoObjectFunctionDefine(unsigned char * pByteCode)
 		funcobj->Name = functionname;
 		for (size_t i = 0;i < param.size();i++)
 		{
-			std::wstring wparam = param.at(i);
+			std::string wparam = param.at(i);
 			funcobj->FormalParameters.push_back(wparam);
 		}
 		funcobj->FunctionObjectSpace->spacename = ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction) + functionname;
@@ -1163,7 +1163,7 @@ unsigned char * ScpByteCode::DoObjectFunctionDefine(unsigned char * pByteCode)
 
 		unsigned char * temp = nextByteCode;
 		int functionlength_byte = 0;
-		//ÕâÀïĞèÒªÅĞ¶ÏÃû×Ö¿Õ¼ä£¬¿¼ÂÇº¯ÊıÖĞÓĞifÓï¾ä whileÓï¾ä Ç¶Ì×µÄÎÊÌâ		
+		//è¿™é‡Œéœ€è¦åˆ¤æ–­åå­—ç©ºé—´ï¼Œè€ƒè™‘å‡½æ•°ä¸­æœ‰ifè¯­å¥ whileè¯­å¥ åµŒå¥—çš„é—®é¢˜		
 		//while (*temp != BC_END)
 		//{
 		//	functionlength_byte = GetBlockByteCodeLength(&temp);
@@ -1187,8 +1187,8 @@ unsigned char * ScpByteCode::DoReturn(unsigned char * pByteCode)
 
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	ScpObjectSpace * FuncObjectSpace = NULL;
-	//µ±Ç°Ãû×Ö¿Õ¼äÓĞ¿ÉÄÜÊÇº¯ÊıÄÚ²¿µÄÌõ¼şÓï¾ä»òÕßÑ­»·Óï¾ä
-	//ÕâÀïÕÒµ½×îÄÚ²ãµÄº¯Êıµ÷ÓÃµÄÃû×Ö¿Õ¼ä
+	//å½“å‰åå­—ç©ºé—´æœ‰å¯èƒ½æ˜¯å‡½æ•°å†…éƒ¨çš„æ¡ä»¶è¯­å¥æˆ–è€…å¾ªç¯è¯­å¥
+	//è¿™é‡Œæ‰¾åˆ°æœ€å†…å±‚çš„å‡½æ•°è°ƒç”¨çš„åå­—ç©ºé—´
 	if (currentObjectSpace->ObjectSpaceType != Space_Function)
 	{
 		if (currentObjectSpace->ObjectSpaceType == Space_While)
@@ -1238,7 +1238,7 @@ unsigned char * ScpByteCode::DoObjectClassDefine(unsigned char * pByteCode)
 	unsigned char * nextByteCode = pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID + SIZE_OF_RESOURCEID;
 	unsigned int  resid1 = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID);
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
-	std::wstring classname = respool.scpGetResource(resid1);
+	std::string classname = respool.scpGetResource(resid1);
 	ScpClassObject *classobj = new ScpClassObject;
 	classobj->ClassDefine(classname);
 	currentObjectSpace->AddObject(classname, classobj);
@@ -1291,7 +1291,7 @@ unsigned char * ScpByteCode::DoWhileStatement(unsigned char * pByteCode)
 	}
 	condlength_byte = temp - nextByteCode;
 	whileBlockByteCode = condByteCode + condlength_byte;
-	//¼ÆËãwhileblockµÄ´óĞ¡
+	//è®¡ç®—whileblockçš„å¤§å°
 	temp = whileBlockByteCode;
 	int whilelenth_byte = 0;
 	while (blocklength > 0)
@@ -1307,11 +1307,11 @@ unsigned char * ScpByteCode::DoWhileStatement(unsigned char * pByteCode)
 	ScpWhileStatementObject * whileobj = new ScpWhileStatementObject(engine);
 	if (whileobj)
 	{
-		std::wstring userobjname = ScpObjectNames::GetSingleInsatnce()->strObjWhileStatement;
+		std::string userobjname = ScpObjectNames::GetSingleInsatnce()->strObjWhileStatement;
 		ScpWhileStatementObject * temp = (ScpWhileStatementObject *)currentObjectSpace->FindObject(userobjname);
 		while (temp)
 		{
-			userobjname += L"@";
+			userobjname += "@";
 			temp = (ScpWhileStatementObject *)currentObjectSpace->FindObject(userobjname);
 		}
 		whileobj->Name = userobjname;
@@ -1328,9 +1328,9 @@ unsigned char * ScpByteCode::DoWhileStatement(unsigned char * pByteCode)
 			break;
 		}
 		DoContitionBlock(condByteCode, condlength_byte);
-		//Ô¼¶¨Ìõ¼şÓï¾ä·µ»ØµÄÁÙÊ±¶ÔÏóÎªtempresultif
+		//çº¦å®šæ¡ä»¶è¯­å¥è¿”å›çš„ä¸´æ—¶å¯¹è±¡ä¸ºtempresultif
 
-		ScpObject * obj1 = currentObjectSpace->FindObject(std::wstring(L"tempwhile"));
+		ScpObject * obj1 = currentObjectSpace->FindObject(std::string("tempwhile"));
 		if (obj1 && obj1->GetType() == ObjInt)
 		{
 			if (((ScpIntObject*)obj1)->value == 1)
@@ -1918,7 +1918,7 @@ unsigned char * ScpByteCode::DoImport(unsigned char * pByteCode)
 {
 	unsigned char * nextByteCode = pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_OBJECT_TYPE_ID + SIZE_OF_RESOURCEID;
 	unsigned int  resid1 = *(unsigned int *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND+ SIZE_OF_OBJECT_TYPE_ID);
-	std::wstring libname = respool.scpGetResource(resid1);
+	std::string libname = respool.scpGetResource(resid1);
 	engine->ImportLib(libname);
 	return nextByteCode;
 }
@@ -1942,14 +1942,14 @@ unsigned char * ScpByteCode::DoIfStatement(unsigned char * pByteCode)
 
 
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
-	std::wstring userobjname = ScpObjectNames::GetSingleInsatnce()->strObjIfStatement;
+	std::string userobjname = ScpObjectNames::GetSingleInsatnce()->strObjIfStatement;
 	userobjname = ScpObjectNames::GetSingleInsatnce()->strObjIfStatement;
 	ScpIfStatementObject * ifstmtObj = new ScpIfStatementObject(engine);
 	if (ifstmtObj)
 	{
 		while (currentObjectSpace->FindObject(userobjname))
 		{
-			userobjname += L"@";
+			userobjname += "@";
 		}
 		ifstmtObj->Name = userobjname;
 		ifstmtObj->IfStatementObjectSpace.spacename = userobjname;
@@ -1961,11 +1961,11 @@ unsigned char * ScpByteCode::DoIfStatement(unsigned char * pByteCode)
 
 	nextByteCode = DoContitionBlock(nextByteCode, condlength_byte);
 
-	//Ô¼¶¨Ìõ¼şÓï¾ä·µ»ØµÄÁÙÊ±¶ÔÏóÎªtempresultif
-	ScpObject * obj1 = engine->GetCurrentObjectSpace()->FindObject(std::wstring(L"tempif"));
+	//çº¦å®šæ¡ä»¶è¯­å¥è¿”å›çš„ä¸´æ—¶å¯¹è±¡ä¸ºtempresultif
+	ScpObject * obj1 = engine->GetCurrentObjectSpace()->FindObject(std::string("tempif"));
 	if (obj1 && obj1->GetType() == ObjInt)
 	{
-		//¼ÆËãtrueblockµÄ´óĞ¡
+		//è®¡ç®—trueblockçš„å¤§å°
 		//temp = nextByteCode;
 		unsigned char * tByteCode = temp;
 		int tlenth_byte = 0;
@@ -1975,7 +1975,7 @@ unsigned char * ScpByteCode::DoIfStatement(unsigned char * pByteCode)
 			temp += tlenth_byte;
 			tlength--;
 		}
-		//¼ÆËãfalseblockµÄ´óĞ¡
+		//è®¡ç®—falseblockçš„å¤§å°
 		tlenth_byte = temp - tByteCode;
 		unsigned char * fByteCode = temp;
 		int flenth_byte = 0;
@@ -2132,7 +2132,7 @@ int ScpByteCode::GetByteCodeLength(unsigned char * pByteCode)
 		unsigned short  flength = *(unsigned short *)((unsigned char *)pByteCode + SIZE_OF_BYTECODE_COMMAND + SIZE_OF_BOLCK + SIZE_OF_BOLCK);
 		unsigned char * condByteCode = nextByteCode;
 		unsigned char * temp = nextByteCode;
-		//¼ÆËãÌõ¼şÓï¾ä¿éµÄ´óĞ¡
+		//è®¡ç®—æ¡ä»¶è¯­å¥å—çš„å¤§å°
 		int condlength_byte = 0;
 		while (condlength > 0)
 		{
@@ -2142,8 +2142,8 @@ int ScpByteCode::GetByteCodeLength(unsigned char * pByteCode)
 		}
 		condlength_byte = temp - condByteCode;
 		unsigned char * tByteCode = temp;
-		//¼ÆËãtrueblockµÄ´óĞ¡
-		//tempÏÖÔÚÖ¸Ïòtrueblock
+		//è®¡ç®—trueblockçš„å¤§å°
+		//tempç°åœ¨æŒ‡å‘trueblock
 		int tlenth_byte = 0;
 		while (tlength > 0)
 		{
@@ -2153,7 +2153,7 @@ int ScpByteCode::GetByteCodeLength(unsigned char * pByteCode)
 		}
 		tlenth_byte = temp - tByteCode;
 		unsigned char * fByteCode = temp;
-		//¼ÆËãfalseblockµÄ´óĞ¡
+		//è®¡ç®—falseblockçš„å¤§å°
 		int flenth_byte = 0;
 		while (flength > 0)
 		{
@@ -2163,7 +2163,7 @@ int ScpByteCode::GetByteCodeLength(unsigned char * pByteCode)
 		}
 		flenth_byte = temp - fByteCode;
 		nextByteCode += condlength_byte + tlenth_byte + flenth_byte;
-		//³¤¶È°üº¬endÓï¾ä
+		//é•¿åº¦åŒ…å«endè¯­å¥
 		length = nextByteCode - pByteCode + 1;
 	}
 	else if (*pByteCode == BC_RETURN)
@@ -2195,7 +2195,7 @@ int ScpByteCode::GetByteCodeLength(unsigned char * pByteCode)
 		}
 		condlength_byte = temp - nextByteCode;
 		whileBlockByteCode = condByteCode + condlength_byte;
-		//¼ÆËãwhileblockµÄ´óĞ¡
+		//è®¡ç®—whileblockçš„å¤§å°
 		temp = whileBlockByteCode;
 		int whilelenth_byte = 0;
 		while (blocklength > 0)
@@ -2206,7 +2206,7 @@ int ScpByteCode::GetByteCodeLength(unsigned char * pByteCode)
 		}
 		whilelenth_byte = temp - whileBlockByteCode;
 		nextByteCode = whileBlockByteCode + whilelenth_byte;
-		//³¤¶È°üº¬endÓï¾ä
+		//é•¿åº¦åŒ…å«endè¯­å¥
 		length = nextByteCode - pByteCode + 1;
 	}
 	else if (*pByteCode == BC_BREAK ||

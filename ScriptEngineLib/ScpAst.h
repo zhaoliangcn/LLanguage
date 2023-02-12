@@ -2,7 +2,7 @@
 #define _H_SCPAST
 
 
-//³éÏóÓï·¨Ê÷
+//æŠ½è±¡è¯­æ³•æ ‘
 class ScpAst
 {
 public:

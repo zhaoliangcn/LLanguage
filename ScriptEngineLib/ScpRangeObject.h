@@ -3,15 +3,15 @@
 #include "ScpObject.h"
 
 
-const static wchar_t *str_CN_head = L"首部";
-const static wchar_t *str_CN_tail = L"尾部";
-const static wchar_t *str_CN_step = L"间距";
-const static wchar_t *str_CN_reset = L"重置";
+const static char  *str_CN_head = "首部";
+const static char  *str_CN_tail = "尾部";
+const static char  *str_CN_step = "间距";
+const static char  *str_CN_reset = "重置";
 
-const static wchar_t *str_EN_head = L"head";
-const static wchar_t *str_EN_tail = L"tail";
-const static wchar_t *str_EN_step = L"step";
-const static wchar_t *str_EN_reset = L"reset";
+const static char  *str_EN_head = "head";
+const static char  *str_EN_tail = "tai";
+const static char  *str_EN_step = "step";
+const static char  *str_EN_reset = "reset";
 
 class ScpObjectSpace;
 class CScriptEngine;
@@ -22,11 +22,11 @@ public:
 	ScpRangeObject();
 	~ScpRangeObject();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release();
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
 
 	int Init();
 	std::vector<ScpObject *> Elements;

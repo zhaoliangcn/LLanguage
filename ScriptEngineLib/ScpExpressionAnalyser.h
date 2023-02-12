@@ -12,12 +12,12 @@
 #include "ScriptByteCode.h"
 #include <stack>
 class ScpExpressionTreeNode;
-typedef std::stack<std::wstring> ScpObjStack;
+typedef std::stack<std::string> ScpObjStack;
 typedef std::stack<ScpExpressionTreeNode*> TheNodeStack;
 typedef std::stack<ScpObject*> TheObjectStack;
 
 /*
-±í´ïÊ½Óï·¨Ê÷½ÚµãÀà
+è¡¨è¾¾å¼è¯­æ³•æ ‘èŠ‚ç‚¹ç±»
 */
 class ScpExpressionTreeNode:public ScpObject
 {
@@ -29,23 +29,23 @@ public:
 	{
 		
 	}
-	virtual ScpObject * Clone(std::wstring strObjName)
+	virtual ScpObject * Clone(std::string strObjName)
 	{
 		return NULL;
 	}
-	virtual std::wstring ToString()
+	virtual std::string ToString()
 	{
-		return L"";
+		return "";
 	}
 	virtual void Release()
 	{
 		delete this;
 	}
-	virtual bool IsInnerFunction(std::wstring & functionname)
+	virtual bool IsInnerFunction(std::string & functionname)
 	{
 		if (nodeobject && InnerFunctionName.empty())
 		{
-			//Èç¹ûÕâ¸ö½ÚµãÊÇÒ»¸öÊı×é¡¢ÁĞ±í¡¢±í³ÉÔ±ÒıÓÃ½Úµã£¬ÄÇĞèÒªÏÈÒıÓÃÆä³ÉÔ±£¬ÔÙ¶ÔÆä³ÉÔ±µ÷ÓÃIsInnerFunction
+			//å¦‚æœè¿™ä¸ªèŠ‚ç‚¹æ˜¯ä¸€ä¸ªæ•°ç»„ã€åˆ—è¡¨ã€è¡¨æˆå‘˜å¼•ç”¨èŠ‚ç‚¹ï¼Œé‚£éœ€è¦å…ˆå¼•ç”¨å…¶æˆå‘˜ï¼Œå†å¯¹å…¶æˆå‘˜è°ƒç”¨IsInnerFunction
 			if (!ArrayItem.empty())
 			{
 				return true;
@@ -59,7 +59,7 @@ public:
 		}
 		return false;
 	}
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 	{
 		if (nodeobject)
 		{
@@ -82,25 +82,25 @@ public:
 	ScpObject * MakeByteCode(CScriptEngine * engine, ByteCodeMemoryStream &memstream);
 	ScpObject * MakeByteCodeStack(CScriptEngine * engine, ByteCodeMemoryStream &memstream);
 	ScpObject * MakeByteCodePerformFunctionCall(CScriptEngine * engine, ByteCodeMemoryStream &memstream);
-	ULONG GenTempObjectByteCode(ScpObject* obj, std::wstring &name, CScriptEngine* engine,bool retvalue);
+	ULONG GenTempObjectByteCode(ScpObject* obj, std::string &name, CScriptEngine* engine,bool retvalue);
 
-	ScpObject * nodeobject;  //µ±Ç°½ÚµãÖĞ±£´æµÄ¶ÔÏó
-	std::wstring Expression;
+	ScpObject * nodeobject;  //å½“å‰èŠ‚ç‚¹ä¸­ä¿å­˜çš„å¯¹è±¡
+	std::string Expression;
 	ScpObjStack nodestackobj;
 	ScpObjStack nodestackop;
 	TheObjectStack NodeObjectStack;
 	ScpObject * PerformFunctionCall(CScriptEngine * engine);
 	ScpObject * DoArrayItemRef(CScriptEngine * engine);
-	VTPARAMETERS vtFuncparameters;   //º¯Êıµ÷ÓÃ²ÎÊı
-	std::wstring InnerFunctionName;  //±¾½Úµã±íÊ¾¶ÔÏó³ÉÔ±º¯ÊıµÄµ÷ÓÃ
-	std::wstring ArrayItem;
-	int GenTempObjectByteCodeOfExpression(std::wstring Expression, CScriptEngine* engine);
+	VTPARAMETERS vtFuncparameters;   //å‡½æ•°è°ƒç”¨å‚æ•°
+	std::string InnerFunctionName;  //æœ¬èŠ‚ç‚¹è¡¨ç¤ºå¯¹è±¡æˆå‘˜å‡½æ•°çš„è°ƒç”¨
+	std::string ArrayItem;
+	int GenTempObjectByteCodeOfExpression(std::string Expression, CScriptEngine* engine);
 };
 
 
 
 /*
-±í´ïÊ½½âÎöÆ÷Àà
+è¡¨è¾¾å¼è§£æå™¨ç±»
 */
 class ScpExpressionAnalyser
 {
@@ -112,26 +112,26 @@ public:
 	
 
 
-	ScpExpressionTreeNode *  BuildExressionTreeEx(std::wstring Expression);   //¹¹½¨±í´ïÊ½µÄÓï·¨Ê÷
-	ScpExpressionTreeNode *  PostFixExpressionToTree(std::wstring PostFixExpression);   //Í¨¹ıºó×º±í´ïÊ½¹¹½¨Óï·¨Ê÷
-	void EmptyStack(std::wstring &PostFixExpression,ScpObjStack &OperationStack);
-	void PopStack(std::wstring &PostFixExpression,ScpObjStack &OperationStack);
+	ScpExpressionTreeNode *  BuildExressionTreeEx(std::string Expression);   //æ„å»ºè¡¨è¾¾å¼çš„è¯­æ³•æ ‘
+	ScpExpressionTreeNode *  PostFixExpressionToTree(std::string PostFixExpression);   //é€šè¿‡åç¼€è¡¨è¾¾å¼æ„å»ºè¯­æ³•æ ‘
+	void EmptyStack(std::string &PostFixExpression,ScpObjStack &OperationStack);
+	void PopStack(std::string &PostFixExpression,ScpObjStack &OperationStack);
 	/*
-	ÓÉÖĞ×º±í´ïÊ½×ª»»Îªºó×º±í´ïÊ½µÄÍ¬Ê±Éú³É±í´ïÊ½Ê÷
+	ç”±ä¸­ç¼€è¡¨è¾¾å¼è½¬æ¢ä¸ºåç¼€è¡¨è¾¾å¼çš„åŒæ—¶ç”Ÿæˆè¡¨è¾¾å¼æ ‘
 	*/
-	ScpExpressionTreeNode * InFixToPostFixEx(std::wstring &InFixExpression,std::wstring &PostFixExpression,ScpObjectSpace * objectSpace, size_t &startpos);
+	ScpExpressionTreeNode * InFixToPostFixEx(std::string &InFixExpression,std::string &PostFixExpression,ScpObjectSpace * objectSpace, size_t &startpos);
 	
 
-	std::wstring GetATokenFromPostFix(std::wstring& PostFixExpression, size_t &startpos); //´Óºó×º±í´ïÊ½ÖĞ»ñµÃÒ»¸ötoken
-	ScpExpressionTreeNode * BuildExressionTreeNode(std::wstring Expression, size_t &startpos);
-	ScpExpressionTreeNode * ParseFunctionCall(ScpObject * obj,std::wstring token,ScpObjectSpace * objectSpace);
+	std::string GetATokenFromPostFix(std::string& PostFixExpression, size_t &startpos); //ä»åç¼€è¡¨è¾¾å¼ä¸­è·å¾—ä¸€ä¸ªtoken
+	ScpExpressionTreeNode * BuildExressionTreeNode(std::string Expression, size_t &startpos);
+	ScpExpressionTreeNode * ParseFunctionCall(ScpObject * obj,std::string token,ScpObjectSpace * objectSpace);
 	ScpExpressionTreeNode * ParseArrayItemRefrence(ScpObject * arrayObj,ScpObjectSpace * objectSpace);
-	std::wstring ParseObjectRefrence(ScpObject * obj, ScpObjectSpace * objectSpace);
-	bool ParseClassDefine(const wchar_t * ScriptFile,VTSTRINGS & ScriptBody,int & currentcommandline);
-	bool ParseStructDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline);
-	bool ParseFunctionDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline);
-	ScpObject * ParseWhileDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline,bool doimmediately);
-	ScpObject * ParseIfDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline, bool doimmediately);
+	std::string ParseObjectRefrence(ScpObject * obj, ScpObjectSpace * objectSpace);
+	bool ParseClassDefine(const char * ScriptFile,VTSTRINGS & ScriptBody,int & currentcommandline);
+	bool ParseStructDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline);
+	bool ParseFunctionDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline);
+	ScpObject * ParseWhileDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline,bool doimmediately);
+	ScpObject * ParseIfDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline, bool doimmediately);
 
 	void ClearNodeStack();
 	TheNodeStack thenodestack;

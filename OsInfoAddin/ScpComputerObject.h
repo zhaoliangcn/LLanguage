@@ -3,11 +3,11 @@
 #include "../ScriptEngineLib/ScriptEngine.h"
 const static ScpObjectType	ObjComputer = 1;
 
-const static wchar_t * str_CN_ObjComputer = L"计算机";
-const static wchar_t * str_CN_ObjComputer1 = L"电脑";
+const static char * str_CN_ObjComputer = "计算机";
+const static char * str_CN_ObjComputer1 = "电脑";
 
-const static wchar_t * str_EN_ObjComputer = L"computer";
-const static wchar_t * str_EN_ObjComputer1 = L"computer";
+const static char * str_EN_ObjComputer = "computer";
+const static char * str_EN_ObjComputer1 = "computer";
 class ScpComputerObject :
 	public ScpObject
 {
@@ -16,11 +16,11 @@ public:
 	~ScpComputerObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 	void Shutdown();
 	void Reboot();
 	void Suspend();

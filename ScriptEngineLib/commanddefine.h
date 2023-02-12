@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 #include <dlfcn.h>
 #include <sys/time.h>
-#define MAX_PATH (260)
+#define MAX_PATH (4096)
 typedef int BOOL;
 typedef int LONG;
 typedef unsigned int ULONG;
@@ -25,7 +25,7 @@ typedef unsigned int DWORD;
 typedef void * HANDLE;
 typedef __int64_t __int64;
 typedef void * HKEY;
-#define MAX_PATH (260)
+
 #define INFINITE 0xFFFFFFFF
 #include "Cross.h"
 #define GetObject GetObjectW

@@ -14,11 +14,11 @@
 
 static inline void *MH_SearchPattern(void *pStartSearch, unsigned long  dwSearchLen, unsigned char *pPattern, unsigned long  dwPatternLen)
 {
-    //ÄÚ´æËÑË÷ÌØÕ÷Âë
+    
     unsigned long dwStartAddr = (unsigned long )pStartSearch;
     unsigned long  dwEndAddr = dwStartAddr + dwSearchLen - dwPatternLen;
 
-	while (dwStartAddr < dwEndAddr) //ÕâÀï´ÓÎÄ¼þµÄ¿ªÊ¼Î»ÖÃÉ¨Ãè,Èç¹ûÃ»ÓÐÕÒµ½Ö¸¶¨ÌØÕ÷ÂëµÄÎ»ÖÃµÄ»°,¾Í»áÌø³öÑ­»·²¢½áÊøÉ¨Ãè¹¤×÷;·ñÔò»á·µ»ØËù²éµ½µÄÖ·
+	while (dwStartAddr < dwEndAddr) 
 	{
 		bool found = true;
 
@@ -89,8 +89,8 @@ ScpMemoryObject::ScpMemoryObject()
 	BindObjectInnerFuction(scpcommand_cn_extend, InnerFunction_extend);
 	BindObjectInnerFuction(scpcommand_en_extend, InnerFunction_extend);
 
-	BindObjectInnerFuction(scpcommand_cn_hash, InnerFunction_hash);
-	BindObjectInnerFuction(scpcommand_en_hash, InnerFunction_hash);
+	//BindObjectInnerFuction(scpcommand_cn_hash, InnerFunction_hash);
+	//BindObjectInnerFuction(scpcommand_en_hash, InnerFunction_hash);
 
 	BindObjectInnerFuction(scpcommand_cn_find, InnerFunction_find);
 	BindObjectInnerFuction(scpcommand_en_find, InnerFunction_find);
@@ -161,9 +161,9 @@ BOOL ScpMemoryObject::Read(void * dest,ULONG aSize)
 	}
 	return FALSE;
 }
-BOOL ScpMemoryObject::Read(std::wstring & wstr)
+BOOL ScpMemoryObject::Read(std::string & wstr)
 {
-	wstr=(wchar_t*)Address;
+	wstr=(char*)Address;
 	return TRUE;
 }
 BOOL ScpMemoryObject::Read(void * dest, ULONG pos, ULONG aSize)
@@ -175,11 +175,11 @@ BOOL ScpMemoryObject::Read(void * dest, ULONG pos, ULONG aSize)
 	}
 	return FALSE;
 }
-BOOL ScpMemoryObject::Read(std::wstring & wstr, ULONG pos)
+BOOL ScpMemoryObject::Read(std::string & wstr, ULONG pos)
 {
 	if (pos < Size)
 	{
-		wstr = (wchar_t*)((unsigned char *)Address+ pos);
+		wstr = (char*)((unsigned char *)Address+ pos);
 		return TRUE;
 	}
 	return FALSE;
@@ -220,7 +220,7 @@ BOOL ScpMemoryObject::Write(void * src, ULONG pos, ULONG aSize)
 	}
 	return FALSE;
 }
-BOOL ScpMemoryObject::Write(std::wstring & wstr, ULONG pos)
+BOOL ScpMemoryObject::Write(std::string & wstr, ULONG pos)
 {
 	return Write((void *)wstr.c_str(), pos, wstr.length() * sizeof(wchar_t));
 }
@@ -250,25 +250,25 @@ void ScpMemoryObject::Show(CScriptEngine * engine)
 {
 	engine->PrintError(ToString());
 }
-ScpObject * ScpMemoryObject::Clone(std::wstring strObjName)
+ScpObject * ScpMemoryObject::Clone(std::string strObjName)
 {
 	ScpMemoryObject * clonemem = new ScpMemoryObject();
 	clonemem->Acquare(this->Size);
 	return clonemem;
 }	
-std::wstring ScpMemoryObject::ToString()
+std::string ScpMemoryObject::ToString()
 {
-	std::wstring text;
+	std::string text;
 	if(Address)
 	{			
 		unsigned char  * temp =(unsigned char *)Address;
-		wchar_t buffer[4]={0};
+		char buffer[4]={0};
 		for(ULONG i=0;i<Size;i++)
 		{
 #ifdef _WIN32
-            StringCbPrintfW(buffer,_countof(buffer),L"%X",temp[i]);
+            StringCbPrintfA(buffer,_countof(buffer),"%X",temp[i]);
 #else 
-			swprintf(buffer,4,L"%X",temp[i]);
+			sprintf(buffer,"%X",temp[i]);
 #endif
 			text+=buffer;				
 		}			
@@ -299,7 +299,7 @@ int ScpMemoryObject::Find(const char * pattern)
 	}
 	return 0;
 }
-bool ScpMemoryObject::IsInnerFunction(std::wstring & functionname)
+bool ScpMemoryObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -307,7 +307,7 @@ bool ScpMemoryObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpMemoryObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpMemoryObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -322,8 +322,8 @@ ScpObject * __stdcall ScpMemoryObjectFactory(VTPARAMETERS * paramters, CScriptEn
 	if (paramters->size() >= 2)
 	{
 		int size = 0;
-		std::wstring &memname = paramters->at(1);
-		std::wstring memsize = L"0";
+		std::string &memname = paramters->at(1);
+		std::string memsize = "0";
 		if (paramters->size() == 3)
 		{
 			memsize = paramters->at(2);
@@ -331,7 +331,7 @@ ScpObject * __stdcall ScpMemoryObjectFactory(VTPARAMETERS * paramters, CScriptEn
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(memname);
 		if (obj)
 		{
-			//¶ÔÏóÒÑ´æÔÚ
+			//å¯¹è±¡å·²å­˜åœ¨
 		}
 		else
 		{
@@ -369,7 +369,7 @@ ScpObject * ScpMemoryObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -409,7 +409,7 @@ ScpObject * ScpMemoryObject::InnerFunction_acquire(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ULONG size = 0;
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(param0);
@@ -439,7 +439,7 @@ ScpObject * ScpMemoryObject::InnerFunction_encode(ScpObject * thisObject, VTPARA
 {
 	/*if (parameters->size() == 1)
 	{
-		std::wstring wsencodetype = parameters->at(0);
+		std::string wsencodetype = parameters->at(0);
 		if (wsencodetype == encodetypebase64)
 		{
 			ScpStringObject * objStr = (ScpStringObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
@@ -461,7 +461,7 @@ ScpObject * ScpMemoryObject::InnerFunction_decode(ScpObject * thisObject, VTPARA
 {
 	//if (parameters->size() == 1)
 	//{
-	//	std::wstring wsdecodetype = parameters->at(0);
+	//	std::string wsdecodetype = parameters->at(0);
 	//	if (wsdecodetype == encodetypebase64)
 	//	{
 	//		ScpStringObject * objStr = (ScpStringObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
@@ -483,7 +483,7 @@ ScpObject * ScpMemoryObject::InnerFunction_encrypt(ScpObject * thisObject, VTPAR
 {
 	/*if (parameters->size() == 1)
 	{
-		std::wstring key = parameters->at(0);
+		std::string key = parameters->at(0);
 		StringStripQuote(key);
 		ScpStringObject * strobj1 = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(key);
 		if (strobj1)
@@ -514,7 +514,7 @@ ScpObject * ScpMemoryObject::InnerFunction_decrypt(ScpObject * thisObject, VTPAR
 {
 	/*if (parameters->size() == 1)
 	{
-		std::wstring key = parameters->at(0);
+		std::string key = parameters->at(0);
 		StringStripQuote(key);
 		ScpStringObject * strobj1 = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(key);
 		if (strobj1)
@@ -546,7 +546,7 @@ ScpObject * ScpMemoryObject::InnerFunction_read(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpObject *obj1 = engine->GetCurrentObjectSpace()->FindObject(objname);
 		if (obj1)
@@ -565,8 +565,8 @@ ScpObject * ScpMemoryObject::InnerFunction_read(ScpObject * thisObject, VTPARAME
 	else if (parameters->size() == 2)
 	{
 		ULONG ulpos = 0;
-		std::wstring pos = parameters->at(0);
-		std::wstring objname = parameters->at(1);
+		std::string pos = parameters->at(0);
+		std::string objname = parameters->at(1);
 		StringStripQuote(pos);
 		StringStripQuote(objname);
 		ScpObject *obj = engine->GetCurrentObjectSpace()->FindObject(pos);
@@ -601,7 +601,7 @@ ScpObject * ScpMemoryObject::InnerFunction_write(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpObject *obj1 = engine->GetCurrentObjectSpace()->FindObject(objname);
 		if (obj1)
@@ -619,8 +619,8 @@ ScpObject * ScpMemoryObject::InnerFunction_write(ScpObject * thisObject, VTPARAM
 	else if (parameters->size() == 2)
 	{
 		ULONG ulpos = 0;
-		std::wstring pos = parameters->at(0);
-		std::wstring objname = parameters->at(1);
+		std::string pos = parameters->at(0);
+		std::string objname = parameters->at(1);
 		StringStripQuote(pos);
 		StringStripQuote(objname);
 		ScpObject *obj = engine->GetCurrentObjectSpace()->FindObject(pos);
@@ -660,7 +660,7 @@ ScpObject * ScpMemoryObject::InnerFunction_compare(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring str1 = parameters->at(0);
+		std::string str1 = parameters->at(0);
 		StringStripQuote(str1);
 		ScpIntObject * compare_ret = new ScpIntObject;
 		compare_ret->istemp = true;
@@ -686,7 +686,7 @@ ScpObject * ScpMemoryObject::InnerFunction_extend(ScpObject * thisObject, VTPARA
 	if (parameters->size() == 1)
 	{
 		ULONG exSize = 0;
-		std::wstring exsizestr = parameters->at(0);
+		std::string exsizestr = parameters->at(0);
 		StringStripQuote(exsizestr);
 		ScpIntObject *intojb = (ScpIntObject *)engine->GetCurrentObjectSpace()->FindObject(exsizestr);
 		if (intojb && intojb->GetType() == ObjInt)
@@ -702,37 +702,37 @@ ScpObject * ScpMemoryObject::InnerFunction_extend(ScpObject * thisObject, VTPARA
 	return nullptr;
 }
 
-ScpObject * ScpMemoryObject::InnerFunction_hash(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
-{
-	//if (parameters->size() == 1)
-	//{
-	//	std::wstring hashtype = parameters->at(0);
-	//	StringStripQuote(hashtype);
-	//	ScpStringObject * strobjhashtype = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(hashtype);
-	//	if (strobjhashtype)
-	//	{
-	//		hashtype = strobjhashtype->content;
-	//	}
-	//	if (hashtype == HashTypeMd5)
-	//	{
-	//		ScpMemoryObject * memobj = (ScpMemoryObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjMemory);
-	//		if (memobj)
-	//		{
-	//			memobj->Acquare(16);
-	//			ScpEncryptLib encryptlib;
-	//			encryptlib.HashMemory((unsigned char *)((ScpMemoryObject*)thisObject)->Address, ((ScpMemoryObject*)thisObject)->GetSize(), (unsigned char *)memobj->Address, memobj->GetSize(), hashtype);
-
-	//		}
-	//	}
-	//}
-	return nullptr;
-}
+//ScpObject * ScpMemoryObject::InnerFunction_hash(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+//{
+//	//if (parameters->size() == 1)
+//	//{
+//	//	std::string hashtype = parameters->at(0);
+//	//	StringStripQuote(hashtype);
+//	//	ScpStringObject * strobjhashtype = (ScpStringObject*)engine->GetCurrentObjectSpace()->FindObject(hashtype);
+//	//	if (strobjhashtype)
+//	//	{
+//	//		hashtype = strobjhashtype->content;
+//	//	}
+//	//	if (hashtype == HashTypeMd5)
+//	//	{
+//	//		ScpMemoryObject * memobj = (ScpMemoryObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjMemory);
+//	//		if (memobj)
+//	//		{
+//	//			memobj->Acquare(16);
+//	//			ScpEncryptLib encryptlib;
+//	//			encryptlib.HashMemory((unsigned char *)((ScpMemoryObject*)thisObject)->Address, ((ScpMemoryObject*)thisObject)->GetSize(), (unsigned char *)memobj->Address, memobj->GetSize(), hashtype);
+//
+//	//		}
+//	//	}
+//	//}
+//	return nullptr;
+//}
 
 ScpObject * ScpMemoryObject::InnerFunction_find(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring patternstr = parameters->at(0);
+		std::string patternstr = parameters->at(0);
 		StringStripQuote(patternstr);
 		ScpStringObject *obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(patternstr);
 		if (obj && obj->GetType() == ObjString)
@@ -743,7 +743,7 @@ ScpObject * ScpMemoryObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 		ScpIntObject * objInt = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		if (objInt)
 		{
-			std::string pa = STDSTRINGEXT::WToA(patternstr);
+			std::string pa = patternstr;
 			objInt->value = ((ScpMemoryObject*)thisObject)->Find(pa.c_str());
 			return objInt;
 		}
@@ -755,7 +755,7 @@ ScpObject * ScpMemoryObject::InnerFunction_copy(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring memsrc = parameters->at(0);
+		std::string memsrc = parameters->at(0);
 		StringStripQuote(memsrc);
 		ScpMemoryObject *obj = (ScpMemoryObject *)engine->GetCurrentObjectSpace()->FindObject(memsrc);
 		if (obj && obj->GetType() == ObjMemory)

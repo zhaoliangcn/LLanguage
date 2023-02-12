@@ -2,32 +2,37 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//»ù±¾¶ÔÏóµÄ¹¹½¨£¬²ÎÊý¼ì²âºÍ¶ÔÏó³õÊ¼»¯
-//µ÷ÓÃÀ©Õ¹¶ÔÏóµÄ¹¤³§º¯Êý
+//åŸºæœ¬å¯¹è±¡çš„æž„å»ºï¼Œå‚æ•°æ£€æµ‹å’Œå¯¹è±¡åˆå§‹åŒ–
+//è°ƒç”¨æ‰©å±•å¯¹è±¡çš„å·¥åŽ‚å‡½æ•°
 */
 #include "ScpObjectDefine.h"
 #include "NumberHelp.h"
 #include "../Common/commonutil.hpp"
 #include "../Common/DebugUtil.hpp"
+#include "../Common/stdstringext.hpp"
 #include "ScpExtendObjectMgr.h"
 #include "ScpCommonObject.h"
 #include "ScriptEngine.h"
 #include "ScpFunctionObject.h"
 #include "ScpCFunctionObject.h"
 #include "ScpObjectNammes.h"
+#include "Cross.h"
 
+
+//å‡½æ•°ã€å¾ªçŽ¯ã€æ¡ä»¶è¯­å¥ã€ç±»å¯¹è±¡å®šä¹‰åº”è¯¥å‚è€ƒV8å¼•æ“Žçš„ä¸¤é˜¶æ®µå¤„ç†ï¼Œç¬¬ä¸€é˜¶æ®µå¤„ç†é™æ€å­—ç¬¦ä¸²ï¼Œç¬¬äºŒé˜¶æ®µå¤„ç†å¯¹è±¡å®šä¹‰
 BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 {
 	BOOL Ret = FALSE;
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() >= 2)
 	{
-		std::wstring strobj = vtparameters->at(0);
-		std::wstring userobjname = vtparameters->at(1);
+		std::string strobj = vtparameters->at(0);
+		std::string userobjname = vtparameters->at(1);
 
 		ScpObject * obj = NULL;
 		if (currentObjectSpace->ObjectSpaceType == Space_While)
 		{
+			//å¦‚æžœåœ¨å¾ªçŽ¯è¯­å¥çš„å†…éƒ¨å‘çŽ°é‡å¤å®šä¹‰å¯¹è±¡ï¼Œåˆ™å¿½ç•¥é‡å¤å®šä¹‰
 			obj = currentObjectSpace->FindLocalObject(userobjname);
 			if (obj)
 			{
@@ -36,6 +41,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 		}
 		else if (currentObjectSpace->ObjectSpaceType == Space_Function)
 		{
+			//å¦‚æžœåœ¨å‡½æ•°å®šä¹‰çš„å†…éƒ¨å‘çŽ°é‡å¤å®šä¹‰å¯¹è±¡ï¼Œåˆ™åˆ é™¤åŽŸå…ˆçš„å¯¹è±¡å®šä¹‰
 			obj = currentObjectSpace->FindLocalObject(userobjname);
 			if (obj)
 			{
@@ -44,6 +50,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 		}
 		else
 		{
+			//å…¶ä»–æƒ…å†µï¼Œå‘çŽ°é‡å¤å®šä¹‰å¯¹è±¡ï¼Œåˆ™å¿½ç•¥é‡å¤å®šä¹‰
 			obj = currentObjectSpace->FindLocalObject(userobjname);
 			if (obj)
 			{
@@ -53,9 +60,10 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 		}
 		//else
 		{
-			std::wstring content;
+			std::string content;
 			if (vtparameters->size() == 3)
 				content = vtparameters->at(2);
+			//å¦‚æžœæ˜¯å®šä¹‰æ‰©å±•å¯¹è±¡ï¼Œåˆ™è°ƒç”¨å®šä¹‰æ‰©å±•å¯¹è±¡çš„å·¥åŽ‚å‡½æ•°
 			if (engine->extend_obj_mgr.IsExtendObject(strobj.c_str()))
 			{
 				ScpObject * obj = engine->extend_obj_mgr.CreateExtendObject(strobj.c_str(), vtparameters,engine);
@@ -155,7 +163,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			}
 			else if (ObjFunction == type)
 			{
-				//ÔÚº¯ÊýµÄÄÚ²¿²»ÔÊÐí¶¨Òåº¯Êý
+				//åœ¨å‡½æ•°çš„å†…éƒ¨ä¸å…è®¸å®šä¹‰å‡½æ•°
 				if (Space_Function == currentObjectSpace->ObjectSpaceType)
 				{
 					engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidFunctionDefine);
@@ -167,7 +175,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 					funcobj->Name = userobjname;
 					for (ULONG i = 2;i < vtparameters->size();i++)
 					{
-						std::wstring & wparam = vtparameters->at(i);
+						std::string & wparam = vtparameters->at(i);
 						funcobj->FormalParameters.push_back(wparam);
 					}
 					funcobj->FunctionObjectSpace->spacename = ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction) + userobjname;
@@ -182,7 +190,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 
 				if (vtparameters->size() >= 5)
 				{
-					std::wstring strdll = vtparameters->at(2);
+					std::string strdll = vtparameters->at(2);
 					ScpStringObject * objdll = (ScpStringObject*)currentObjectSpace->FindObject(strdll);
 					if (objdll)
 					{
@@ -191,7 +199,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 							strdll = ((ScpStringObject *)objdll)->content;
 						}
 					}
-					std::wstring strcfunction = vtparameters->at(3);
+					std::string strcfunction = vtparameters->at(3);
 					ScpStringObject * objfunction = (ScpStringObject*)currentObjectSpace->FindObject(strcfunction);
 					if (objfunction)
 					{
@@ -200,12 +208,12 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 							strcfunction = ((ScpStringObject *)objfunction)->content;
 						}
 					}
-					std::wstring returntype = vtparameters->at(4);
+					std::string returntype = vtparameters->at(4);
 					ScpCFunctionObject * funcobj = new ScpCFunctionObject;
 					VTPARAMETERS Parameters;
 					for (ULONG i = 5;i<vtparameters->size();i++)
 					{
-						std::wstring wparam = vtparameters->at(i);
+						std::string wparam = vtparameters->at(i);
 						Parameters.push_back(wparam);
 					}
 					funcobj->MakeCFunctionInterface(userobjname, strdll, strcfunction, returntype, Parameters);
@@ -219,7 +227,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				ScpIntObject * intobj = (ScpIntObject *)currentObjectSpace->FindObject(content);
 				if (intobj)
 				{
-					if (obj->GetType() == ObjInt)
+					if (intobj->GetType() == ObjInt)
 					{
 						obj->Value = intobj->value;
 					}
@@ -228,7 +236,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				{
 					if (IsStaticNumber(content))
 					{
-						obj->Value = StringToInt(content);
+						obj->Value = StringToInt(content.c_str());
 					}
 					else
 					{
@@ -242,42 +250,75 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			else if (ObjHandle == type)
 			{
 				ScpObjHandle *obj = new ScpObjHandle;
-#ifdef Linux64
-				obj->Value = (HANDLE)StringToInt64(content);
-#else
-				obj->Value = (HANDLE)StringToInt(content);
+#if defined(Linux64) || defined(_M_AMD64)
+				obj->Value = (HANDLE)StringToInt64(content.c_str());
+#else				
+				obj->Value = (HANDLE)StringToInt(content.c_str());
 #endif
 				currentObjectSpace->AddObject(userobjname, obj);
 			}
 			else if (ObjPointerofChar == type)
 			{
 				ScpObjPointerofChar *obj = new ScpObjPointerofChar;
-				ScpStringObject *strobj = (ScpStringObject *)currentObjectSpace->FindObject(content);
-				obj->Value = (char *)strobj->content.c_str();
-				currentObjectSpace->AddObject(userobjname, obj);
+				if (obj)
+				{
+
+					ScpObject* bindingobj = (ScpObject*)currentObjectSpace->FindObject(content);
+					if (bindingobj)
+					{
+						if (bindingobj->GetType() == ObjString)
+						{
+							ScpStringObject* strobj = (ScpStringObject*)bindingobj;
+							obj->Value = (char*)strobj->content.data();
+						}
+						else if (ObjMemory == bindingobj->GetType())
+						{
+							ScpMemoryObject* memobj = (ScpMemoryObject*)bindingobj;
+							obj->Value = (char * )memobj->Address;
+						}						
+					}
+					else
+					{
+						StringStripQuote(content);
+						obj->Value = strdup((char*)content.c_str());
+					}
+					currentObjectSpace->AddObject(userobjname, obj);
+				}
 			}
 			else if (ObjPointerofWchar == type)
 			{
 				ScpObjPointerofWchar *obj = new ScpObjPointerofWchar;
-				ScpStringObject *strobj = (ScpStringObject *)currentObjectSpace->FindObject(content);
-				if (strobj)
-					if (strobj->GetType() == ObjString)
-						obj->Value = (wchar_t *)strobj->content.c_str();
-
-				ScpMemoryObject *memobj = (ScpMemoryObject *)currentObjectSpace->FindObject(content);
-				if (memobj)
-					if (memobj->GetType() == ObjMemory)
+				if (obj)
+				{
+					ScpObject* bindingobj = (ScpObject*)currentObjectSpace->FindObject(content);
+					if (bindingobj)
 					{
-						obj->Value = (wchar_t *)memobj->Address;
+						if (bindingobj->GetType() == ObjString)
+						{
+							ScpStringObject* strobj = (ScpStringObject*)bindingobj;
+							obj->Value = (wchar_t*)strobj->content.c_str();
+						}
+						else if (ObjMemory == bindingobj->GetType())
+						{
+							ScpMemoryObject* memobj = (ScpMemoryObject*)bindingobj;
+							obj->Value = (wchar_t*)memobj->Address;
+						}
 					}
-				currentObjectSpace->AddObject(userobjname, obj);
+					else
+					{
+						StringStripQuote(content);
+						obj->Value = wstringdup((wchar_t*)STDSTRINGEXT::UTF2W(content).c_str());
+					}
+					currentObjectSpace->AddObject(userobjname, obj);
+				}
+
 			}
 			else if (ObjUnsignedInt32 == type)
 			{
 				ScpObjUnsignedInt32 *obj = new ScpObjUnsignedInt32;
 				if (IsStaticNumber(content))
 				{
-					obj->Value = (unsigned int)StringToInt(content);
+					obj->Value = (unsigned int)StringToInt(content.c_str());
 				}
 				else
 				{
@@ -288,23 +329,46 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			else if (ObjPointer == type)
 			{
 				ScpObjPointer *obj = new ScpObjPointer;
-#ifdef Linux64
-				obj->Value = (void *)StringToInt64(content);
+				ScpObject* bindingobj = (ScpObject*)currentObjectSpace->FindObject(content);
+				if (bindingobj)
+				{
+					if (bindingobj->GetType() == ObjString)
+					{
+						ScpStringObject* strobj = (ScpStringObject*)bindingobj;
+						obj->Value = (wchar_t*)strobj->content.c_str();
+					}
+					else if (ObjMemory == bindingobj->GetType())
+					{
+						ScpMemoryObject* memobj = (ScpMemoryObject*)bindingobj;
+						obj->Value = (wchar_t*)memobj->Address;
+					}
+					else if(ObjInt == bindingobj->GetType())
+					{
+						ScpIntObject* intobj = (ScpIntObject*)bindingobj;
+						obj->Value = &intobj->value;
+					}
+				}
+				else
+				{
+#if defined(Linux64) || defined(_M_AMD64)
+					obj->Value = (void*)StringToInt64(content.c_str());
 #else
-				obj->Value = (void *)StringToInt(content);
-#endif
+					obj->Value = (void*)StringToInt(content.c_str());
+#endif		
+				}
+
 				currentObjectSpace->AddObject(userobjname, obj);
 			}
 			else if (ObjCChar == type)
 			{
 				ScpObjCChar * obj = new ScpObjCChar;
-				obj->Value = (unsigned char)STDSTRINGEXT::WToA(content).at(0);
+				obj->Value = (unsigned char)content.at(0);
 				currentObjectSpace->AddObject(userobjname, obj);
 			}
 			else if (ObjCUnsignedChar == type)
 			{
 				ScpObjCUnsignedChar * obj = new ScpObjCUnsignedChar;
-				obj->Value = STDSTRINGEXT::WToA(content).at(0);
+				obj->Value = content.at(0);
 				currentObjectSpace->AddObject(userobjname, obj);
 			}
 			else if (ObjCShort == type)
@@ -322,7 +386,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				{
 					if (IsStaticNumber(content))
 					{
-						obj->Value = (short)StringToInt(content);
+						obj->Value = (short)StringToInt(content.c_str());
 					}
 					else
 					{
@@ -347,7 +411,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				{
 					if (IsStaticNumber(content))
 					{
-						obj->Value = (unsigned short)StringToInt(content);
+						obj->Value = (unsigned short)StringToInt(content.c_str());
 					}
 					else
 					{
@@ -374,7 +438,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				{
 					if (IsStaticNumber(content))
 					{
-						obj->Value = (long)StringToInt(content);
+						obj->Value = (long)StringToInt(content.c_str());
 					}
 					else
 					{
@@ -400,7 +464,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				{
 					if (IsStaticNumber(content))
 					{
-						obj->Value = (unsigned long)StringToInt(content);
+						obj->Value = (unsigned long)StringToInt(content.c_str());
 					}
 					else
 					{
@@ -411,7 +475,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			}			
 			else if (ObjClass == type)
 			{
-				//ÔÚÀàµÄÄÚ²¿ºÍº¯ÊýµÄÄÚ²¿²»ÔÊÐí¶¨ÒåÀà
+				//åœ¨ç±»çš„å†…éƒ¨å’Œå‡½æ•°çš„å†…éƒ¨ä¸å…è®¸å®šä¹‰ç±»
 				if (Space_Global != currentObjectSpace->ObjectSpaceType)
 				{
 					engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorNestClassDefine);
@@ -423,8 +487,11 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 					if (classobj)
 					{
 						classobj->ClassDefine(userobjname);
+						//å°†ç±»å¯¹è±¡æ·»åŠ åˆ°å…¨å±€åå­—ç©ºé—´
 						currentObjectSpace->AddObject(userobjname, classobj);
+						//è®¾ç½®ç±»å¯¹è±¡çš„çˆ¶åå­—ç©ºé—´
 						classobj->UserClassObjectSpace.parentspace = engine->GetCurrentObjectSpace();
+						//å°†å½“å‰åå­—ç©ºé—´ä¿®æ”¹ä¸ºç±»çš„åå­—ç©ºé—´
 						engine->SetCurrentObjectSpace(&classobj->UserClassObjectSpace);
 					}					
 				}
@@ -455,7 +522,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			{
 				if (vtparameters->size() == 2)
 				{
-					std::wstring jsonname = vtparameters->at(1);
+					std::string jsonname = vtparameters->at(1);
 					ScpObject * obj = currentObjectSpace->FindObject(jsonname);
 					if (obj)
 					{
@@ -505,7 +572,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 			}
 			else
 			{
-				//¿´¿´ÊÇ·ñÊÇ¶¨ÒåÀàµÄÊµÀý
+				//çœ‹çœ‹æ˜¯å¦æ˜¯å®šä¹‰ç±»çš„å®žä¾‹
 				ScpObject * obj = currentObjectSpace->FindObject(strobj);
 				if (obj)
 				{
@@ -516,7 +583,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 							ScpClassInstanceObject *classobj = new ScpClassInstanceObject;
 							if(classobj)
 							{
-								//Àà³ÉÔ±±äÁ¿ÐèÒª½øÐÐÉî¿½±´£¬Àà³ÉÔ±º¯Êý½ö¿½±´º¯ÊýµØÖ·
+								//ç±»æˆå‘˜å˜é‡éœ€è¦è¿›è¡Œæ·±æ‹·è´ï¼Œç±»æˆå‘˜å‡½æ•°ä»…æ‹·è´å‡½æ•°åœ°å€
 								classobj->UserClassObjectSpace.userobject.DeepCopy(&((ScpClassObject *)obj)->UserClassObjectSpace.userobject);
 								//classobj->UserClassObjectSpace = ((ScpClassObject *)obj)->UserClassObjectSpace;		
 								/*for (int i = 0;i < classobj->UserClassObjectSpace.userobject.GetSize();i++)
@@ -527,9 +594,9 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 										obj->AddRef();
 									}
 								}*/
-								//¿½±´Àà³ÉÔ±µÄÊôÐÔ
+								//æ‹·è´ç±»æˆå‘˜çš„å±žæ€§
 								classobj->memberattrmap = ((ScpClassObject *)obj)->memberattrmap;
-								//ÖØÐÂÐÞ¸Äµ±Ç°ÀàÊµÀýµÄÃû×Ö¿Õ¼äµÄÊôÖ÷
+								//é‡æ–°ä¿®æ”¹å½“å‰ç±»å®žä¾‹çš„åå­—ç©ºé—´çš„å±žä¸»
 								classobj->UserClassObjectSpace.belongto = classobj;
 								//
 								classobj->ClassBody = ((ScpClassObject *)obj)->ClassBody;
@@ -558,7 +625,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 				}
 				else if (ObjUnknown == type)
 				{
-					std::wstring Message = STDSTRINGEXT::Format(L" at line(%d)", engine->GetCurrentCommandLine());
+					std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
 					engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidObjectDefine + Message);
 				}
 			}
@@ -566,7 +633,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring Message = STDSTRINGEXT::Format(L" at line(%d)", engine->GetCurrentCommandLine());
+		std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
 		engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidObjectDefine+ Message);
 	}
 	return TRUE;

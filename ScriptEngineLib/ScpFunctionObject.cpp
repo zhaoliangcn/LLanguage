@@ -6,10 +6,16 @@
 #include "ScpFunctionObject.h"
 #include "ScpStringObject.h"
 #include "ScpDoubleObject.h"
+#include "ScpBigIntObject.h"
 #include "ScpGlobalObject.h"
+#include "ScpListObject.h"
+#include "ScpObjectFactory.h"
 #include "commanddefine_uni.h"
 #include "../Common/DebugUtil.hpp"
 #include "../Common/commonutil.hpp"
+#ifndef _WIN32
+#include <climits>
+#endif
 ScpFunctionObject::ScpFunctionObject():functionexpressionblock(NULL)
 {
 	objecttype =ObjFunction;
@@ -23,7 +29,8 @@ ScpFunctionObject::ScpFunctionObject():functionexpressionblock(NULL)
 	ByteCode = NULL;
 	ByteCodeLength = 0;	
 	ParenObject = NULL;
-	parentobjectname = L"";
+	parentobjectname = "";
+	paramlist = nullptr;
 
 	BindObjectInnerFuction(scpcommand_en_show, InnerFunction_Show);
 	BindObjectInnerFuction(scpcommand_cn_show, InnerFunction_Show);
@@ -40,7 +47,7 @@ ScpFunctionObject::~ScpFunctionObject()
 	}
 	delete FunctionObjectSpace;	
 }
-ScpObject * ScpFunctionObject::Clone(std::wstring strObjName)
+ScpObject * ScpFunctionObject::Clone(std::string strObjName)
 {
 	ScpFunctionObject * obj = new ScpFunctionObject;	
 	obj->pFormalParameters=&this->FormalParameters;
@@ -49,27 +56,27 @@ ScpObject * ScpFunctionObject::Clone(std::wstring strObjName)
 	obj->iscloned =true;
 	return obj;
 }	
-std::wstring ScpFunctionObject::ToString()
+std::string ScpFunctionObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 
-	std::wstring tempfuncbody =Name;
-	tempfuncbody+=L"(";
+	std::string tempfuncbody =Name;
+	tempfuncbody+="(";
 	for(ITPARAMETERS it =FormalParameters.begin();it!=FormalParameters.end();it++)
 	{
-		std::wstring temp1 = *it;
+		std::string temp1 = *it;
 		tempfuncbody+=temp1;
-		tempfuncbody+=L",";
+		tempfuncbody+=",";
 	}
-	if(tempfuncbody.substr(tempfuncbody.length()-1,1)==L",")
+	if(tempfuncbody.substr(tempfuncbody.length()-1,1)==",")
 		tempfuncbody=tempfuncbody.substr(0,tempfuncbody.length()-1);
-	tempfuncbody+=L")\n";
+	tempfuncbody+=")\n";
 
 	temp=tempfuncbody;
 	for(ITSTRINGS it =Boday.begin();it!=Boday.end();it++)
 	{
 		temp+= *it;
-		temp+=L"\r\n";
+		temp+="\r\n";
 	}
 
 	return temp;
@@ -80,7 +87,7 @@ int ScpFunctionObject::Do(CScriptEngine *engine)
 	if(engine)
 	{
 		BOOL bRecurseCall=FALSE;
-		ScpObjectSpace * oldparentspace = FunctionObjectSpace->parentspace;  //Ω‚æˆµ›πÈµ˜”√µƒŒ Ã‚
+		ScpObjectSpace * oldparentspace = FunctionObjectSpace->parentspace;  //Ëß£ÂÜ≥ÈÄíÂΩíË∞ÉÁî®ÁöÑÈóÆÈ¢ò
 		if (FunctionObjectSpace == engine->GetCurrentObjectSpace() || engine->GetCurrentObjectSpace()->IsMyParentSpace(FunctionObjectSpace))
 		{
 			bRecurseCall=TRUE;				
@@ -118,75 +125,115 @@ int ScpFunctionObject::Do(CScriptEngine *engine)
 int ScpFunctionObject::BindParameters(CScriptEngine *engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
-	if(pFormalParameters->size()>0)
+	if (objectSpace)
 	{
-		if(pFormalParameters->size()==RealParameters.size())
-		{			
-			//ππΩ®–Œ≤Œ”Î µ≤Œµƒ”≥…‰πÿœµ
-			for(ULONG i=0;i<pFormalParameters->size();i++)
+		if (paramlist)
+		{
+			paramlist->EmptyElement();
+			paramlist = nullptr;
+		}
+		paramlist =(ScpListObject * )BaseObjectFactory(ObjList);
+		if (paramlist)
+		{
+			paramlist->EmptyElement();
+			objectSpace->AddObject("parameters", paramlist);
+		}		
+		if (pFormalParameters->size() == 0 && RealParameters.size() > 0)
+		{
+			for (ITSTRINGS it = RealParameters.begin(); it != RealParameters.end(); it++)
 			{
-				//œ÷‘⁄“ÚŒ™ «‘⁄∫Ø ˝◊‘º∫µƒæ÷≤ø√˚◊÷ø’º‰¿Ô£¨À˘“‘ø…“‘≤ª”√øº¬«”Î»´æ÷√˚◊÷ø’º‰µƒ√˚≥∆≥ÂÕªŒ Ã‚ 
-				//“ÚŒ™≤È’“µƒ ±∫Ú ◊œ» «‘⁄æ÷≤øø’º‰¿Ô£¨À˘“‘ µœ÷¡Àæ÷≤ø√˚◊÷ø’º‰µƒ±‰¡ø∏≤∏«…œ“ª≤„√˚◊÷ø’º‰µƒ±‰¡ø
-				ScpObject * obj=objectSpace->FindObject(RealParameters.at(i));
-				if(obj)
+				std::string temp = *it;
+				pFormalParameters->push_back("@" + temp);
+			}
+		}
+		if (pFormalParameters->size() > 0)
+		{
+			if (pFormalParameters->size() == RealParameters.size())
+			{
+				//ÊûÑÂª∫ÂΩ¢ÂèÇ‰∏éÂÆûÂèÇÁöÑÊò†Â∞ÑÂÖ≥Á≥ª
+				for (ULONG i = 0; i < pFormalParameters->size(); i++)
 				{
-					objectSpace->AddObject(pFormalParameters->at(i),obj);
-				}				
-				else
-				{
-					ScpObject * tempobj=NULL;					
-					////’‚—˘“ª¿¥£¨∫Ø ˝µƒ≤Œ ˝“≤ø…“‘ « ˝÷µ≥£¡ø
-					if (IsStaticNumber(RealParameters.at(i)))
+					//Áé∞Âú®Âõ†‰∏∫ÊòØÂú®ÂáΩÊï∞Ëá™Â∑±ÁöÑÂ±ÄÈÉ®ÂêçÂ≠óÁ©∫Èó¥ÈáåÔºåÊâÄ‰ª•ÂèØ‰ª•‰∏çÁî®ËÄÉËôë‰∏éÂÖ®Â±ÄÂêçÂ≠óÁ©∫Èó¥ÁöÑÂêçÁß∞ÂÜ≤Á™ÅÈóÆÈ¢ò 
+					//Âõ†‰∏∫Êü•ÊâæÁöÑÊó∂ÂÄôÈ¶ñÂÖàÊòØÂú®Â±ÄÈÉ®Á©∫Èó¥ÈáåÔºåÊâÄ‰ª•ÂÆûÁé∞‰∫ÜÂ±ÄÈÉ®ÂêçÂ≠óÁ©∫Èó¥ÁöÑÂèòÈáèË¶ÜÁõñ‰∏ä‰∏ÄÂ±ÇÂêçÂ≠óÁ©∫Èó¥ÁöÑÂèòÈáè
+					ScpObject* obj = objectSpace->FindObject(RealParameters.at(i));
+					if (obj)
 					{
-						tempobj = new ScpIntObject;
-						((ScpIntObject*)tempobj)->value = StringToInt(RealParameters.at(i));
-						objectSpace->AddObject(pFormalParameters->at(i), tempobj);
-					}
-					else if (IsStaticDoubleNumber(RealParameters.at(i)))
-					{
-						tempobj = new ScpDoubleObject;
-						((ScpDoubleObject*)tempobj)->value = StringToDouble(RealParameters.at(i));
-						objectSpace->AddObject(pFormalParameters->at(i), tempobj);
+						objectSpace->AddObject(pFormalParameters->at(i), obj);
+						paramlist->AddElement(pFormalParameters->at(i), obj);
 					}
 					else
 					{
-						std::wstring Expression = RealParameters.at(i);
-						ScpObjectSpace * currentObjectSpace = objectSpace;
-						ScpExpressionTreeNode *root = engine->ana.BuildExressionTreeEx(Expression);
-						if (root)
+						ScpObject* tempobj = NULL;
+						////ËøôÊ†∑‰∏ÄÊù•ÔºåÂáΩÊï∞ÁöÑÂèÇÊï∞‰πüÂèØ‰ª•ÊòØÊï∞ÂÄºÂ∏∏Èáè
+						if (IsStaticNumber(RealParameters.at(i)))
 						{
-							tempobj = root->CalculateEx(engine);
-							if (tempobj)
+							__int64 v = StringToInt64(RealParameters.at(i));
+							if (v > INT_MAX)
 							{
-								//objectSpace->EraseObject(pFormalParameters->at(i));
+								tempobj = new ScpBigIntObject;
+								((ScpBigIntObject*)tempobj)->value = v;
 								objectSpace->AddObject(pFormalParameters->at(i), tempobj);
+								paramlist->AddElement(pFormalParameters->at(i), tempobj);
 							}
 							else
 							{
-								tempobj = new ScpStringObject;
-								((ScpStringObject*)tempobj)->content = RealParameters.at(i);
+								tempobj = new ScpIntObject;
+								((ScpIntObject*)tempobj)->value = StringToInt(RealParameters.at(i));
 								objectSpace->AddObject(pFormalParameters->at(i), tempobj);
+								paramlist->AddElement(pFormalParameters->at(i), tempobj);
 							}
-							root->Destroy(engine->GetCurrentObjectSpace());
-							engine->GetCurrentObjectSpace()->ReleaseTempObject(root);
+
 						}
-												
+						else if (IsStaticDoubleNumber(RealParameters.at(i)))
+						{
+							tempobj = new ScpDoubleObject;
+							((ScpDoubleObject*)tempobj)->value = StringToDouble(RealParameters.at(i));
+							objectSpace->AddObject(pFormalParameters->at(i), tempobj);
+							paramlist->AddElement(pFormalParameters->at(i), tempobj);
+						}
+						else
+						{
+							std::string Expression = RealParameters.at(i);
+							ScpObjectSpace* currentObjectSpace = objectSpace;
+							ScpExpressionTreeNode* root = engine->ana.BuildExressionTreeEx(Expression);
+							if (root)
+							{
+								tempobj = root->CalculateEx(engine);
+								if (tempobj)
+								{
+									//objectSpace->EraseObject(pFormalParameters->at(i));
+									objectSpace->AddObject(pFormalParameters->at(i), tempobj);
+									paramlist->AddElement(pFormalParameters->at(i), tempobj);
+								}
+								else
+								{
+									tempobj = new ScpStringObject;
+									((ScpStringObject*)tempobj)->content = RealParameters.at(i);
+									objectSpace->AddObject(pFormalParameters->at(i), tempobj);
+									paramlist->AddElement(pFormalParameters->at(i), tempobj);
+								}
+								root->Destroy(engine->GetCurrentObjectSpace());
+								engine->GetCurrentObjectSpace()->ReleaseTempObject(root);
+							}
+
+						}
+
 					}
-							
 				}
-			}		
-		}
-		else
-		{
-			engine->PrintError(L"Invalid Function Parameter");
-			return -1;
+			}
+			else
+			{
+				engine->PrintError(L"Invalid Function Parameter");
+				return -1;
+			}
 		}
 	}
+	
 	return 0;
 }
 int ScpFunctionObject::UnBindParameters(CScriptEngine *engine)
 {
-	//≥∑œ˙–Œ≤Œ”Î « µ≤Œ÷Æº‰µƒ”≥…‰πÿœµ
+	//Êí§ÈîÄÂΩ¢ÂèÇ‰∏éÊòØÂÆûÂèÇ‰πãÈó¥ÁöÑÊò†Â∞ÑÂÖ≥Á≥ª
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	for(ULONG i=0;i<pFormalParameters->size();i++)
 	{
@@ -200,31 +247,37 @@ int ScpFunctionObject::UnBindParameters(CScriptEngine *engine)
 			continue;
 		}
 	}
-	//…æ≥˝ µ≤Œ¡–±Ì
+	//Âà†Èô§ÂÆûÂèÇÂàóË°®
 	while(RealParameters.size()>0)
 	{
 		RealParameters.pop_back();
 	}	
+	if (paramlist)
+	{
+		paramlist->EmptyElement();
+		objectSpace->EraseObject(paramlist);
+		paramlist = nullptr;
+	}
 	return 0;
 }
 
 void ScpFunctionObject::Show(CScriptEngine * engine)
 {
-	std::wstring tempfuncbody =Name;
-	tempfuncbody+=L"(";
+	std::string tempfuncbody =Name;
+	tempfuncbody+="(";
 	for(ITPARAMETERS it =pFormalParameters->begin();it!=pFormalParameters->end();it++)
 	{
-		std::wstring temp = *it;
+		std::string temp = *it;
 		tempfuncbody+=temp;
-		tempfuncbody+=L",";
+		tempfuncbody+=",";
 	}
-	if(tempfuncbody.substr(tempfuncbody.length()-1,1)==L",")
+	if(tempfuncbody.substr(tempfuncbody.length()-1,1)==",")
 		tempfuncbody=tempfuncbody.substr(0,tempfuncbody.length()-1);
-	tempfuncbody+=L")\n";
+	tempfuncbody+=")\n";
 	engine->PrintError(tempfuncbody);
 	for(ITSTRINGS it =Boday.begin();it!=Boday.end();it++)
 	{
-		std::wstring temp = *it;
+		std::string temp = *it;
 		engine->PrintError(temp);
 	}
 }
@@ -236,25 +289,25 @@ int ScpFunctionObject::GetFormalParametersCount()
 {
 	return FormalParameters.size();
 }
-std::wstring ScpFunctionObject::GetCloneName()
+std::string ScpFunctionObject::GetCloneName()
 {
 	
-	std::wstring tempobjname=Name;
+	std::string tempobjname=Name;
 	int AppendIndex = 0;
 	int AppendIndexLen = 0;
-	std::wstring wsAppendIndex;
-	size_t pos = Name.rfind(L"LSClone");
-	if (pos!=std::wstring::npos)
+	std::string wsAppendIndex;
+	size_t pos = Name.rfind("LSClone");
+	if (pos!=std::string::npos)
 	{		
 		AppendIndexLen = Name.length()-pos - 7;
 		wsAppendIndex = Name.substr(pos + 7);
 		AppendIndex = StringToInt(wsAppendIndex);		
 		AppendIndex += 1;
-		tempobjname.replace(pos + 7, AppendIndexLen, STDSTRINGEXT::Format(L"%d", AppendIndex));
+		tempobjname.replace(pos + 7, AppendIndexLen, STDSTRINGEXT::Format("%d", AppendIndex));
 	}
 	else
 	{
-		tempobjname = STDSTRINGEXT::Format(L"%sLSClone%d", Name.c_str(),AppendIndex);
+		tempobjname = STDSTRINGEXT::Format("%sLSClone%d", Name.c_str(),AppendIndex);
 	}
 
 	return tempobjname;
@@ -271,7 +324,7 @@ ScpObject * ScpFunctionObject::InnerFunction_Get(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -300,7 +353,7 @@ void ScpFunctionObject::Release()
 {
 	delete this;
 }
-bool ScpFunctionObject::IsInnerFunction(std::wstring & functionname)
+bool ScpFunctionObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -308,7 +361,7 @@ bool ScpFunctionObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpFunctionObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpFunctionObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{

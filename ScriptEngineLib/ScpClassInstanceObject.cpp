@@ -11,7 +11,7 @@ void ScpClassInstanceObject::Show(CScriptEngine * engine)
 	ScpClassObject::Show(engine);
 }
 
-ScpObject * ScpClassInstanceObject::Clone(std::wstring strObjName)
+ScpObject * ScpClassInstanceObject::Clone(std::string strObjName)
 {
 	ScpClassInstanceObject * obj = new ScpClassInstanceObject;
 	if (obj)

@@ -7,8 +7,8 @@
 #define _H_SCPMAPOBJECT
 #include "ScpObject.h"
 #include "ScpObjectSpace.h"
-typedef std::map<std::wstring ,std::wstring> ScpObjectNameMap;
-typedef std::map<std::wstring ,std::wstring>::iterator ITScpObjectNameMap;
+typedef std::map<std::string ,std::string> ScpObjectNameMap;
+typedef std::map<std::string ,std::string>::iterator ITScpObjectNameMap;
 
 
 
@@ -17,18 +17,18 @@ class ScpMapObject : public ScpObject
 public:
 	ScpMapObject();
 	~ScpMapObject();
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
     virtual void Show(CScriptEngine * engine);
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
-    BOOL MapObject(std::wstring& key,std::wstring& value, CScriptEngine * engine);
-    BOOL UnMapObject(std::wstring& key);
+    BOOL MapObject(std::string& key,std::string& value, CScriptEngine * engine);
+    BOOL UnMapObject(std::string& key);
 	BOOL UnMapObject(int index);
-    ScpObject* GetKeyObject(std::wstring& key,ScpObjectSpace * objectSpace);
-    ScpObject* GetValueObject(std::wstring& key,ScpObjectSpace * objectSpace);
+    ScpObject* GetKeyObject(std::string& key,ScpObjectSpace * objectSpace);
+    ScpObject* GetValueObject(std::string& key,ScpObjectSpace * objectSpace);
 	ScpObject* GetValueObject(int index);
     
 

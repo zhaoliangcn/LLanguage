@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//´óÕûÊý¶ÔÏó
+//å¤§æ•´æ•°å¯¹è±¡
 */
 #ifndef _H_SCPBIGINTOBJECT
 #define _H_SCPBIGINTOBJECT
@@ -13,11 +13,11 @@ public:
 	ScpBigIntObject();
 	~ScpBigIntObject();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	__int64 value;
 
@@ -35,6 +35,9 @@ public:
 	static ScpObject * InnerFunction_sin(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_atan(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_tan(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject * InnerFunction_pow(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject* InnerFunction_add(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine);
+	static ScpObject* InnerFunction_sub(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine);
 };
 
 ScpObject * __stdcall ScpBigIntObjectFactory(VTPARAMETERS * paramters, CScriptEngine * engine);

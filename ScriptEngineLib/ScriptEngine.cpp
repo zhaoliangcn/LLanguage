@@ -2,48 +2,49 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//L½Å±¾ÓïÑÔ½âÊÍÒıÇæ£¬°üÀ¨½Å±¾ÎÄ¼şµÄ¼ÓÔØ£¬ÖğĞĞ½âÎö£¬½Å±¾µ÷ÊÔÖ§³Ö£¬
-//¿âÎÄ¼şµ¼Èë£¬À©Õ¹ÃüÁîµÄ×¢²á¡¢À©Õ¹¶ÔÏóµÄ¼ÓÔØºÍ×¢²á
+//Lè„šæœ¬è¯­è¨€è§£é‡Šå¼•æ“ï¼ŒåŒ…æ‹¬è„šæœ¬æ–‡ä»¶çš„åŠ è½½ï¼Œé€è¡Œè§£æï¼Œè„šæœ¬è°ƒè¯•æ”¯æŒï¼Œ
+//åº“æ–‡ä»¶å¯¼å…¥ï¼Œæ‰©å±•å‘½ä»¤çš„æ³¨å†Œã€æ‰©å±•å¯¹è±¡çš„åŠ è½½å’Œæ³¨å†Œ
 */
 // ScritpEngine.cpp : Defines the entry point for the console application.
 //
-
 #include "ScriptEngine.h"
 #include "ScpScriptLex.h"
 #include "commanddefine_uni.h"
 #include "../Common/commonutil.hpp"
 #include "ScpExtendObjectMgr.h"
+#include "ScpObjectMgr.h"
 #include "ScpCommonObject.h"
 #include "ScpObjectNammes.h"
 #include "addin.h"
 #include "ScpOperationMgr.h"
 #include <iostream>
 #include <fstream>
-//¶¯×÷£º¶ÔÏó,²ÎÊı
-//¶¯×÷£º²ÎÊı,²ÎÊı
-DWORD GetCurrentTickCount()
-{
-	DWORD dwStart=0;
-#ifdef WIN32
-	dwStart = GetTickCount();
+#ifdef _WIN32
+
 #else
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv, &tz);
-	 dwStart = tv.tv_usec;
+#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
 #endif
-	 return dwStart;
-}
+
+//åŠ¨ä½œï¼šå¯¹è±¡,å‚æ•°
+//åŠ¨ä½œï¼šå‚æ•°,å‚æ•°
+
 void CScriptEngine::Init()
 {
 	language = 0;
 	Jit = 0;
+	Build = 0;
 	globalcommand.InitBaseCommand();
 
+	
+	
 
 	ScpGlobalObject::GetInstance()->SelectLanguage(language);
 	ScpObjectNames::GetSingleInsatnce()->SelectLanguage(language);
 
+	
 	currentcommandline = 0;
 	globalObjectSpace = new ScpObjectSpace();
 	if (globalObjectSpace)
@@ -60,8 +61,155 @@ void CScriptEngine::Init()
 
 	debugger = NULL;
 	RegisterGlobalFunctions();
-	//¼ÓÔØÑ¹Ëõ¿âÀ©Õ¹£¬Ö§³Öµ¼Èë°üÃüÁî
-	extend_obj_mgr.LoadExtension(L"Zip", &globalcommand);
+	obj_mgr.RegisterInnerObjects();
+	//åŠ è½½å‹ç¼©åº“æ‰©å±•ï¼Œæ”¯æŒå¯¼å…¥åŒ…å‘½ä»¤
+	extend_obj_mgr.LoadExtension("Zip", &globalcommand);
+
+	//make an global function 
+	std::string global_show = "define:string,lasterror\n\
+			define:function,show\n\
+			define:int, count\n\
+			count = parameters.getsize()\n\
+			while (count > 0)\n\
+			count--\n\
+			parameters[count].show()\n\
+			end\n\
+			end\n";	
+	std::string golbal_clear = "define:function,clear\n\
+			define:string,t\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			while (count > 0)\n\
+			count--\n\
+			parameters[count].clear()\n\
+			end\n\
+			end\n";
+	std::string global_delete = "define:function,delete\n\
+			define:string,t\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			while (count > 0)\n\
+			count--\n\
+			parameters[count].delete()\n\
+			end\n\
+			end\n";
+	std::string global_open = "define:function,open\n\
+			define:string,t\n\
+			define:string,path\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			path = parameters[1]\n\
+			#path.show()\n\
+			parameters[0].open(path)\n\
+			end\n\
+			end\n";
+	std::string global_seek = "define:function,seek\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			parameters[0].seek(parameters[1])\n\
+			end\n\
+			end\n";
+	std::string global_copy = "define:function,copy\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			parameters[0].copy(parameters[1])\n\
+			end\n\
+			end\n";
+	std::string global_compare = "define:function,compare\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			return(parameters[0].compare(parameters[1]))\n\
+			end\n\
+			end\n";
+	std::string global_acquire = "define:function,acquire\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			return(parameters[0].acquire(parameters[1]))\n\
+			end\n\
+			end\n";
+	std::string global_release = "define:function,release\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			parameters[0].release(parameters[1])\n\
+			end\n\
+			end\n";
+	std::string global_write = "define:function,write\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			parameters[0].write(parameters[1])\n\
+			end\n\
+			end\n";
+	std::string global_read = "define:function,read\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			return(parameters[0].read(parameters[1]))\n\
+			end\n\
+			end\n";
+	std::string global_insert = "define:function,insert\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			parameters[0].insert(parameters[1])\n\
+			end\n\
+			if (count == 3)\n\
+			parameters[0].insert(parameters[2], parameters[1])\n\
+			end\n\
+			end\n";
+	std::string global_match = "define:function,match\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			return(parameters[0].find(parameters[1]))\n\
+			end\n\
+			end\n";
+	std::string global_replace = "define:function,replace\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 3)\n\
+			parameters[0].replace(parameters[1], parameters[2])\n\
+			end\n\
+			end\n";
+	std::string global_save = "define:function,save\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			if (count == 2)\n\
+			parameters[0].save(parameters[1])\n\
+			end\n\
+			if (count == 1)\n\
+			parameters[0].save()\n\
+			end\n\
+			end\n";
+	std::string global_print = "define:function,print\n\
+			define:int,count\n\
+			count = parameters.getsize()\n\
+			while (count > 0)\n\
+			count--\n\
+			parameters[count].show()\n\
+			end\n\
+			end\n";
+	globallib = "#scplib\n#scpeng\n" +
+		global_show + "\n" +
+		golbal_clear + "\n" +
+		global_delete + "\n" +
+		global_open + "\n" +
+		global_compare + "\n" +
+		global_read + "\n" +
+		global_insert + "\n" +
+		global_match + "\n" +
+		global_replace + "\n" +
+		global_save + "\n" +
+		global_print + "\n";
+	
+	
+
 }
 BOOL CScriptEngine::FetchCommand(unsigned long commandvalue, VTPARAMETERS * vtparameters)
 {
@@ -69,8 +217,8 @@ BOOL CScriptEngine::FetchCommand(unsigned long commandvalue, VTPARAMETERS * vtpa
 	size_t dwExtCommandCount = globalcommand.GetExtCommandFunctionCount(commandvalue);
 	if (dwExtCommandCount > 0)
 	{
-		//¶à¸öÀ©Õ¹¶ÔÏó¿ÉÄÜ»á×¢²áÍ¬Ò»¸öÀ©Õ¹ÃüÁî
-		//ËùÒÔÀ©Õ¹ÃüÁî»á·¢ËÍµ½ËùÓĞ×¢²áÕß£¬×¢²áÕß±ØĞë½øĞĞ±ØÒªµÄÀàĞÍ¼ì²â
+		//å¤šä¸ªæ‰©å±•å¯¹è±¡å¯èƒ½ä¼šæ³¨å†ŒåŒä¸€ä¸ªæ‰©å±•å‘½ä»¤
+		//æ‰€ä»¥æ‰©å±•å‘½ä»¤ä¼šå‘é€åˆ°æ‰€æœ‰æ³¨å†Œè€…ï¼Œæ³¨å†Œè€…å¿…é¡»è¿›è¡Œå¿…è¦çš„ç±»å‹æ£€æµ‹
 		for (size_t index = 0; index < dwExtCommandCount; index++)
 		{
 			ExtObjectCommandFunction func = globalcommand.GetExtCommandFunctionAddress(commandvalue, index);
@@ -209,7 +357,7 @@ BOOL CScriptEngine::FetchCommand(unsigned long commandvalue, VTPARAMETERS * vtpa
 	}
 	return TRUE;
 }
-ULONG CScriptEngine::QueryCommandValue(const std::wstring & commandstring)
+ULONG CScriptEngine::QueryCommandValue(const std::string & commandstring)
 {
 	return globalcommand.QueryCommand(commandstring);
 }
@@ -217,14 +365,14 @@ ULONG CScriptEngine::QueryCurrentUserCommand()
 {
 	return vl_usercommand;
 }
-int CScriptEngine::ParseLibBody(const wchar_t * libFileName, VTSTRINGS &LibBody, bool islib)
+int CScriptEngine::ParseLibBody(const char * libFileName, VTSTRINGS &LibBody, bool islib)
 {
 	if (LibBody.size() == 0)
 	{
 		return -1;
 	}
 	ITSTRINGS it;
-	std::wstring headline;
+	std::string headline;
 	it = LibBody.begin();
 	if (LibBody.size() > 0)
 	{
@@ -252,10 +400,10 @@ int CScriptEngine::ParseLibBody(const wchar_t * libFileName, VTSTRINGS &LibBody,
 
 	while (libcurrentcommandline < LibBody.size())
 	{
-		std::wstring &wcommandline = LibBody.at(libcurrentcommandline);
+		std::string &wcommandline = LibBody.at(libcurrentcommandline);
 		if (wcommandline.empty())
 		{
-			//ºöÂÔ¿ÕĞĞ
+			//å¿½ç•¥ç©ºè¡Œ
 			libcurrentcommandline++;
 			continue;
 		}
@@ -265,14 +413,13 @@ int CScriptEngine::ParseLibBody(const wchar_t * libFileName, VTSTRINGS &LibBody,
 			libcurrentcommandline++;
 			continue;
 		}
+		else if (CScriptFile::IsCppComment(wcommandline))
+		{
+			libcurrentcommandline++;
+			continue;
+		}
 		else
 		{
-			//if (wcommandline.empty())
-			//{
-			//	//ºöÂÔ¿ÕĞĞ
-			//	libcurrentcommandline++;
-			//	continue;
-			//}
 			ULONG value;
 			VTPARAMETERS vtparameters;
 
@@ -347,13 +494,13 @@ int CScriptEngine::ImportLibFromMemory(void * Mem, bool islib)
 		return -1;
 	}
 	VTSTRINGS LibBody;
-	scriptfile.ReadAllFromMemory(STDSTRINGEXT::AToW((char *)Mem).c_str(), LibBody);
-	return ParseLibBody(NULL,LibBody, islib);
+	scriptfile.ReadAllFromMemory((char *)Mem, LibBody);
+	return ParseLibBody((char*)NULL,LibBody, islib);
 }
-int CScriptEngine::ImportLib(std::wstring libfilename, bool islib)
+int CScriptEngine::ImportLib(std::string libfilename, bool islib)
 {
 	int ret = -1;
-	//±ÜÃâÖØ¸´µ¼Èë
+	//é¿å…é‡å¤å¯¼å…¥
 	ITSTRINGS it = importedlibs.begin();
 	while (it != importedlibs.end())
 	{
@@ -364,31 +511,31 @@ int CScriptEngine::ImportLib(std::wstring libfilename, bool islib)
 		it++;
 	}
 #ifdef _WIN32
-	//win32»·¾³ÏÂµÄ¿âÎÄ¼ş²éÕÒÂ·¾¶
-	if (libfilename.find(L"\\") == std::wstring::npos)
+	//win32ç¯å¢ƒä¸‹çš„åº“æ–‡ä»¶æŸ¥æ‰¾è·¯å¾„
+	if (libfilename.find("\\") == std::string::npos)
 	{
-		//Èç¹ûÖ»¸ø³öÁË¿âÎÄ¼şµÄÃû×Öµ«Ã»ÓĞ¸ø³öÂ·¾¶
-		std::wstring EnginePath;
-		wchar_t path[MAX_PATH] = { 0 };
-		GetModuleFileNameW(NULL, path, sizeof(path));
+		//å¦‚æœåªç»™å‡ºäº†åº“æ–‡ä»¶çš„åå­—ä½†æ²¡æœ‰ç»™å‡ºè·¯å¾„
+		std::string EnginePath;
+		char path[MAX_PATH] = { 0 };
+		GetModuleFileNameA(NULL, path, sizeof(path));
 		EnginePath = CScriptFile::GetPath(path);
-		std::wstring temp;
+		std::string temp;
 		temp = EnginePath;
-		temp += L"\\lib\\";
+		temp += "\\lib\\";
 		temp += libfilename;
 		BOOL Exist = CScriptFile::FileExist(temp);
 		if (!Exist)
 		{
 			temp = EnginePath;
-			temp += L"\\";
+			temp += "\\";
 			temp += libfilename;
 			Exist = CScriptFile::FileExist(temp);
 			if (!Exist)
 			{
-				std::wstring ScriptPath;
+				std::string ScriptPath;
 				ScriptPath = CScriptFile::GetPath(currentscriptfilename.c_str());
 				temp = ScriptPath;
-				temp += L"\\";
+				temp += "\\";
 				temp += libfilename;
 				Exist = CScriptFile::FileExist(temp);
 			}
@@ -419,7 +566,7 @@ int CScriptEngine::ImportLib(std::wstring libfilename, bool islib)
 	return 0;
 }
 
-int CScriptEngine::DoString(std::wstring& script)
+int CScriptEngine::DoString(std::string& script)
 {
 	if (CScriptFile::IsComment(script))
 	{
@@ -448,17 +595,17 @@ int CScriptEngine::DoString(std::wstring& script)
 		return 0;
 	}
 }
-int CScriptEngine::DumpScript(std::wstring newscriptfilename)
+int CScriptEngine::DumpScript(std::string newscriptfilename)
 {
 #ifdef WIN32
 	std::ofstream outfile(newscriptfilename.c_str());
 #else
-	std::ofstream outfile(STDSTRINGEXT::WToA(newscriptfilename).c_str());
+	std::ofstream outfile(newscriptfilename.c_str());
 #endif
 	std::string commandline;
 	for (ITSTRINGS it = allScriptBody.begin();it != allScriptBody.end();it++)
 	{
-		commandline = STDSTRINGEXT::WToA((*it).c_str());
+		commandline =*it;
 		outfile << commandline << std::endl;
 	}
 	outfile.close();
@@ -466,7 +613,7 @@ int CScriptEngine::DumpScript(std::wstring newscriptfilename)
 }
 int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 {
-	DWORD dwStart = GetCurrentTickCount();
+	
 	runmode = mode;
 	currentcommandline = 0;
 
@@ -476,10 +623,21 @@ int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 
 	while (currentcommandline < allScriptBody.size())
 	{
-		std::wstring &wcommandline = allScriptBody.at(currentcommandline);		
+		std::string &wcommandline = allScriptBody.at(currentcommandline);		
 		if (wcommandline.empty())
 		{
-			//ºöÂÔ¿ÕĞĞ
+			//å¿½ç•¥ç©ºè¡Œ
+			currentcommandline++;
+			continue;
+		}
+		else if (CScriptFile::IsComment(wcommandline))
+		{
+			SwitchLanguage(wcommandline);
+			currentcommandline++;
+			continue;
+		}
+		else if (CScriptFile::IsCppComment(wcommandline))
+		{
 			currentcommandline++;
 			continue;
 		}
@@ -488,9 +646,7 @@ int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 			ULONG value;
 			VTPARAMETERS vtparameters;
 			if (!lex.ParseCommandLine(wcommandline, value, vtparameters))
-			{
-				SwitchLanguage(wcommandline);
-				
+			{			
 				currentcommandline++;
 				continue;
 			}
@@ -555,7 +711,7 @@ int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 				debugger->CheckDebugEvent(currentscriptfilename.c_str(), currentcommandline, INFINITE);
 			}
 
-			if (Jit)
+			if (Jit || Build)
 			{
 				ByteCodeMemoryStream memstream;
 				bytecode.GenByteCodeFromCommand(value, vtparameters, memstream, this);
@@ -578,7 +734,7 @@ int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 		}
 		currentcommandline++;		
 	};
-	//²éÕÒ²¢µ÷ÓÃ¡°Ö÷º¯Êı¡±
+	//æŸ¥æ‰¾å¹¶è°ƒç”¨â€œä¸»å‡½æ•°â€
 	ScpObject * obj = currentObjectSpace->FindObject(ScpObjectNames::GetSingleInsatnce()->strObjMainFunction);
 	if (obj && obj->GetType() == ObjFunction)
 	{
@@ -586,7 +742,7 @@ int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 		VTPARAMETERS param;
 		param.push_back(ScpObjectNames::GetSingleInsatnce()->strObjMainFunction);
 
-		if (Jit)
+		if (Jit || Build)
 		{
 			ByteCodeMemoryStream memstream;
 			bytecode.GenByteCodeFromCommand(ulcommand, param, memstream, this);
@@ -598,28 +754,29 @@ int  CScriptEngine::DoloadedScript(SCRIPTRUNTYPE mode)
 			FetchCommand(ulcommand, &param);
 		}
 	}
-	DWORD dwEnd = GetCurrentTickCount();
-	dwTimeCount = dwEnd - dwStart;
-	if(Jit)
-		bytecode.DumpToFile((currentscriptfilename+L".scpb").c_str());
+	
+	//dwTimeCount = dwEnd - dwStart;
+	if(Jit || Build)
+		bytecode.DumpToFile((currentscriptfilename+".scpb").c_str());
 	currentObjectSpace->userobject.Destroy();
 	//printf("%d\n",dwTimeCount);
 	return 0;
 }
 
-bool CScriptEngine::LoadAllScript(std::wstring scriptfilename)
+bool CScriptEngine::LoadAllScript(std::string scriptfilename)
 {
 	allScriptBody.clear();
 	return scriptfile.ReadAll(scriptfilename.c_str(), allScriptBody);
 
 }
-int CScriptEngine::DoScript(std::wstring scriptfilename, SCRIPTRUNTYPE mode)
+int CScriptEngine::DoScript(std::string scriptfilename, SCRIPTRUNTYPE mode)
 {
 	if (LoadAllScript(scriptfilename))
 	{
 		if (CScriptFile::IsValidScript(allScriptBody.at(0)))
 		{
-			currentscriptfilename = scriptfilename;
+			currentscriptfilename = scriptfilename;	
+			ImportLibFromMemory((void *)globallib.c_str(), true);		
 			return DoloadedScript(mode);
 		}
 		else
@@ -655,9 +812,9 @@ void CScriptEngine::Create_Global_CommndLine_TableObject()
 				ScpStringObject * strobj = new ScpStringObject;
 				if (strobj)
 				{
-					strobj->content = szArglist[i];
-					std::wstring tempname = ScpObjectNames::GetSingleInsatnce()->strCommandParameter;
-					tempname += IntToWString(i);
+					strobj->content = STDSTRINGEXT::W2UTF(szArglist[i]);
+					std::string tempname = ScpObjectNames::GetSingleInsatnce()->strCommandParameter;
+					tempname += IntToString(i);
 					tableobj->AddElement(tempname, strobj);
 				}
 				if (i == 1)
@@ -665,13 +822,13 @@ void CScriptEngine::Create_Global_CommndLine_TableObject()
 					ScpStringObject * strobj1 = new ScpStringObject;
 					if (strobj1)
 					{
-						strobj1->content = szArglist[i];
+						strobj1->content = STDSTRINGEXT::W2UTF(szArglist[i]);
 						currentObjectSpace->AddObject(ScpObjectNames::GetSingleInsatnce()->strCurrentScriptFile, strobj1);
 					}
 					ScpStringObject * strobj2 = new ScpStringObject;
 					if (strobj2)
 					{
-						strobj2->content = PathStripFileName(szArglist[i]);
+						strobj2->content = PathStripFileName(STDSTRINGEXT::W2UTF(szArglist[i]));
 						currentObjectSpace->AddObject(ScpObjectNames::GetSingleInsatnce()->strCurrentScriptPath, strobj2);
 					}
 				}
@@ -681,10 +838,7 @@ void CScriptEngine::Create_Global_CommndLine_TableObject()
 		LocalFree(szArglist);
 	}
 #else
-#include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <string.h>
+
 	char buff[4096] = { 0 };
 	int fd = open("/proc/self/cmdline", O_RDONLY);
 	int rsize = read(fd, buff, sizeof(buff));
@@ -703,9 +857,9 @@ void CScriptEngine::Create_Global_CommndLine_TableObject()
 				ScpStringObject* strobj = new ScpStringObject;
 				if (strobj)
 				{
-					strobj->content = STDSTRINGEXT::UTF2W(pcmdargs);
-					std::wstring tempname = ScpObjectNames::GetSingleInsatnce()->strCommandParameter;
-					tempname += IntToWString(i);
+					strobj->content =pcmdargs;
+					std::string tempname = ScpObjectNames::GetSingleInsatnce()->strCommandParameter;
+					tempname += IntToString(i);
 					tableobj->AddElement(tempname, strobj);
 					i++;
 				}
@@ -714,13 +868,13 @@ void CScriptEngine::Create_Global_CommndLine_TableObject()
 					ScpStringObject* strobj1 = new ScpStringObject;
 					if (strobj1)
 					{
-						strobj1->content = STDSTRINGEXT::UTF2W(pcmdargs);
+						strobj1->content =pcmdargs;
 						currentObjectSpace->AddObject(ScpObjectNames::GetSingleInsatnce()->strCurrentScriptFile, strobj1);
 					}
 					ScpStringObject* strobj2 = new ScpStringObject;
 					if (strobj2)
 					{
-						strobj2->content = STDSTRINGEXT::UTF2W(PathStripFileName(pcmdargs));
+						strobj2->content = PathStripFileName(pcmdargs);
 						currentObjectSpace->AddObject(ScpObjectNames::GetSingleInsatnce()->strCurrentScriptPath, strobj2);
 					}
 				}
@@ -759,14 +913,14 @@ void CScriptEngine::Create_Global_Environment_TableObject()
 					ScpStringObject * strobj = new ScpStringObject;
 					if (strobj)
 					{
-						std::wstring tempname;
+						std::string tempname;
 						size_t pos = envstr.find(L"=");
 						if (pos != std::wstring::npos)
 						{
 							//strobj->content =envstr.substr(pos+1);
-							strobj->content = envstr;
+							strobj->content =STDSTRINGEXT::W2UTF(envstr);
 							tempname = ScpObjectNames::GetSingleInsatnce()->strObjEnvironmentVariable;
-							tempname += IntToWString(i);
+							tempname += IntToString(i);
 							//tempname += L"_";
 							//tempname += envstr.substr(0,pos);
 							tableobj->AddElement(tempname, strobj);
@@ -795,21 +949,21 @@ void CScriptEngine::Create_Global_Environment_TableObject()
 		if (penv)
 		{
 			char** envir = penv;
-			int i=0;
+			int i = 0;
 			while (*envir)
 			{
 				//fprintf(stdout, "%s\n", *envir);
-				std::wstring envstr = STDSTRINGEXT::UTF2W(*envir);
+				std::string envstr = *envir;
 				ScpStringObject* strobj = new ScpStringObject;
 				if (strobj)
 				{
-					std::wstring tempname;
-					size_t pos = envstr.find(L"=");
-					if (pos != std::wstring::npos)
+					std::string tempname;
+					size_t pos = envstr.find("=");
+					if (pos != std::string::npos)
 					{
 						strobj->content = envstr;
 						tempname = ScpObjectNames::GetSingleInsatnce()->strObjEnvironmentVariable;
-						tempname += IntToWString(i);
+						tempname += IntToString(i);
 						tableobj->AddElement(tempname, strobj);
 					}
 					i++;
@@ -836,15 +990,15 @@ void CScriptEngine::Create_Global_CurrentTimeObject()
 		}
 	}
 }
-std::wstring CScriptEngine::GetCurrentSourceLine()
+std::string CScriptEngine::GetCurrentSourceLine()
 {
-	std::wstring error = L"LineNumber: " + IntToWString(currentcommandline);
-	error += L" Source : ";
+	std::string error = "LineNumber: " + IntToString(currentcommandline);
+	error += " Source : ";
 	if(currentcommandline>=0 && currentcommandline < allScriptBody.size())
 		error += allScriptBody[currentcommandline];
 	return error;
 }
-bool CScriptEngine::RegisterGlobalFunction(const std::wstring  chscommandstring, const std::wstring  engcommandstring, unsigned long commandid, GlobalCommandFunction Func)
+bool CScriptEngine::RegisterGlobalFunction(const std::string  chscommandstring, const std::string  engcommandstring, unsigned long commandid, GlobalCommandFunction Func)
 {
 	return globalcommand.RegisterGlobalFunction(chscommandstring, engcommandstring, commandid, Func);
 }
@@ -890,16 +1044,12 @@ void CScriptEngine::RegisterGlobalFunctions()
 	RegisterGlobalFunction(scpcommand_cn_print, scpcommand_en_print, vl_print, GlobalCommands::Do_Print_Command);
 	RegisterGlobalFunction(scpcommand_cn_create, scpcommand_en_create, vl_create, GlobalCommands::Do_Create_Command);
 	RegisterGlobalFunction(scpcommand_cn_save, scpcommand_en_save, vl_save, GlobalCommands::Do_Save_Command);
-	
-	
-	
-	
-	
-	
+
+
 }
 int CScriptEngine::DoByteCode(const char * ByteCodeFile, SCRIPTRUNTYPE mode )
 {
-	currentscriptfilename = STDSTRINGEXT::AToW(ByteCodeFile);
+	currentscriptfilename = ByteCodeFile;
 	scpbytecode.engine = this;
 	scpbytecode.Load(ByteCodeFile);
 	return scpbytecode.Do();
@@ -909,12 +1059,11 @@ int CScriptEngine::DoMemByteCode(const unsigned char * ByteCode, unsigned int le
 	scpbytecode.engine = this;
 	scpbytecode.LoadFromMem(ByteCode, length);
 	return scpbytecode.Do();
-	return 0;
 }
-int CScriptEngine::DumpByteCode(const wchar_t * ByteCodeFile)
+int CScriptEngine::DumpByteCode(const char * ByteCodeFile)
 {
 	if(ByteCodeFile==NULL)
-		bytecode.DumpToFile((currentscriptfilename + L".scpb").c_str());
+		bytecode.DumpToFile((currentscriptfilename + ".scpb").c_str());
 	else
 		bytecode.DumpToFile(ByteCodeFile);
 	return 0;
@@ -928,7 +1077,7 @@ bool CScriptEngine::SetDebugger(IScriptDebugger * dbg)
 	}
 	return false;
 }
-void CScriptEngine::SetScriptFileName(const wchar_t * filePathName)
+void CScriptEngine::SetScriptFileName(const char * filePathName)
 {
 	currentscriptfilename = filePathName;
 }
@@ -951,7 +1100,7 @@ BOOL CScriptEngine::RegisterUIStepCallBack(void * uiclass, UICallBack callback)
 {
 	return uimessage.RegisterUIStepCallBack(uiclass, callback);
 }
-int CScriptEngine::DebugMemoryScript(const wchar_t * memroyscript)
+int CScriptEngine::DebugMemoryScript(const char * memroyscript)
 {
 	allScriptBody.clear();
 	scriptfile.ReadAllFromMemory(memroyscript, allScriptBody);
@@ -978,7 +1127,7 @@ VTSTRINGS CScriptEngine::EnumObjects()
 {
 	return currentObjectSpace->userobject.EnumObjects();
 }
-void CScriptEngine::DumpObject(std::wstring objectname)
+void CScriptEngine::DumpObject(std::string objectname)
 {
 	return currentObjectSpace->userobject.DumpObject(objectname, this);
 }
@@ -993,21 +1142,26 @@ void CScriptEngine::SetCurrentObjectSpace(ScpObjectSpace * objspace)
 		currentObjectSpace = objspace;
 	}
 }
-std::wstring CScriptEngine::GetLastErrorString()
+std::string CScriptEngine::GetLastErrorString()
 {
 	return LastErrorString;
 }
-void CScriptEngine::SetLastErrorString(std::wstring &error)
+void CScriptEngine::SetLastErrorString(const char * error)
 {
 	LastErrorString = error;
+	ScpStringObject* obj = (ScpStringObject*)currentObjectSpace->FindObject("lasterror");
+	if (obj && obj->GetType()==ObjString)
+	{
+		obj->content = error;
+	}
 }
 
-void CScriptEngine::SwitchLanguage(std::wstring &comment)
+void CScriptEngine::SwitchLanguage(std::string &comment)
 {
-	if (comment == L"#scpeng")
+	if (comment == "#scpeng")
 	{
 		language = 1;
-		if (Jit)
+		if (Jit || Build)
 		{
 
 			ByteCodeMemoryStream memstream;
@@ -1022,10 +1176,10 @@ void CScriptEngine::SwitchLanguage(std::wstring &comment)
 		Create_Global_CommndLine_TableObject();
 		Create_Global_Environment_TableObject();
 	}
-	else if (comment == L"#scpchs")
+	else if (comment == "#scpchs")
 	{
 		language = 0;
-		if (Jit)
+		if (Jit || Build)
 		{
 			ByteCodeMemoryStream memstream;
 			bytecode.GenByteCodeFromSouceLine(comment, memstream);
@@ -1047,12 +1201,6 @@ int CScriptEngine::GetLanguge()
 	return language;
 }
 
-//std::string CScriptEngine::GetObjectNames(int lang)
-//{
-//	if (lang == LangEn)
-//		return std::string("int\ndouble\nstring\nfunction\n");
-//	else if (lang == LangCn)
-//		return std::string("ÕûÊı\n¸¡µãÊı\n×Ö·û´®\nº¯Êı\n");
-//}
+
 
 

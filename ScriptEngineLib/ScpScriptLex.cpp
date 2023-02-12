@@ -2,20 +2,40 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//´Ê·¨½âÎö¡¢ÃüÁîĞĞ½âÎö
+//è¯æ³•è§£æã€å‘½ä»¤è¡Œè§£æ
 */
 #include "ScpScriptLex.h"
 #include "ScriptEngine.h"
 #include "ScpGlobalObject.h"
 #include "ScpObjectNammes.h"
 #include "commanddefine_uni.h"
+#include <locale>
+#include "../Common/stdstringext.hpp"
 
+bool isalnumlaut(const char character) {
+	int cr = (int)(unsigned char)character;
+	if (isalnum(character)
+		|| cr == 195 // UTF-8
+		|| cr == 132 // ?
+		|| cr == 164 // ?
+		|| cr == 150 // ?
+		|| cr == 182 // ?
+		|| cr == 156 // ?
+		|| cr == 188 // Ã¼
+		|| cr == 159 // ?
+		) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 ScpScriptLex::ScpScriptLex()
 {
 	
 
 }
-void ScpScriptLex::SetExpression(std::wstring& Expression)
+void ScpScriptLex::SetExpression(std::string& Expression)
 {
 	wcommandline = Expression;
 	prevtoken.clear();
@@ -33,13 +53,13 @@ void ScpScriptLex::Attach(CScriptEngine * eng)
 	engine = eng;
 }
 
-BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& commandvalue, VTPARAMETERS & vtparameters)
+BOOL ScpScriptLex::ParseCommandLine(std::string& wcommandstring, ULONG& commandvalue, VTPARAMETERS & vtparameters)
 {
 	wcommandline = wcommandstring;
-	currenttoken = L"";
-	prevtoken = L"";
+	currenttoken = "";
+	prevtoken = "";
 	currentpos = wcommandline.begin();
-	std::wstring token = GetNextToken(TRUE);
+	std::string token = GetNextToken(TRUE);
 	if (token.empty())
 	{
 		return FALSE;
@@ -51,12 +71,35 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 	commandvalue = engine->QueryCommandValue(token);
 	if (commandvalue != -1 )
 	{
-		if (commandvalue >= vl_maxbasecommand)
+		//if (commandvalue >= vl_maxbasecommand)
+		//{
+		//	commandvalue = vl_call;
+		//	vtparameters.push_back(ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction));
+		//	vtparameters.push_back(token);
+		//}
+		//else if(engine->globalcommand.IsGlobalCommandFunction(token))
+		//{
+		//	commandvalue = vl_call;
+		//	vtparameters.push_back(ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction));
+		//	vtparameters.push_back(token);
+		//}
+		//else
 		{
-			commandvalue = vl_call;
-			vtparameters.push_back(ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction));
-			vtparameters.push_back(token);
-		}				
+			ScpObject* obj = engine->GetCurrentObjectSpace()->FindObject(token);
+			if (obj && obj->GetType() == ObjFunction)
+			{
+				commandvalue = vl_call;
+				vtparameters.push_back(ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction));
+				vtparameters.push_back(token);
+			}
+			if (obj && obj->GetType() == ObjCFunction)
+			{
+				commandvalue = vl_call;
+				vtparameters.push_back(ScpGlobalObject::GetInstance()->GetTypeName(ObjCFunction));
+				vtparameters.push_back(token);
+			}
+		}
+
 		token = GetNextToken(TRUE);		
 
 		//engine->globalcommand.GetGlobalCommandFunction(commandvalue);
@@ -76,17 +119,17 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 		//		return FALSE;
 		//	}				
 		//}
-		//ÕâÀïÊÇÈÃ return:1 return(1) return 1 ¶¼¿ÉÒÔÕıÈ·µÄÖ´ĞĞ
+		//è¿™é‡Œæ˜¯è®© return:1 return(1) return 1 éƒ½å¯ä»¥æ­£ç¡®çš„æ‰§è¡Œ
 		if (commandvalue == vl_return)
 		{
-			if((token == L":")|| (token == L"("))
+			if((token == ":")|| (token == "("))
 			{
 				token = GetNextToken(TRUE);
 			}			
 		}
 		else
 			token = GetNextToken(TRUE);
-		std::wstring combinedtoken;
+		std::string combinedtoken;
 /*		while (!token.empty())
 		{
 			if (token == scpComma ||
@@ -117,7 +160,7 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 			else if (token == scpRightParentheses)
 			{
 				inParenthesesScop -= 1;
-				if(inParenthesesScop>=0)//ÓÒÀ¨ºÅµÄÇ¶Ì×Éî¶ÈĞ¡ÓÚÁãÔò½«ÓÒÀ¨ºÅÅ×Æú
+				if(inParenthesesScop>=0)//å³æ‹¬å·çš„åµŒå¥—æ·±åº¦å°äºé›¶åˆ™å°†å³æ‹¬å·æŠ›å¼ƒ
 					combinedtoken += token;
 			}
 			else if (token == scpComma ||
@@ -126,7 +169,7 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 				if (inParenthesesScop <= 0)
 				{
 					vtparameters.push_back(combinedtoken);
-					combinedtoken = L"";
+					combinedtoken = "";
 				}
 				else
 				{
@@ -147,8 +190,22 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 	else
 	{
 
-		commandvalue = vl_compute;
-		std::wstring combinedtoken;
+		ScpObject* obj = engine->GetCurrentObjectSpace()->FindObject(token);
+
+		if (obj && obj->GetType() == ObjCFunction)
+		{
+			if (PeekNextToken() != scpLeftParentheses)
+			{
+				commandvalue = vl_call;
+				vtparameters.push_back(ScpGlobalObject::GetInstance()->GetTypeName(ObjCFunction));
+			}
+			else
+				commandvalue = vl_compute;
+			//vtparameters.push_back(token);
+		}
+		else
+			commandvalue = vl_compute;
+		std::string combinedtoken;
 		int inParenthesesScop = 0;
 		while (!token.empty())
 		{
@@ -168,7 +225,7 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 				if (inParenthesesScop <= 0)
 				{
 					vtparameters.push_back(combinedtoken);
-					combinedtoken = L"";
+					combinedtoken = "";
 				}
 				else
 				{
@@ -190,7 +247,7 @@ BOOL ScpScriptLex::ParseCommandLine(std::wstring& wcommandstring, ULONG& command
 	return TRUE;
 }
 
-BOOL ScpScriptLex::IsUserFunction(std::wstring token)
+BOOL ScpScriptLex::IsUserFunction(std::string token)
 {
 	BOOL bRet = FALSE;
 	ScpObject *usercommand = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(token);
@@ -203,7 +260,7 @@ BOOL ScpScriptLex::IsUserFunction(std::wstring token)
 	}
 	return bRet;
 }
-BOOL ScpScriptLex::IsClassInstance(std::wstring token)
+BOOL ScpScriptLex::IsClassInstance(std::string token)
 {
 	BOOL bRet = FALSE;
 	ScpObject *usercommand = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(token);
@@ -216,7 +273,7 @@ BOOL ScpScriptLex::IsClassInstance(std::wstring token)
 	}
 	return bRet;
 }
-BOOL ScpScriptLex::IsOperator(std::wstring token)
+BOOL ScpScriptLex::IsOperator(std::string token)
 {
 	BOOL bRet = FALSE;
 	if (token == scpOperationObjectRefrence ||
@@ -274,67 +331,67 @@ BOOL ScpScriptLex::IsOperator(std::wstring token)
 	return bRet;
 
 }
-std::wstring  ScpScriptLex::PeekNextToken(BOOL Convert)
+std::string  ScpScriptLex::PeekNextToken(BOOL Convert)
 {
-	std::wstring::iterator it = currentpos;
-	std::wstring temptoken = GetNextToken(Convert);
+	std::string::iterator it = currentpos;
+	std::string temptoken = GetNextToken(Convert);
 	currentpos = it;
 	return temptoken;
 }
-std::wstring ScpScriptLex::GetCurrentToken()
+std::string ScpScriptLex::GetCurrentToken()
 {
 	return currenttoken;
 }
-std::wstring  ScpScriptLex::PeekNext2Token(BOOL Convert)
+std::string  ScpScriptLex::PeekNext2Token(BOOL Convert)
 {
-	std::wstring::iterator it = currentpos;
-	std::wstring temptoken = GetNextToken(Convert);
+	std::string::iterator it = currentpos;
+	std::string temptoken = GetNextToken(Convert);
 	temptoken = GetNextToken(Convert);
 	currentpos = it;
 	return temptoken;
 }
-std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
+std::string ScpScriptLex::GetNextToken(BOOL Convert)
 {
 	prevtoken = currenttoken;
-	std::wstring token;
+	std::string token;
 	bool until_nextscpDoubleQuote = false;
 	while (currentpos != wcommandline.end())
 	{
-		std::wstring temp;
-		temp += wchar_t(*currentpos);
+		std::string temp;
+		temp += char(*currentpos);
 		if (Convert)
 		{
 			if (temp == strPathTag)
 			{
 				if (until_nextscpDoubleQuote)
 				{
-					if (wchar_t(*(currentpos + 1)) == scpDoubleQuote[0])
+					if (char(*(currentpos + 1)) == scpDoubleQuote[0])
 					{
 						token += scpDoubleQuote;
 						currentpos++; currentpos++;
 						continue;
 					}
-					else if (wchar_t(*(currentpos + 1)) == L'\\')
+					else if (char(*(currentpos + 1)) == '\\')
 					{
-						token += L"\\";
+						token += "\\";
 						currentpos++; currentpos++;
 						continue;
 					}
-					else if (wchar_t(*(currentpos + 1)) == L'r')
+					else if (char(*(currentpos + 1)) == 'r')
 					{
-						token += L"\r";
+						token += "\r";
 						currentpos++; currentpos++;
 						continue;
 					}
-					else if (wchar_t(*(currentpos + 1)) == L'n')
+					else if (char(*(currentpos + 1)) == 'n')
 					{
-						token += L"\n";
+						token += "\n";
 						currentpos++; currentpos++;
 						continue;
 					}
-					else if (wchar_t(*(currentpos + 1)) == L't')
+					else if (char(*(currentpos + 1)) == 't')
 					{
-						token += L"\t";
+						token += "\t";
 						currentpos++; currentpos++;
 						continue;
 					}
@@ -359,7 +416,7 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 		}
 		if (!until_nextscpDoubleQuote)
 		{
-			if (iswspace((wint_t)*currentpos))
+			if (isspace(*currentpos))
 			{
 				currentpos++;
 				if (token.empty())
@@ -383,7 +440,7 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 						currentpos++;
 						continue;
 					}
-					else if (iswdigit(wint_t(token.at(0))))
+					else if (isdigit(token.at(0)))
 					{
 						token += temp;
 						currentpos++;
@@ -423,15 +480,15 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ+=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯+=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationAddAndAssign;
 						currentpos++; currentpos++;
 						break;
 					}
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ++
-					else if (wchar_t(*(currentpos + 1)) == scpOperationAdd[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯++
+					else if (char(*(currentpos + 1)) == scpOperationAdd[0])
 					{
 						token = scpOperationSelfAdd;
 						currentpos++; currentpos++;
@@ -454,24 +511,24 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ-=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯-=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationSubAndAssign;
 						currentpos++; currentpos++;
 						break;
 					}
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ--
-					else if (wchar_t(*(currentpos + 1)) == scpOperationSubtraction[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯--
+					else if (char(*(currentpos + 1)) == scpOperationSubtraction[0])
 					{
 						token = scpOperationSelfSub;
 						currentpos++; currentpos++;
 						break;
 					}
-					else if (iswdigit(wint_t(*(currentpos + 1))))
+					else if (isdigit(*(currentpos + 1)))
 					{
-						std::wstring temp2 = GetPrevToken();
-						if (temp2.empty() || temp2 == L"(")
+						std::string temp2 = GetPrevToken();
+						if (temp2.empty() || temp2 == "(")
 						{
 							token += temp; currentpos++;
 						}
@@ -499,8 +556,8 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ*=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯*=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationMulAndAssign;
 						currentpos++; currentpos++;
@@ -523,15 +580,15 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ/=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯/=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationDivAndAssign;
 						currentpos++; currentpos++;
 						break;
 					}
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ// C++·ç¸ñµÄ×¢ÊÍ
-					else if (wchar_t(*(currentpos + 1)) == scpOperationDivision[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯// C++é£æ ¼çš„æ³¨é‡Š
+					else if (char(*(currentpos + 1)) == scpOperationDivision[0])
 					{
 						currentpos = wcommandline.end();
 						//token=scpCppComment;
@@ -555,8 +612,8 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ%=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯%=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOpeartionModAndAssign;
 						currentpos++; currentpos++;
@@ -579,8 +636,8 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ==
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯==
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationEqual;
 						currentpos++; currentpos++;
@@ -603,17 +660,17 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ<=Ğ¡ÓÚµÈÓÚ
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯<=å°äºç­‰äº
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationLessorEqual;
 						currentpos++; currentpos++;
 						break;
 					}
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ<<×óÒÆ
-					else if (wchar_t(*(currentpos + 1)) == scpOperationLessthan[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯<<å·¦ç§»
+					else if (char(*(currentpos + 1)) == scpOperationLessthan[0])
 					{
-						if (wchar_t(*(currentpos + 2)) == scpOperationAssign[0])
+						if (char(*(currentpos + 2)) == scpOperationAssign[0])
 						{
 							token = scpOpeartionBitShiftLeftAndAssign;
 							currentpos++;
@@ -642,17 +699,17 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ>=´óÓÚµÈÓÚ
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯>=å¤§äºç­‰äº
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationBigorEqual;
 						currentpos++; currentpos++;
 						break;
 					}
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ>>ÓÒÒÆ
-					else if (wchar_t(*(currentpos + 1)) == scpOperationBigthan[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯>>å³ç§»
+					else if (char(*(currentpos + 1)) == scpOperationBigthan[0])
 					{
-						if (wchar_t(*(currentpos + 2)) == scpOperationAssign[0])
+						if (char(*(currentpos + 2)) == scpOperationAssign[0])
 						{
 							token = scpOpeartionBitShiftRightAndAssign;
 							currentpos++;
@@ -681,8 +738,8 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ!=²»µÈÓÚ
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯!=ä¸ç­‰äº
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationNotEqual;
 						currentpos++; currentpos++;
@@ -705,14 +762,14 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ&=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯&=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationBitAndAndAssign;
 						currentpos++; currentpos++;
 						break;
 					}
-					else if (wchar_t(*(currentpos + 1)) == scpOperationBitAnd[0])
+					else if (char(*(currentpos + 1)) == scpOperationBitAnd[0])
 					{
 						token = scpOperationLogicalAnd;
 						currentpos++; currentpos++;
@@ -735,14 +792,14 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ|=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯|=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationBitOrAndAssign;
 						currentpos++; currentpos++;
 						break;
 					}
-					else if (wchar_t(*(currentpos + 1)) == scpOperationBitOr[0])
+					else if (char(*(currentpos + 1)) == scpOperationBitOr[0])
 					{
 						token = scpOperationLogicalOr;
 						currentpos++; currentpos++;
@@ -765,8 +822,8 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ~=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯~=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationBitNotAndAssign;
 						currentpos++; currentpos++;
@@ -789,8 +846,8 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			{
 				if (token.empty())
 				{
-					//ÏòÇ°Ì½²é£¬ÊÇ·ñÊÇ^=
-					if (wchar_t(*(currentpos + 1)) == scpOperationAssign[0])
+					//å‘å‰æ¢æŸ¥ï¼Œæ˜¯å¦æ˜¯^=
+					if (char(*(currentpos + 1)) == scpOperationAssign[0])
 					{
 						token = scpOperationBitXorAndAssign;
 						currentpos++; currentpos++;
@@ -823,12 +880,14 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 			}
 			else
 			{
-				//±êÊ¶·ûÔÊĞíÊÇ¿É¼û×Ö·û£¬Êı×Ö£¬ÏÂ»®Ïß£¬@·ûºÅ
-				//ºöÂÔµôÎ´¶¨ÒåµÄ·ûºÅ;?`'@$
+				//æ ‡è¯†ç¬¦å…è®¸æ˜¯å¯è§å­—ç¬¦ï¼Œæ•°å­—ï¼Œä¸‹åˆ’çº¿ï¼Œ@ç¬¦å·
+				//å¿½ç•¥æ‰æœªå®šä¹‰çš„ç¬¦å·;?`'@$
 #ifdef _WIN32
-				if (iswalnum(wint_t(*currentpos)) || (*currentpos) == L'_' || (*currentpos) == L'@')
+				//std::locale loc2("zh_CN.UTF-8");
+				//if (std::isalnum((*currentpos), loc2)  || (*currentpos) == '_' || (*currentpos) == '@')
+				if (!isspace(*currentpos) || (*currentpos) == '_' || (*currentpos) == '@')
 #else
-				if (!iswspace(wint_t(*currentpos)) || (*currentpos) == L'_' || (*currentpos) == L'@')
+				if (!isspace(*currentpos) || (*currentpos) == '_' || (*currentpos) == '@')
 #endif
 				{
 					token += (*currentpos);
@@ -857,11 +916,11 @@ std::wstring ScpScriptLex::GetNextToken(BOOL Convert)
 	currenttoken = token;
 	return currenttoken;
 }
-std::wstring ScpScriptLex::GetPrevToken()
+std::string ScpScriptLex::GetPrevToken()
 {
 	return prevtoken;
 }
-BOOL ScpScriptLex::IsUnaryOperator(std::wstring & Token)
+BOOL ScpScriptLex::IsUnaryOperator(std::string & Token)
 {
 	if (Token == scpOperationNot || 
 		Token == scpOperationBitNot || 
@@ -874,7 +933,7 @@ BOOL ScpScriptLex::IsUnaryOperator(std::wstring & Token)
 	}
 	return FALSE;
 }
-BOOL ScpScriptLex::IsAssignOperator(std::wstring & token)
+BOOL ScpScriptLex::IsAssignOperator(std::string & token)
 {
 	if (token == scpOperationAssign
 		|| token == scpOperationAddAndAssign
@@ -893,7 +952,7 @@ BOOL ScpScriptLex::IsAssignOperator(std::wstring & token)
 	}
 	return FALSE;
 }
-BOOL ScpScriptLex::IsBinaryOperator(std::wstring & token)
+BOOL ScpScriptLex::IsBinaryOperator(std::string & token)
 {
 	BOOL bRet = FALSE;
 	if (token == scpOperationAdd
@@ -920,9 +979,9 @@ BOOL ScpScriptLex::IsBinaryOperator(std::wstring & token)
 	}
 	return FALSE;
 }
-int ScpScriptLex::GetOperationPriority(std::wstring &strOperation)
+int ScpScriptLex::GetOperationPriority(std::string &strOperation)
 {
-	//»ñµÃÔËËã·ûµÄÓÅÏÈ¼¶£¬ÊıÖµÔ½Ğ¡£¬ÓÅÏÈ¼¶Ô½¸ß£¬-1Îª·Ç·¨£¬
+	//è·å¾—è¿ç®—ç¬¦çš„ä¼˜å…ˆçº§ï¼Œæ•°å€¼è¶Šå°ï¼Œä¼˜å…ˆçº§è¶Šé«˜ï¼Œ-1ä¸ºéæ³•ï¼Œ
 	int priority = -1;
 	if (strOperation == scpOperationSelfAdd
 		|| strOperation == scpOperationMinus
@@ -934,9 +993,9 @@ int ScpScriptLex::GetOperationPriority(std::wstring &strOperation)
 	}
 	return priority;
 }
-int ScpScriptLex::GetBinaryOperationPriority(std::wstring &strOperation)
+int ScpScriptLex::GetBinaryOperationPriority(std::string &strOperation)
 {
-	//»ñµÃÔËËã·ûµÄÓÅÏÈ¼¶£¬ÊıÖµÔ½Ğ¡£¬ÓÅÏÈ¼¶Ô½¸ß£¬-1Îª·Ç·¨£¬
+	//è·å¾—è¿ç®—ç¬¦çš„ä¼˜å…ˆçº§ï¼Œæ•°å€¼è¶Šå°ï¼Œä¼˜å…ˆçº§è¶Šé«˜ï¼Œ-1ä¸ºéæ³•ï¼Œ
 	int priority = -1;
 	if (strOperation == scpOperationMultiplication
 		|| strOperation == scpOperationDivision

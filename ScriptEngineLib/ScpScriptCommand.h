@@ -24,7 +24,7 @@ public:
 	~CScriptCommand();
 
 
-	//SCP �﷨	
+	//SCP М№ие	
 	static BOOL Do_Import_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine);
 	static BOOL Do_Do_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine);
 	static BOOL Do_Return_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine);

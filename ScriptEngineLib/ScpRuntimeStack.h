@@ -14,22 +14,22 @@ public:
 	{
 		objstack.push(obj);
 	}
-	ScpObject * Pop()
+	ScpObject * Pop() noexcept
 	{
 		ScpObject * obj = objstack.top();
 		objstack.pop();
 		return obj;
 	}
-	ScpObject * Peek()
+	ScpObject * Peek() noexcept
 	{
 		ScpObject * obj = objstack.top();
 		return obj;
 	}
-	bool IsEmpty()
+	bool IsEmpty() noexcept
 	{
 		return objstack.empty();
 	}
-	void Clear()
+	void Clear() noexcept
 	{
 		ScpObject * obj = objstack.top();
 		while (obj)

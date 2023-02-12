@@ -6,7 +6,7 @@
 #ifndef _H_UIMESSAGE
 #define _H_UIMESSAGE
 
-typedef void (*UICallBack)(void * UIClass,const wchar_t * Message);
+typedef void (*UICallBack)(void * UIClass,const char * Message);
 
 
 #include <string>

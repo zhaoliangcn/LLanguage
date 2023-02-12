@@ -37,7 +37,7 @@ void ScpClassObject::Show(CScriptEngine * engine)
 	//auto it = memberattrmap.begin();
 	//while (it != memberattrmap.end())
 	//{
-	//	std::wstring name = it->first;
+	//	std::string name = it->first;
 	//	ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 	//	if (obj)
 	//	{
@@ -46,13 +46,13 @@ void ScpClassObject::Show(CScriptEngine * engine)
 	//	it++;
 	//}
 }
-ScpObject * ScpClassObject::Clone(std::wstring strObjName)
+ScpObject * ScpClassObject::Clone(std::string strObjName)
 {
 	return NULL;
 }
-std::wstring ScpClassObject::ToString()
+std::string ScpClassObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	for (unsigned int i = 0;i < ClassBody.size();i++)
 	{
 		temp += ClassBody.at(i);
@@ -63,7 +63,7 @@ void  ScpClassObject::Release()
 {
 	delete this;
 }
-bool ScpClassObject::IsInnerFunction(std::wstring & functionname)
+bool ScpClassObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -76,7 +76,7 @@ bool ScpClassObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpClassObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpClassObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -94,19 +94,19 @@ ScpObject * ScpClassObject::CallInnerFunction(std::wstring & functionname, VTPAR
 	}
 	return NULL;
 }
-void ScpClassObject::ClassDefine(std::wstring name)
+void ScpClassObject::ClassDefine(std::string name)
 {
 	userclassname = name;
 }
-void  ScpClassObject::AddMemberVariable(std::wstring name, ScpObject * object)
+void  ScpClassObject::AddMemberVariable(std::string name, ScpObject * object)
 {
 	UserClassObjectSpace.AddObject(name, object);
 }
-void  ScpClassObject::AddMemberFunction(std::wstring name, ScpObject * object)
+void  ScpClassObject::AddMemberFunction(std::string name, ScpObject * object)
 {
 	UserClassObjectSpace.AddObject(name, object);
 }
-ScpObject * ScpClassObject::FindMemberVariable(std::wstring name)
+ScpObject * ScpClassObject::FindMemberVariable(std::string name)
 {
 	return UserClassObjectSpace.FindLocalObject(name);
 }
@@ -119,7 +119,7 @@ ScpObject * ScpClassObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -143,7 +143,7 @@ ScpObject * ScpClassObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 	}
 	return nullptr;
 }
-ScpObject * ScpClassObject::CallMemberFunction(std::wstring functionname, VTPARAMETERS * RealParameters, CScriptEngine * engine)
+ScpObject * ScpClassObject::CallMemberFunction(std::string functionname, VTPARAMETERS * RealParameters, CScriptEngine * engine)
 {
 	ScpFunctionObject * func = (ScpFunctionObject*)UserClassObjectSpace.FindObject(functionname);
 	if (func)

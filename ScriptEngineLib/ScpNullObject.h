@@ -2,14 +2,14 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//¿Õ¶ÔÏó
+//ç©ºå¯¹è±¡
 */
 #ifndef _H_SCPNULLOBJECT
 #define _H_SCPNULLOBJECT
 #include "ScpObject.h"
 #include "ScpObject_uni.h"
 
-//NullObjectÖ»ÊÇÓÃÓÚÊı×é¶ÔÏó¶¨ÒåÊ±µÄÕ¼Î»
+//NullObjectåªæ˜¯ç”¨äºæ•°ç»„å¯¹è±¡å®šä¹‰æ—¶çš„å ä½
 class ScpNullObject :
 	public ScpObject
 {
@@ -17,14 +17,16 @@ public:
 	ScpNullObject(void);
 	~ScpNullObject(void);
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
 	ScpObject * parentObj;
 
 	
 };
+//ScpNullObjectçš„å·¥å‚å‡½æ•°
+ScpObject * __stdcall ScpNullObjectFactory(VTPARAMETERS* paramters, CScriptEngine* engine);
 
 #endif //_H_SCPNULLOBJECT

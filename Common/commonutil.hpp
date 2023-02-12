@@ -10,12 +10,11 @@ static std::wstring GetEnvironmentVariableStr(std::wstring name)
 {
 	DWORD dwErr;
 	std::wstring temp ;
-	#define BUFFER_SIZE (4096)
-	wchar_t * Buffer = (wchar_t *) malloc(BUFFER_SIZE);
-	if(Buffer)
+	wchar_t * Buffer = (wchar_t *) malloc(4096);
+	if (Buffer)
 	{
-		memset(Buffer,0,BUFFER_SIZE);
-		GetEnvironmentVariableW(name.c_str(),Buffer,BUFFER_SIZE);
+		memset(Buffer, 0, 4096);
+		GetEnvironmentVariableW(name.c_str(), Buffer, 4096);
 		dwErr = GetLastError();
 		temp = Buffer;
 		free(Buffer);
@@ -32,6 +31,16 @@ static std::wstring PathStripFileName(std::wstring pathname)
 	Temp =Drv;
 	return Temp;	
 }
+static std::string PathStripFileName(std::string pathname)
+{
+	std::string Temp;
+	char Drv[MAX_PATH] = { 0 };
+	char Dir[MAX_PATH] = { 0 };
+	_splitpath_s(pathname.c_str(), Drv, MAX_PATH, Dir, MAX_PATH, NULL, 0, NULL, 0);
+	strcat_s(Drv, MAX_PATH, Dir);
+	Temp = Drv;
+	return Temp;
+}
 static std::wstring MyPathStripPath(const wchar_t * Path)
 {
 	std::wstring filename;
@@ -42,6 +51,19 @@ static std::wstring MyPathStripPath(const wchar_t * Path)
 		_tsplitpath_s(Path,NULL,0,NULL,0,Name,MAX_PATH,Ext,MAX_PATH);
 		_tcscat_s(Name,MAX_PATH,Ext);
 		filename=Name;
+	}
+	return filename;
+}
+static std::string MyPathStripPath(const char * Path)
+{
+	std::string filename;
+	if (Path)
+	{
+		char Name[MAX_PATH] = { 0 };
+		char Ext[MAX_PATH] = { 0 };
+		_splitpath_s(Path, NULL, 0, NULL, 0, Name, MAX_PATH, Ext, MAX_PATH);
+		strcat_s(Name, MAX_PATH, Ext);
+		filename = Name;
 	}
 	return filename;
 }
@@ -166,27 +188,57 @@ static HMODULE LoadModule(const wchar_t * ModuleName)
 	}
 	return hModule;
 }
+
+static BOOL GetWinVersion(DWORD *major, DWORD *minor, DWORD *build)
+{
+	typedef void (WINAPI *pRtlGetNtVersionNumbers)(DWORD *, DWORD *, DWORD *);
+	BOOL	bResult = FALSE;
+	pRtlGetNtVersionNumbers RtlGetNtVersionNumbers = (pRtlGetNtVersionNumbers)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlGetNtVersionNumbers");
+	if (RtlGetNtVersionNumbers
+		&& major
+		&& minor
+		&& build)
+	{
+		RtlGetNtVersionNumbers(major, minor, build);
+		//		*build &= 0xFFFFF;
+		bResult = TRUE;
+	}
+	return bResult;
+}
 static BOOL	IsWinXPSystem()
 {
 	BOOL	bResult = FALSE;
-	OSVERSIONINFO info;
-	ZeroMemory(&info, sizeof(OSVERSIONINFO));
-	info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	//OSVERSIONINFO info;
+	//ZeroMemory(&info, sizeof(OSVERSIONINFO));
+	//info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-	if (GetVersionEx(&info))
+	//if (GetVersionEx(&info))
+	//{
+	//	bResult = (info.dwMajorVersion == 5 && info.dwMinorVersion == 1);
+	//}
+	DWORD major, minor, build;
+	if (GetWinVersion(&major, &minor, &build))
 	{
-		bResult = (info.dwMajorVersion == 5 && info.dwMinorVersion == 1);
+		bResult = (major == 5 && minor == 1);
 	}
 	return  bResult;
 }
 static inline BOOL IsVistaOrLater()
 {
-	OSVERSIONINFO osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if (osvi.dwMajorVersion >= 6)
-		return TRUE;
+	//OSVERSIONINFO osvi;
+	//ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	//osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	//GetVersionEx(&osvi);
+	//if (osvi.dwMajorVersion >= 6)
+	//	return TRUE;
+	DWORD major, minor, build;
+	if (GetWinVersion(&major, &minor, &build))
+	{
+		if (major >= 6)
+		{
+			return TRUE;
+		}
+	}
 	return FALSE;
 }
 
@@ -508,6 +560,7 @@ static void _splitpath(const char *path, char *drive, char *dir, char *fname, ch
 		dir[0] = '\0';
 	}
 }
+
 static std::string PathStripFileName(std::string pathname)
 {
 	std::string Temp;
@@ -532,5 +585,27 @@ static inline void StringStripQuote(std::wstring & quotedstring)
 		}
 	}
 }
-
+static inline void StringStripQuote(std::string & quotedstring)
+{
+	if (!quotedstring.empty())
+	{
+		if (quotedstring.at(0) == '\"' && quotedstring.at(quotedstring.length() - 1) == '\"')
+		{
+			quotedstring = quotedstring.substr(1, quotedstring.length() - 2);
+		}
+	}
+}
+static DWORD GetCurrentTickCount()
+{
+	DWORD dwStart = 0;
+#ifdef WIN32
+	dwStart = GetTickCount64();
+#else
+	struct timeval tv;
+	struct timezone tz;
+	gettimeofday(&tv, &tz);
+	dwStart = tv.tv_usec;
+#endif
+	return dwStart;
+}
 #endif //_H_COMMONUTIL

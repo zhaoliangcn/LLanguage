@@ -5,7 +5,7 @@ ifeq ($(BUILD),DEBUG)
 CFLAGS+= -g 
 endif
 TARGET := libScriptEngineDll.so
-SRCS := $(wildcard *.cpp)
+SRCS := ScriptEngineDll.cpp
 OBJS := $(patsubst %cpp,%o,$(SRCS))
 all:$(TARGET)
 %.o:%.cpp

@@ -43,7 +43,7 @@ void ScpJsonObject::Show(CScriptEngine * engine)
 	engine->PrintError(ToString());	
 
 }
-ScpObject * ScpJsonObject::Clone(std::wstring strObjName)
+ScpObject * ScpJsonObject::Clone(std::string strObjName)
 {
 	ScpJsonObject * obj = new ScpJsonObject;
 	if (obj)
@@ -53,17 +53,15 @@ ScpObject * ScpJsonObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpJsonObject::ToString()
+std::string ScpJsonObject::ToString()
 {
-	std::wstring temp;
-	temp=STDSTRINGEXT::AToW(ejson.ToString());
-	return temp;
+	return ejson.ToString();
 }
 void ScpJsonObject::Release() 
 {
 	delete this;
 }
-bool ScpJsonObject::IsInnerFunction(std::wstring & functionname)
+bool ScpJsonObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -71,7 +69,7 @@ bool ScpJsonObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpJsonObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpJsonObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -80,51 +78,51 @@ ScpObject * ScpJsonObject::CallInnerFunction(std::wstring & functionname,VTPARAM
 	}
 	return NULL;
 }
-BOOL ScpJsonObject::Load(std::wstring jsonstring)
+BOOL ScpJsonObject::Load(std::string jsonstring)
 {
-	return ejson.ParseString(STDSTRINGEXT::WToA(jsonstring).c_str());
+	return ejson.ParseString(jsonstring.c_str());
 }
-BOOL ScpJsonObject::Save(std::wstring name)
+BOOL ScpJsonObject::Save(std::string name)
 {
 	return FALSE;
 
 }
-BOOL ScpJsonObject::Open(std::wstring name)
+BOOL ScpJsonObject::Open(std::string name)
 {
 	jsonfileName = name;
 	if(ScpFileObject::FileExist(jsonfileName))
-		return ejson.ParseFile(STDSTRINGEXT::WToA(jsonfileName).c_str());
+		return ejson.ParseFile(jsonfileName.c_str());
 	return FALSE;
 }
 BOOL ScpJsonObject::Close()
 {
-	jsonfileName=L"";
+	jsonfileName="";
 	return TRUE;
 }
-BOOL ScpJsonObject::GetValue(std::wstring tag,std::wstring& value)
+BOOL ScpJsonObject::GetValue(std::string tag,std::string& value)
 {
 	BOOL bRet=FALSE;
 	char cvalue[256]={0};
-	bRet= ejson.GetValue(STDSTRINGEXT::WToA(tag).c_str(),cvalue,256);
-	value=STDSTRINGEXT::AToW(cvalue);
+	bRet= ejson.GetValue(tag.c_str(),cvalue,256);
+	value=cvalue;
 	return bRet;
 }
-BOOL ScpJsonObject::GetValue(std::wstring tag,int & value)
+BOOL ScpJsonObject::GetValue(std::string tag,int & value)
 {
 	BOOL bRet=FALSE;
-	bRet= ejson.GetValue(STDSTRINGEXT::WToA(tag).c_str(),value);
+	bRet= ejson.GetValue(tag.c_str(),value);
 	return bRet;
 }
-BOOL ScpJsonObject::SetValue(std::wstring tag,std::wstring value)
+BOOL ScpJsonObject::SetValue(std::string tag,std::string value)
 {
 	BOOL bRet=FALSE;
-	bRet= ejson.SetValue(STDSTRINGEXT::WToA(tag).c_str(),(char *)STDSTRINGEXT::WToA(value).c_str());
+	bRet= ejson.SetValue(tag.c_str(),(char *)value.c_str());
 	return bRet;
 }
-BOOL ScpJsonObject::SetValue(std::wstring tag,int value)
+BOOL ScpJsonObject::SetValue(std::string tag,int value)
 {
 	BOOL bRet=FALSE;
-	bRet= ejson.SetValue(STDSTRINGEXT::WToA(tag).c_str(),value);
+	bRet= ejson.SetValue(tag.c_str(),value);
 	return bRet;
 }
 
@@ -139,7 +137,7 @@ ScpObject * ScpJsonObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -167,8 +165,8 @@ ScpObject * ScpJsonObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 	}
 	else if (parameters->size() == 2)
 	{
-		std::wstring objname2 = parameters->at(0);
-		std::wstring objname3 = parameters->at(1);
+		std::string objname2 = parameters->at(0);
+		std::string objname3 = parameters->at(1);
 		StringStripQuote(objname2);
 		StringStripQuote(objname3);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(objname2);
@@ -181,7 +179,7 @@ ScpObject * ScpJsonObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 		{
 			objname3 = ((ScpStringObject *)objparam1)->content;
 		}
-		std::wstring content;
+		std::string content;
 		int value;
 		if (objname2 == str_CN_ObjValue ||
 			objname2 == str_EN_ObjValue)
@@ -227,7 +225,7 @@ ScpObject * ScpJsonObject::InnerFunction_open(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring userobjname = parameters->at(0);
+		std::string userobjname = parameters->at(0);
 		StringStripQuote(userobjname);
 		ScpObject * userobj = engine->GetCurrentObjectSpace()->FindObject(userobjname);
 		if (userobj)
@@ -247,7 +245,7 @@ ScpObject * ScpJsonObject::InnerFunction_load(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring userobjname = parameters->at(0);
+		std::string userobjname = parameters->at(0);
 		StringStripQuote(userobjname);
 		ScpObject * userobj = engine->GetCurrentObjectSpace()->FindObject(userobjname);
 		if (userobj)
@@ -267,7 +265,7 @@ ScpObject * ScpJsonObject::InnerFunction_save(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring userobjname = parameters->at(0);
+		std::string userobjname = parameters->at(0);
 		StringStripQuote(userobjname);
 		ScpObject * userobj = engine->GetCurrentObjectSpace()->FindObject(userobjname);
 		if (userobj)
@@ -291,9 +289,9 @@ ScpObject * ScpJsonObject::InnerFunction_set(ScpObject * thisObject, VTPARAMETER
 {
 	if (parameters->size() == 3)
 	{
-		std::wstring objname2 = parameters->at(0);
-		std::wstring objname3 = parameters->at(1);
-		std::wstring content = parameters->at(2);
+		std::string objname2 = parameters->at(0);
+		std::string objname3 = parameters->at(1);
+		std::string content = parameters->at(2);
 		StringStripQuote(objname2);
 		StringStripQuote(objname3);
 		StringStripQuote(content);
@@ -312,7 +310,7 @@ ScpObject * ScpJsonObject::InnerFunction_set(ScpObject * thisObject, VTPARAMETER
 		{
 			content = ((ScpStringObject *)objparam2)->content;
 		}
-		int value;
+		
 		if (objname2 == str_CN_ObjValue ||
 			objname2 == str_EN_ObjValue)
 		{

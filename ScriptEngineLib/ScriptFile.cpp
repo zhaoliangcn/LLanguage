@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//�ű��ļ����غ��ַ�����ʶ��
+//脚本文件加载和字符编码识别
 */
 #include "ScriptFile.h"
 #include "ScpObject.h"
@@ -35,35 +35,49 @@ bool CScriptFile::IsValidScriptLib(std::wstring headline)
 {
 	return STDSTRINGEXT::ToLowerW(headline)==L"#scplib";
 }
-bool CScriptFile::IsComment(std::wstring& commandline)
+bool CScriptFile::IsComment(std::string& commandline)
 {
-	std::wstring headtoken = commandline.substr(0,1);
+	std::string headtoken = commandline.substr(0,1);
 	return (headtoken==scpComment);	
 }
-bool  CScriptFile::ReadAllFromMemory(const wchar_t *memoryscript,VTSTRINGS& body)
+bool CScriptFile::IsCppComment(std::string & commandline)
+{
+	std::string headtoken = commandline.substr(0, 2);
+	return (headtoken == scpCppComment);
+}
+bool  CScriptFile::ReadAllFromMemory(const char *memoryscript,VTSTRINGS& body)
 {
 	if(memoryscript)
 	{
-		std::wstring all = memoryscript;
-		std::wstring temp;
-		std::wstring::iterator itlast = all.begin();
-		std::wstring::iterator it = all.begin();
+		std::string all;
+		if (!STDSTRINGEXT::IsTextUTF8((char*)memoryscript,strlen(memoryscript)))
+		{
+			all= STDSTRINGEXT::AToU(memoryscript);
+		}
+		else
+		{
+			all = memoryscript;
+		}		
+		std::string temp;
+		std::string::iterator itlast = all.begin();
+		std::string::iterator it = all.begin();
 		while (it != all.end())
 		{
-			if (*it == L'\r')
+			if (*it == '\r')
 			{
-				if (*(it + 1) == L'\n')
-				{					
+				if (*(it + 1) == '\n')
+				{				
+					//windows格式的回车换行
 					if (itlast == it)
 					{
-						body.push_back(L"");
+						body.push_back("");
 						itlast = it + 2;
 						it+=2;
 						continue;
 					}
 					else
 					{
-						temp = std::wstring(itlast, it);
+						temp = std::string(itlast, it);
 						STDSTRINGEXT::trim(temp);
 						body.push_back(temp);
 						itlast = it + 2;
@@ -73,28 +87,30 @@ bool  CScriptFile::ReadAllFromMemory(const wchar_t *memoryscript,VTSTRINGS& body
 				}
 				else
 				{
+					//macintosh格式的回车
 					if (itlast == it)
 					{
-						body.push_back(L"");
+						body.push_back("");
 						itlast = it + 1;
 						it++;
 						continue;
 					}
 					else
 					{
-						temp = std::wstring(itlast, it);
+						temp = std::string(itlast, it);
 						STDSTRINGEXT::trim(temp);
 						body.push_back(temp);
-						itlast = it + 2;
-						it += 2;
+						itlast = it + 1;
+						it += 1;
 						continue;
 					}
 					
 				}
 			}
-			else if (*(it) == L'\n')
+			else if (*(it) == '\n')
 			{
-				temp = std::wstring(itlast, it);
+				//unix格式的换行
+				temp = std::string(itlast, it);
 				STDSTRINGEXT::trim(temp);
 				body.push_back(temp);
 				itlast = it + 1;
@@ -103,13 +119,20 @@ bool  CScriptFile::ReadAllFromMemory(const wchar_t *memoryscript,VTSTRINGS& body
 		}
 		if (itlast != it)
 		{
-			temp = std::wstring(itlast, it);
+			temp = std::string(itlast, it);
 			STDSTRINGEXT::trim(temp);
 			body.push_back(temp);
 		}
 		return true;
 	}
 	return false;
+}
+bool  CScriptFile::ReadAll(const char *scriptfilename, VTSTRINGS& body)
+{
+	if(STDSTRINGEXT::IsTextUTF8((char*)scriptfilename,strlen(scriptfilename)))
+		return ReadAll(STDSTRINGEXT::UTF2W(scriptfilename).c_str(),body);
+	else
+		return ReadAll(STDSTRINGEXT::AToW(scriptfilename).c_str(), body);
 }
 bool  CScriptFile::ReadAll(const wchar_t *scriptfilename,VTSTRINGS& body)
 {
@@ -142,7 +165,7 @@ bool  CScriptFile::ReadAll(const wchar_t *scriptfilename,VTSTRINGS& body)
 		{
 			temp=all.substr(0,pos-1);
 			STDSTRINGEXT::trim(temp);
-			body.push_back(temp);
+			body.push_back(STDSTRINGEXT::W2UTF(temp));
 			all=all.substr(pos+1,all.length()-pos-1);
 			pos =all.find(L"\n",0);
 		}
@@ -152,17 +175,17 @@ bool  CScriptFile::ReadAll(const wchar_t *scriptfilename,VTSTRINGS& body)
 	{
 
 		std::string commandline;
-		std::string headine;
+		std::string headline;
 #ifdef _WIN32
 		std::ifstream infile(scriptfilename);
 #else
-		std::ifstream infile(STDSTRINGEXT::WToA(scriptfilename).c_str());
+		std::ifstream infile(STDSTRINGEXT::W2UTF(scriptfilename).c_str());
 #endif
 
-		if(std::getline(infile,headine))
+		if(std::getline(infile, headline))
 		{
-			STDSTRINGEXT::trim(headine);
-			if(!IsValidScript(headine) && !IsValidScriptLib(headine))
+			STDSTRINGEXT::trim(headline);
+			if(!IsValidScript(headline) && !IsValidScriptLib(headline))
 			{
 				return false;
 			}
@@ -171,15 +194,14 @@ bool  CScriptFile::ReadAll(const wchar_t *scriptfilename,VTSTRINGS& body)
 		{
 			return false;
 		}
-		std::wstring wcommandline=STDSTRINGEXT::AToW(headine);
-		STDSTRINGEXT::trim(wcommandline);
-		body.push_back(wcommandline);
+		commandline= headline;
+		STDSTRINGEXT::trim(commandline);
+		body.push_back(commandline);
 
 		while(std::getline(infile,commandline))
 		{
 			STDSTRINGEXT::trim(commandline);
-			std::wstring wcommandline=STDSTRINGEXT::AToW(commandline);
-			body.push_back(wcommandline);
+			body.push_back(commandline);
 		}
 		infile.close();
 	}
@@ -187,17 +209,17 @@ bool  CScriptFile::ReadAll(const wchar_t *scriptfilename,VTSTRINGS& body)
 	{
 
 		std::string commandline;
-		std::string headine;
+		std::string headline;
 #ifdef _WIN32
 		std::ifstream infile(scriptfilename);
 #else
 		std::ifstream infile(STDSTRINGEXT::W2UTF(scriptfilename).c_str());
 #endif
 
-		if(std::getline(infile,headine))
+		if(std::getline(infile, headline))
 		{
-			STDSTRINGEXT::trim(headine);
-			if(!IsValidScript(headine) && !IsValidScriptLib(headine))
+			STDSTRINGEXT::trim(headline);
+			if(!IsValidScript(headline) && !IsValidScriptLib(headline))
 			{
 				return false;
 			}
@@ -206,24 +228,48 @@ bool  CScriptFile::ReadAll(const wchar_t *scriptfilename,VTSTRINGS& body)
 		{
 			return false;
 		}
-		std::wstring wcommandline;
-#ifdef _WIN32
-		wcommandline=STDSTRINGEXT::UTF2W(headine);
-#else
-		wcommandline=STDSTRINGEXT::UTF2W(headine);
-#endif
-		STDSTRINGEXT::trim(wcommandline);
-		body.push_back(wcommandline);
+		commandline= headline;
+		STDSTRINGEXT::trim(commandline);
+		body.push_back(commandline);
 
 		while(std::getline(infile,commandline))
 		{
 			STDSTRINGEXT::trim(commandline);
+			body.push_back(commandline);
+		}
+		infile.close();
+	}
+	else if (Utf8BOM == encodetype)
+	{
+		std::string commandline;
+		std::string headline;
 #ifdef _WIN32
-		wcommandline=STDSTRINGEXT::UTF2W(commandline);
+		std::ifstream infile(scriptfilename);
 #else
-		wcommandline=STDSTRINGEXT::UTF2W(commandline);
+		std::ifstream infile(STDSTRINGEXT::W2UTF(scriptfilename).c_str());
 #endif
-			body.push_back(wcommandline);
+
+		if (std::getline(infile, headline))
+		{
+			headline = headline.substr(3);
+			STDSTRINGEXT::trim(headline);
+			if (!IsValidScript(headline) && !IsValidScriptLib(headline))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		commandline = headline;
+		STDSTRINGEXT::trim(commandline);
+		body.push_back(commandline);
+
+		while (std::getline(infile, commandline))
+		{
+			STDSTRINGEXT::trim(commandline);
+			body.push_back(commandline);
 		}
 		infile.close();
 	}
@@ -248,49 +294,49 @@ EncodeType CScriptFile::GetScriptEncodeType(const wchar_t *scriptfilename)
 #ifdef _WIN32
 	std::ifstream infile(scriptfilename);
 #else
-	std::ifstream infile(STDSTRINGEXT::WToA(scriptfilename).c_str());
+	std::ifstream infile(STDSTRINGEXT::W2UTF(scriptfilename).c_str());
 #endif
 	infile.read(srcBuff,1024);
-	if (STDSTRINGEXT::IsTextUTF8(srcBuff, infile.gcount()))
+
+	for (int i = 0; i < 4; i++)
 	{
-		type = Utf8;
+		header[0] = srcBuff[0];
+		header[1] = srcBuff[1];
+		header[2] = srcBuff[2];
+
+		if (srcBuff[i] < 0 || srcBuff[i]>127)
+		{
+			ascii++;
+		}
 	}
-	else
+	if (0 == ascii)		// ASCII file
 	{
-
-		for (int i = 0; i < 4; i++)
-		{
-			header[0] = srcBuff[0];
-			header[1] = srcBuff[1];
-			header[2] = srcBuff[2];
-
-			if (srcBuff[i] < 0 || srcBuff[i]>127)
-			{
-				ascii++;
-			}
-		}
-		if (0 == ascii)		// ASCII file
-		{
-			type = Ansi;
-		}
-		else if ((2 == ascii) && (0 == memcmp(header, uniTxt, sizeof(uniTxt))))		// Unicode file
-		{
-			type = Unicode;
-
-		}
-		else if ((2 == ascii) && (0 == memcmp(header, endianTxt, sizeof(endianTxt))))	//  Unicode big endian file
-		{
-			type = UnicodeBigEndian;
-		}
-		else if ((3 == ascii) && (0 == memcmp(header, utf8Txt, sizeof(utf8Txt))))		// UTF-8 file
+		type = Ansi;
+		if (STDSTRINGEXT::IsTextUTF8(srcBuff, infile.gcount()))
 		{
 			type = Utf8;
 		}
-		else  //Unknow
-		{
-
-		}
 	}
+	else if ((2 == ascii) && (0 == memcmp(header, uniTxt, sizeof(uniTxt))))		// Unicode file
+	{
+		type = Unicode;
+
+	}
+	else if ((2 == ascii) && (0 == memcmp(header, endianTxt, sizeof(endianTxt))))	//  Unicode big endian file
+	{
+		type = UnicodeBigEndian;
+	}
+	else if ((3 == ascii) && (0 == memcmp(header, utf8Txt, sizeof(utf8Txt))))		// UTF-8 file
+	{
+		type = Utf8BOM;
+	}
+	else  //Unknow
+	{
+		if (STDSTRINGEXT::IsTextUTF8(srcBuff, infile.gcount()))
+		{
+			type = Utf8;
+		}
+	}	
 	infile.close();
 	return type;
 }
@@ -331,6 +377,48 @@ bool CScriptFile::FileExist(std::wstring FilePathName)
 	}
 #else
 	if (access(STDSTRINGEXT::W2UTF(FilePathName).c_str(), F_OK) == 0)
+		return true;
+	return false;
+#endif
+	return Exist;
+}
+std::string CScriptFile::GetPath(const char* FullPathName)
+{
+	std::string temp;
+#ifdef _WIN32
+	if (FullPathName)
+	{
+		char Drv[MAX_PATH] = { 0 };
+		char Dir[MAX_PATH] = { 0 };
+		_splitpath_s(FullPathName, Drv, MAX_PATH, Dir, MAX_PATH, NULL, 0, NULL, 0);
+		strcat_s(Drv, MAX_PATH, Dir);
+		temp = Drv;
+	}
+#else
+	if (FullPathName)
+	{
+		char Drv[MAX_PATH] = { 0 };
+		char Dir[MAX_PATH] = { 0 };
+		_splitpath(FullPathName, Drv, Dir, NULL, NULL);
+		strcat(Drv, Dir);
+		temp = Drv;
+	}
+
+#endif
+	return temp;
+}
+bool CScriptFile::FileExist(std::string FilePathName)
+{
+	bool Exist = false;
+#ifdef _WIN32
+	HANDLE hFile = CreateFileA(FilePathName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		Exist = true;
+		CloseHandle(hFile);
+	}
+#else
+	if (access(FilePathName.c_str(), F_OK) == 0)
 		return true;
 	return false;
 #endif

@@ -24,6 +24,25 @@ BOOL IsStaticNumber(std::wstring Expression)
 	}
 	return TRUE;
 }
+BOOL IsStaticNumber(std::string Expression)
+{
+	if (Expression.empty())
+		return FALSE;
+	STDSTRINGEXT::trim(Expression);
+	std::string::iterator it = Expression.begin();
+	if (*it == '-')
+	{
+		it++;
+	}
+	for (;it != Expression.end();it++)
+	{
+		if (!isdigit(*it))
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
 BOOL IsStaticDoubleNumber(std::wstring Expression)
 {
 	if(!IsStaticNumber(Expression))
@@ -54,12 +73,54 @@ BOOL IsStaticDoubleNumber(std::wstring Expression)
 	}
 	return FALSE;
 }
+BOOL IsStaticDoubleNumber(std::string Expression)
+{
+	if (!IsStaticNumber(Expression))
+	{
+		if (Expression.empty())
+			return FALSE;
+		STDSTRINGEXT::trim(Expression);
+		std::string::iterator it = Expression.begin();
+		if (*it == '-')
+		{
+			it++;
+		}
+		for (;it != Expression.end();it++)
+		{
+			if (!isdigit(*it) && (*it) != '.')
+			{
+				return FALSE;
+			}
+		}
+		return TRUE;
+
+
+		/*		double dvalue = _wtof(Expression.c_str());
+				if(errno!=EINVAL)
+				{
+					return TRUE;
+				}*/
+	}
+	return FALSE;
+}
 BOOL IsStaticString(std::wstring Expression)
 {
 	if (Expression.length()>=2)
 	{
-		int len = Expression.length();
+		size_t len = Expression.length();
 		if ((Expression.at(0) == L'"') && (Expression.at(len - 1) == L'"'))
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+BOOL IsStaticString(std::string Expression)
+{
+	if (Expression.length() >= 2)
+	{
+		size_t len = Expression.length();
+		if ((Expression.at(0) == '"') && (Expression.at(len - 1) == '"'))
 		{
 			return TRUE;
 		}

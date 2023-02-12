@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//¶ÔÏó×÷ÓÃÓò¿Õ¼ä¹ÜÀí£¬ÓÃÓÚÊµÏÖÃû×Ö¿Õ¼äµÄ¸ôÀë
+//å¯¹è±¡ä½œç”¨åŸŸç©ºé—´ç®¡ç†ï¼Œç”¨äºå®ç°åå­—ç©ºé—´çš„éš”ç¦»
 */
 #include "ScpObjectSpace.h"
 #include "ScpTableObject.h"
@@ -13,12 +13,92 @@
 #include "ScpObjectFactory.h"
 #include "ScpCommonObject.h"
 #include "../Common/stdstringext.hpp"
-ScpObjectSpace::ScpObjectSpace(void):breakingout(0),continuewhile(0),parentspace(NULL),enddepths(0),lastTestResult(-1),LastTempObjAppendix(0),lastcommand(0),LastTempObjectName(L"@@tempobj")
+#include <time.h>
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <sys/time.h>
+#endif
+#ifdef WIN32
+int gettimeofday(struct timeval *tp, void *tzp)
+{
+	time_t clock;
+	struct tm tm;
+	SYSTEMTIME wtm;
+	GetLocalTime(&wtm);
+	tm.tm_year = wtm.wYear - 1900;
+	tm.tm_mon = wtm.wMonth - 1;
+	tm.tm_mday = wtm.wDay;
+	tm.tm_hour = wtm.wHour;
+	tm.tm_min = wtm.wMinute;
+	tm.tm_sec = wtm.wSecond;
+	tm.tm_isdst = -1;
+	clock = mktime(&tm);
+	tp->tv_sec = clock;
+	tp->tv_usec = wtm.wMilliseconds * 1000;
+	return (0);
+}
+#endif
+
+//äº§ç”Ÿé•¿åº¦ä¸ºlengthçš„éšæœºå­—ç¬¦ä¸²
+int genRandomString2(int length, char* ouput)
+{
+	int flag, i;
+	struct timeval tpstart;
+	gettimeofday(&tpstart, NULL);
+	srand(tpstart.tv_usec);
+	for (i = 0; i < length - 1; i++)
+	{
+		flag = rand() % 3;
+		switch (flag)
+		{
+		case 0:
+			ouput[i] = 'A' + rand() % 26;
+			break;
+		case 1:
+			ouput[i] = 'a' + rand() % 26;
+			break;
+		case 2:
+			ouput[i] = '0' + rand() % 10;
+			break;
+		default:
+			ouput[i] = 'x';
+			break;
+		}
+	}
+	return 0;
+}
+std::string GenRandomString1()
+{
+	const int SIZE_CHAR = 32; //ç”Ÿæˆ32 + 1ä½C Styleå­—ç¬¦ä¸²
+	const char CCH[] = "_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+#ifdef _WIN32
+	srand((unsigned)GetTickCount64());
+#else 
+	srand((unsigned)time(NULL));
+#endif
+	char ch[SIZE_CHAR + 1] = { 0 };
+	for (int i = 0; i < SIZE_CHAR; ++i)
+	{
+		int x = rand() / (RAND_MAX / (sizeof(CCH) - 1));
+		ch[i] = CCH[x];
+	}
+	return std::string("temp")+ch;
+}
+std::string GenRandomString()
+{
+	const int SIZE_CHAR = 32; //ç”Ÿæˆ32 + 1ä½C Styleå­—ç¬¦ä¸²
+	char ch[SIZE_CHAR + 1] = { 0 };
+	genRandomString2(SIZE_CHAR, ch);
+	return std::string("temp") + ch;
+}
+ScpObjectSpace::ScpObjectSpace(void):breakingout(0),continuewhile(0),parentspace(NULL),enddepths(0),lastTestResult(-1),LastTempObjAppendix(0),lastcommand(0),LastTempObjectName("@@tempobj")
 {
 	breakingout = 0  ;
 	continuewhile =  0 ;
 	parentspace = NULL;
-	LastTempObjectName = L"@@tempobj";
+	//LastTempObjectName = "@@tempobj";
+	LastTempObjectName = STDSTRINGEXT::Format("@@tempobj%d", ScpRandomNumberObject::GetRandom().value);
 	enddepths = 0;
 	lastTestResult =-1;
 	LastTempObjAppendix =0;
@@ -29,13 +109,13 @@ ScpObjectSpace::~ScpObjectSpace(void)
 {
 	DestroyTempObjects();
 }
-ScpObject * ScpObjectSpace::FindStructMemberVariable(const std::wstring& objname)
+ScpObject * ScpObjectSpace::FindStructMemberVariable(const std::string& objname)
 {
 	size_t pos = objname.find(scpOperationObjectRefrence);
-	if(pos!=std::wstring::npos)
+	if(pos!=std::string::npos)
 	{
-		std::wstring parent;
-		std::wstring children;
+		std::string parent;
+		std::string children;
 		parent=objname.substr(0,pos);
 		children=objname.substr(pos+1,objname.length()-pos-1);
 		ScpObject* parentobj = FindObject(parent);
@@ -54,13 +134,13 @@ ScpObject * ScpObjectSpace::FindStructMemberVariable(const std::wstring& objname
 	}
 	return NULL;
 }
-ScpObject * ScpObjectSpace::FindClassOrStructMemberVariable(const std::wstring & objname)
+ScpObject * ScpObjectSpace::FindClassOrStructMemberVariable(const std::string & objname)
 {
 	size_t pos = objname.find(scpOperationObjectRefrence);
-	if (pos != std::wstring::npos)
+	if (pos != std::string::npos)
 	{
-		std::wstring parent;
-		std::wstring children;
+		std::string parent;
+		std::string children;
 		parent = objname.substr(0, pos);
 		children = objname.substr(pos + 1, objname.length() - pos - 1);
 		ScpObject* parentobj = FindObject(parent);
@@ -101,7 +181,7 @@ ScpObject * ScpObjectSpace::FindClassOrStructMemberVariable(const std::wstring &
 	}
 	return NULL;
 }
-ScpObject * ScpObjectSpace::FindClassMemberVariable(const std::wstring& objname)
+ScpObject * ScpObjectSpace::FindClassMemberVariable(const std::string& objname)
 {
 	//size_t pos = objname.find(scpColon);
 	//if(pos==std::wstring::npos)
@@ -113,10 +193,10 @@ ScpObject * ScpObjectSpace::FindClassMemberVariable(const std::wstring& objname)
 	//	pos = objname.find(scpOperationObjectRefrence);
 	//}
 	size_t pos = objname.find(scpOperationObjectRefrence);
-	if(pos!=std::wstring::npos)
+	if(pos!=std::string::npos)
 	{
-		std::wstring parent;
-		std::wstring children;
+		std::string parent;
+		std::string children;
 		parent=objname.substr(0,pos);
 		children=objname.substr(pos+1,objname.length()-pos-1);
 		ScpObject* parentobj = FindObject(parent);
@@ -145,16 +225,16 @@ ScpObject * ScpObjectSpace::FindClassMemberVariable(const std::wstring& objname)
 	}
 	return NULL;
 }
-ScpObject * ScpObjectSpace::FindTableElement(const std::wstring& objname)
+ScpObject * ScpObjectSpace::FindTableElement(const std::string& objname)
 {
 	size_t pos1 = objname.find(scpLeftBracket);
-	if((pos1!=std::wstring::npos))
+	if((pos1!=std::string::npos))
 	{
 		size_t pos2=objname.length()-1;
 		if(scpRightBracket==objname.substr(pos2,1))
 		{			
-			std::wstring name = objname.substr(0,pos1);
-			std::wstring element = objname.substr(pos1+1,pos2-pos1-1);			
+			std::string name = objname.substr(0,pos1);
+			std::string element = objname.substr(pos1+1,pos2-pos1-1);			
 			if(element.substr(element.length()-1,1)==scpRightBracket)
 			{
 				return FindTableElement(element);
@@ -203,16 +283,16 @@ ScpObject * ScpObjectSpace::FindTableElement(const std::wstring& objname)
 	}	
 	return NULL;
 }
-ScpObject * ScpObjectSpace::FindArrayElement(const std::wstring& objname)
+ScpObject * ScpObjectSpace::FindArrayElement(const std::string& objname)
 {
 	size_t pos1 = objname.find(scpLeftBracket);
-	if((pos1!=std::wstring::npos))
+	if((pos1!=std::string::npos))
 	{
 		size_t pos2=objname.length()-1;
 		if(scpRightBracket==objname.substr(pos2,1))
 		{
-			std::wstring arrayname = objname.substr(0,pos1);
-			std::wstring arrayelement = objname.substr(pos1+1,pos2-pos1-1);
+			std::string arrayname = objname.substr(0,pos1);
+			std::string arrayelement = objname.substr(pos1+1,pos2-pos1-1);
 			if(arrayelement.substr(arrayelement.length()-1,1)==scpRightBracket)
 			{
 				return FindArrayElement(arrayelement);
@@ -253,6 +333,16 @@ ScpObject * ScpObjectSpace::FindArrayElement(const std::wstring& objname)
 								int Index =((ScpIntObject *)obj)->value;
 								return ((ScpArrayObject *)arrayobj)->GetElement(Index);
 							}
+							else if (obj && obj->GetType() == ObjBigInt)
+							{
+								int Index = ((ScpBigIntObject *)obj)->value;
+								return ((ScpArrayObject *)arrayobj)->GetElement(Index);
+							}
+							else
+							{
+								//Invalid Array Item Refrence
+								
+							}
 						}
 					}
 				}
@@ -261,7 +351,7 @@ ScpObject * ScpObjectSpace::FindArrayElement(const std::wstring& objname)
 	}	
 	return NULL;
 }
-ScpObject * ScpObjectSpace::FindLocalObject(const std::wstring& objname)
+ScpObject * ScpObjectSpace::FindLocalObject(const std::string& objname)
 {
 	ScpObject* temp =NULL;
 	/*size_t pos1 = objname.rfind(scpRightBracket);
@@ -296,7 +386,7 @@ ScpObject * ScpObjectSpace::FindLocalObject(const std::wstring& objname)
 	temp = userobject.GetObject(objname);
 	return temp;
 }
-ScpObject * ScpObjectSpace::FindObject(IN const std::wstring& objname)
+ScpObject * ScpObjectSpace::FindObject(IN const std::string& objname)
 {
 	ScpObject* temp =NULL;
 	//size_t pos1 = objname.rfind(scpRightBracket);
@@ -345,7 +435,7 @@ ScpObject * ScpObjectSpace::FindObject(IN const std::wstring& objname)
 		}
 	}		
 }
-ScpObject * ScpObjectSpace::FindGlobalObject(const std::wstring & objname)
+ScpObject * ScpObjectSpace::FindGlobalObject(const std::string & objname)
 {
 	if (parentspace)
 	{
@@ -356,7 +446,7 @@ ScpObject * ScpObjectSpace::FindGlobalObject(const std::wstring & objname)
 		return FindObject(objname);
 	}
 }
-std::wstring ScpObjectSpace::GetObjectSpace(IN const std::wstring objname)
+std::string ScpObjectSpace::GetObjectSpace(IN const std::string objname)
 {
 	ScpObject* temp=userobject.GetObject(objname);
 	if(temp)
@@ -371,11 +461,11 @@ std::wstring ScpObjectSpace::GetObjectSpace(IN const std::wstring objname)
 		}
 		else
 		{
-			return L"";
+			return "";
 		}
 	}
 }
-BOOL ScpObjectSpace::AddObject(std::wstring strObjname,ScpObject *obj,std::wstring scope)
+BOOL ScpObjectSpace::AddObject(std::string strObjname,ScpObject *obj,std::string scope)
 {
 	if(ObjectSpaceType==Space_Class)
 	{
@@ -385,7 +475,7 @@ BOOL ScpObjectSpace::AddObject(std::wstring strObjname,ScpObject *obj,std::wstri
 			classObj->memberattrmap[strObjname]=classObj->MemberVariableAttribute;
 		}
 	}
-	//±»Ó³ÉäµÄ¶ÔÏó²»ÄÜÊ±ÁÙÊ±¶ÔÏó
+	//è¢«æ˜ å°„çš„å¯¹è±¡ä¸èƒ½æ—¶ä¸´æ—¶å¯¹è±¡
 	obj->istemp = false;
 	//if (obj->GetType() == ObjExpressionNode)
 	//{
@@ -397,19 +487,19 @@ BOOL ScpObjectSpace::AddObject(std::wstring strObjname,ScpObject *obj,std::wstri
 	//}
 	return userobject.MapObject(strObjname,obj,scope);
 }
-void ScpObjectSpace::EraseObject(std::wstring strObjname)
+void ScpObjectSpace::EraseObject(std::string strObjname)
 {
 	userobject.UnMapObject(strObjname);
 }
 void ScpObjectSpace::EraseObject(ScpObject * Obj)
 {
-    std::wstring strObjname = userobject.GetObjectName(Obj);
-	if (strObjname != L"")
+    std::string strObjname = userobject.GetObjectName(Obj);
+	if (strObjname != "")
 	{
 		userobject.UnMapObject(strObjname);
 	}
 }
-ScpObjectType ScpObjectSpace::GetType(std::wstring strObjname)
+ScpObjectType ScpObjectSpace::GetType(std::string strObjname)
 {
 	ScpObject * temp = FindObject(strObjname);
 	if(temp)
@@ -417,13 +507,13 @@ ScpObjectType ScpObjectSpace::GetType(std::wstring strObjname)
 	else
 		return ObjUnknown;
 }
-std::wstring ScpObjectSpace::GetObjectName(ScpObject * obj)
+std::string ScpObjectSpace::GetObjectName(ScpObject * obj)
 {
 	return userobject.GetObjectName(obj);
 }
-std::wstring ScpObjectSpace::GetObjectNameR(ScpObject * obj)
+std::string ScpObjectSpace::GetObjectNameR(ScpObject * obj)
 {
-	std::wstring name = userobject.GetObjectName(obj);
+	std::string name = userobject.GetObjectName(obj);
 	if (name.empty())
 	{
 		ScpObjectSpace * pobjectSpace = parentspace;
@@ -498,7 +588,7 @@ void ScpObjectSpace::ReleaseTempObject(ScpObject * tempobj)
 		//std::wstring name = GetObjectName(tempobj);
 		//if (!name.empty())
 		//{
-		//	//ËµÃ÷ÒÑ¾­±»Ó³Éäµ½ÁË¶ÔÏóÃû×Ö¿Õ¼ä£¬ÕâÀï²»ÄÜ·Å½øÁÙÊ±¶ÔÏó»º³åÇø
+		//	//è¯´æ˜å·²ç»è¢«æ˜ å°„åˆ°äº†å¯¹è±¡åå­—ç©ºé—´ï¼Œè¿™é‡Œä¸èƒ½æ”¾è¿›ä¸´æ—¶å¯¹è±¡ç¼“å†²åŒº
 		//	return;
 		//}
 		if (tempobj->RefCount > 0)
@@ -530,7 +620,7 @@ void ScpObjectSpace::ReleaseTempObject(ScpObject * tempobj)
 			else
 			{
 				ITPOBJECTS result = find(UnusedTempObjects.begin(), UnusedTempObjects.end(), tempobj);
-				if (result == UnusedTempObjects.end()) //Ã»ÕÒµ½
+				if (result == UnusedTempObjects.end()) //æ²¡æ‰¾åˆ°
 				{					
 					tempobj->RefCount = 0;
 					//UnusedTempObjects.push_back(tempobj);
@@ -576,7 +666,7 @@ ScpObject * ScpObjectSpace::AcquireTempObjectUni(VTPOBJECTS & TempObjects)
 void ScpObjectSpace::ReleaseTempObjectUni(ScpObject * tempobj, VTPOBJECTS & TempObjects)
 {
 	ITPOBJECTS result = find(TempObjects.begin(), TempObjects.end(), tempobj);
-	if (result == TempObjects.end()) //Ã»ÕÒµ½
+	if (result == TempObjects.end()) //æ²¡æ‰¾åˆ°
 	{		
 		if (tempobj->GetType() == ObjInt)
 		{
@@ -629,7 +719,7 @@ BOOL ScpObjectSpace::IsMyParentSpace(ScpObjectSpace * space)
 //	if(tempobj->istemp)
 //	{
 //		ITPOBJECTS result = find( TempObjects.begin( ), TempObjects.end( ), tempobj ); 
-//		if ( result == TempObjects.end( ) ) //Ã»ÕÒµ½
+//		if ( result == TempObjects.end( ) ) //æ²¡æ‰¾åˆ°
 //		{
 //			tempobj->AddRef();
 //			TempObjects.push_back(tempobj);
@@ -648,14 +738,17 @@ BOOL ScpObjectSpace::IsMyParentSpace(ScpObjectSpace * space)
 //		it = TempObjects.erase(it);
 //	}
 //}
-std::wstring ScpObjectSpace::GetNewTempObjectName()
+std::string ScpObjectSpace::GetNewTempObjectName()
 {
-	std::wstring tempobjname ;	
+	std::string tempobjname ;
 	do
 	{
-		tempobjname = STDSTRINGEXT::Format(L"@@tempobj%d", ++LastTempObjAppendix);
+		//tempobjname = STDSTRINGEXT::Format("@@tempobj%d", ScpRandomNumberObject::GetRandom().value);
+		//tempobjname = STDSTRINGEXT::Format("%s%d", LastTempObjectName.c_str(),++LastTempObjAppendix);
+		tempobjname = LastTempObjectName + IntToString(++LastTempObjAppendix);
+		//tempobjname = GenRandomString();
 	}while (FindLocalObject(tempobjname));
-	LastTempObjectName = tempobjname;
+	//LastTempObjectName = tempobjname;
 	return tempobjname;
 }
 
@@ -688,7 +781,7 @@ ScpObjectSpace * ScpObjectSpace::GetGlobalSpace()
 
 ScpObjectSpace * ScpObjectSpace::FindObject_ObjectSpace(ScpObject * obj)
 {
-	std::wstring name = userobject.GetObjectName(obj);
+	std::string name = userobject.GetObjectName(obj);
 	if (name.empty())
 	{
 		ScpObjectSpace * pobjectSpace = parentspace;

@@ -143,8 +143,8 @@ bool copy_dir(const char * source,const char * dest)
 
         while((p_dirent=readdir(p_dir)) != NULL)
         {
-            char read_buffer[PATH_MAX*2];
-            char write_buffer[PATH_MAX*2];
+            char read_buffer[PATH_MAX];
+            char write_buffer[PATH_MAX];
             sprintf(read_buffer,"%s%s", read_buf, p_dirent->d_name);
             sprintf(write_buffer,"%s%s", write_buf, p_dirent->d_name);
             if( is_dir(read_buffer) && 0 != strcmp(p_dirent->d_name, ".") && 0 != strcmp(p_dirent->d_name, "..") )
@@ -192,12 +192,32 @@ BOOL MyPathFileExist(const wchar_t* PathName)
 	return ret;
 }
 
+BOOL MyPathFileExist(const char* PathName)
+{
+	BOOL ret = FALSE;
+#ifdef _WIN32
+	if (INVALID_FILE_ATTRIBUTES != GetFileAttributesA(PathName))
+	{
+		ret = TRUE;
+	}
+#else
+
+	DIR* dir;
+	dir = opendir(PathName);
+	if (dir != NULL)
+	{
+		ret = TRUE;
+	}
+	closedir(dir);
+#endif
+	return ret;
+}
 BOOL IsDirectory(const wchar_t* pDir)
 {
 #ifdef WIN32
 	wchar_t szCurPath[MAX_PATH];
 	ZeroMemory(szCurPath, MAX_PATH);
-	_swprintf(szCurPath, L"%s//*", pDir);
+	swprintf_s(szCurPath, L"%s//*", pDir);
 	WIN32_FIND_DATAW FindFileData;
 	ZeroMemory(&FindFileData, sizeof(WIN32_FIND_DATAW));
 	HANDLE hFile = FindFirstFileW(szCurPath, &FindFileData);
@@ -218,7 +238,35 @@ BOOL IsDirectory(const wchar_t* pDir)
 	{
 		return TRUE;
 	}
-	return FALSE;
+#endif
+}
+
+BOOL IsDirectory(const char* pDir)
+{
+#ifdef WIN32
+	char szCurPath[MAX_PATH];
+	ZeroMemory(szCurPath, MAX_PATH);
+	sprintf_s(szCurPath, "%s//*", pDir);
+	WIN32_FIND_DATAA FindFileData;
+	ZeroMemory(&FindFileData, sizeof(WIN32_FIND_DATAA));
+	HANDLE hFile = FindFirstFileA(szCurPath, &FindFileData);
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		FindClose(hFile);
+		return FALSE;
+	}
+	else
+	{
+		FindClose(hFile);
+		return TRUE;
+	}
+#else
+	struct stat st;
+	stat(pDir, &st);
+	if (st.st_mode&S_IFDIR == S_IFDIR)
+	{
+		return TRUE;
+	}
 #endif
 }
 
@@ -226,7 +274,7 @@ BOOL DeleteDirectory(const wchar_t* DirName)
 {
 #ifdef WIN32
 	wchar_t szCurPath[MAX_PATH];
-	_swprintf(szCurPath, L"%s//*.*", DirName);
+	swprintf_s(szCurPath, L"%s//*.*", DirName);
 	WIN32_FIND_DATAW FindFileData;
 	ZeroMemory(&FindFileData, sizeof(WIN32_FIND_DATAW));
 	HANDLE hFile = FindFirstFileW(szCurPath, &FindFileData);
@@ -252,50 +300,84 @@ BOOL DeleteDirectory(const wchar_t* DirName)
 	BOOL bRet = RemoveDirectoryW(DirName);
 	return bRet;
 #else
-	return (0==delete_dir(STDSTRINGEXT::W2UTF(DirName).c_str()));
+	delete_dir(STDSTRINGEXT::W2UTF(DirName).c_str());
 #endif
 }
 
-BOOL myFindAllFiles(std::wstring directory, std::wstring matchrule, VTSTRINGS& allfiles)
+BOOL DeleteDirectory(const char* DirName)
+{
+#ifdef WIN32
+	char szCurPath[MAX_PATH];
+	sprintf_s(szCurPath, "%s//*.*", DirName);
+	WIN32_FIND_DATAA FindFileData;
+	ZeroMemory(&FindFileData, sizeof(WIN32_FIND_DATAA));
+	HANDLE hFile = FindFirstFileA(szCurPath, &FindFileData);
+	BOOL IsFinded = TRUE;
+	while (IsFinded)
+	{
+		IsFinded = FindNextFileA(hFile, &FindFileData);
+		if (strcmp(FindFileData.cFileName, ".") && strcmp(FindFileData.cFileName, ".."))
+		{
+			std::string strFileName = "";
+			strFileName = strFileName + DirName + "//" + FindFileData.cFileName;
+			if (IsDirectory(strFileName.c_str()))
+			{
+				DeleteDirectory(strFileName.c_str());
+			}
+			else
+			{
+				DeleteFileA(strFileName.c_str());
+			}
+		}
+	}
+	FindClose(hFile);
+	BOOL bRet = RemoveDirectoryA(DirName);
+	return bRet;
+#else
+	delete_dir(DirName);
+#endif
+}
+
+BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& allfiles)
 {
 #ifdef _WIN32
 
-	wchar_t szFind[MAX_PATH] = { L"\0" };
-	WIN32_FIND_DATAW findFileData;
+	char szFind[MAX_PATH] = { "\0" };
+	WIN32_FIND_DATAA findFileData;
 	BOOL bRet;
 
-	wcscpy_s(szFind, MAX_PATH, directory.c_str());
-	wcscat_s(szFind, L"\\*.*");
+	strcpy_s(szFind, MAX_PATH, directory.c_str());
+	strcpy_s(szFind, "\\*.*");
 
-	HANDLE hFind = ::FindFirstFileW(szFind, &findFileData);
+	HANDLE hFind = ::FindFirstFileA(szFind, &findFileData);
 	if (INVALID_HANDLE_VALUE == hFind)
 	{
 		return FALSE;
 	}
 
-	//±éÀúÎÄ¼þ¼Ð
+	//éåŽ†æ–‡ä»¶å¤¹
 	while (TRUE)
 	{
 		if (findFileData.cFileName[0] != L'.')
 		{
-			wchar_t pathname[MAX_PATH] = { 0 };
-			if (directory.substr(directory.length() - 1, 1) == L"\\")
+			char pathname[MAX_PATH] = { 0 };
+			if (directory.substr(directory.length() - 1, 1) == "\\")
 			{
 				directory = directory.substr(0, directory.length() - 1);
 			}
-			swprintf(pathname, L"%s\\%s", directory.c_str(), findFileData.cFileName);
+			sprintf_s(pathname, "%s\\%s", directory.c_str(), findFileData.cFileName);
 			if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
 				myFindAllFiles(pathname, matchrule, allfiles);
 			}
 			else
 			{
-				wregex wrgx;
+				regex rgx;
 				bool ret = false;
 				try
 				{
-					wrgx = matchrule;
-					ret = regex_search(pathname, wrgx);
+					rgx = matchrule;
+					ret = regex_search(pathname, rgx);
 				}
 				catch (...)
 				{
@@ -307,7 +389,7 @@ BOOL myFindAllFiles(std::wstring directory, std::wstring matchrule, VTSTRINGS& a
 				}
 			}
 		}
-		bRet = ::FindNextFileW(hFind, &findFileData);
+		bRet = ::FindNextFileA(hFind, &findFileData);
 		if (!bRet)
 		{
 			break;
@@ -321,7 +403,7 @@ BOOL myFindAllFiles(std::wstring directory, std::wstring matchrule, VTSTRINGS& a
 	DIR * dir = NULL;
 	struct dirent *ptr;
 	int ret = 0;
-	dir = opendir(STDSTRINGEXT::W2UTF(directory).c_str());
+	dir = opendir(directory.c_str());
 	if (NULL == dir)
 	{
 		return FALSE;
@@ -338,19 +420,19 @@ BOOL myFindAllFiles(std::wstring directory, std::wstring matchrule, VTSTRINGS& a
 		{
 			continue;
 		}
-		snprintf(chBuf, 4096, "%s/%s", STDSTRINGEXT::W2UTF(directory).c_str(), ptr->d_name);
+		snprintf(chBuf, 4096, "%s/%s", directory.c_str(), ptr->d_name);
 		if (is_dir(chBuf))
 		{
-			myFindAllFiles(STDSTRINGEXT::UTF2W(chBuf).c_str(), matchrule, allfiles);
+			myFindAllFiles(chBuf, matchrule, allfiles);
 		}
 		else
 		{
-			wregex wrgx;
+			regex rgx;
 			bool bret = false;
 			try
 			{
-				wrgx = matchrule;
-				bret = regex_search(STDSTRINGEXT::UTF2W(chBuf).c_str(), wrgx);
+				rgx = matchrule;
+				bret = regex_search(chBuf, rgx);
 			}
 			catch (...)
 			{
@@ -358,7 +440,7 @@ BOOL myFindAllFiles(std::wstring directory, std::wstring matchrule, VTSTRINGS& a
 			}
 			if (bret)
 			{
-				allfiles.push_back(STDSTRINGEXT::UTF2W(chBuf));
+				allfiles.push_back(chBuf);
 			}
 		}
 	}
@@ -369,15 +451,15 @@ BOOL myFindAllFiles(std::wstring directory, std::wstring matchrule, VTSTRINGS& a
 }
 
 #ifdef _WIN32
-BOOL copy_dir(std::wstring source, std::wstring dest)
+BOOL copy_dir(std::string source, std::string dest)
 {
 	BOOL re = FALSE;
-	CreateDirectoryW(dest.c_str(), NULL); //´´½¨Ä¿±êÎÄ¼þ¼Ð
-	std::wstring  stPath;
+	CreateDirectoryA(dest.c_str(), NULL); //åˆ›å»ºç›®æ ‡æ–‡ä»¶å¤¹
+	std::string  stPath;
 
-	stPath = STDSTRINGEXT::Format(L"%s\\*.*", source.c_str());
-	WIN32_FIND_DATAW findFileData;
-	HANDLE hFind = ::FindFirstFileW(stPath.c_str(), &findFileData);
+	stPath = STDSTRINGEXT::Format("%s\\*.*", source.c_str());
+	WIN32_FIND_DATAA findFileData;
+	HANDLE hFind = ::FindFirstFileA(stPath.c_str(), &findFileData);
 	if (INVALID_HANDLE_VALUE == hFind)
 	{
 		return FALSE;
@@ -386,24 +468,24 @@ BOOL copy_dir(std::wstring source, std::wstring dest)
 	{
 		if (findFileData.cFileName[0] != L'.')
 		{
-			wchar_t pathname[MAX_PATH] = { 0 };
-			swprintf(pathname, L"%s\\%s", source.c_str(), findFileData.cFileName);
+			char pathname[MAX_PATH] = { 0 };
+			sprintf_s(pathname, "%s\\%s", source.c_str(), findFileData.cFileName);
 			if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				//µÝ¹é´´½¨ÎÄ¼þ¼Ð+"/"+finder.GetFileName()
-				copy_dir(pathname, dest + L"\\" + findFileData.cFileName);
+				//é€’å½’åˆ›å»ºæ–‡ä»¶å¤¹+"/"+finder.GetFileName()
+				copy_dir(pathname, dest + "\\" + findFileData.cFileName);
 			}
 			else
 			{
 
-				BOOL result = (GetFileAttributes(pathname) & FILE_ATTRIBUTE_DIRECTORY);
+				BOOL result = (GetFileAttributesA(pathname) & FILE_ATTRIBUTE_DIRECTORY);
 				if (!result)
 				{
-					re = CopyFileW(pathname, (dest + L"\\" + findFileData.cFileName).c_str(), FALSE);
+					re = CopyFileA(pathname, (dest + "\\" + findFileData.cFileName).c_str(), FALSE);
 				}
 			}
 		}
-	} while (::FindNextFileW(hFind, &findFileData));
+	} while (::FindNextFileA(hFind, &findFileData));
 	::FindClose(hFind);
 	return re;
 }
@@ -451,15 +533,15 @@ ScpDirectoryObject::~ScpDirectoryObject(void)
 void ScpDirectoryObject::Show(CScriptEngine* engine)
 {
 #ifdef _WIN32
-	std::wstring text;
-	text = STDSTRINGEXT::Format(L"%s", directory.c_str());
+	std::string text;
+	text = STDSTRINGEXT::Format("%s", directory.c_str());
 #else
 	std::string text;
-	text = STDSTRINGEXT::Format("%s", STDSTRINGEXT::W2UTF(directory).c_str());
+	text = STDSTRINGEXT::Format("%s", directory.c_str());
 #endif
 	engine->PrintError(text);
 }
-ScpObject* ScpDirectoryObject::Clone(std::wstring strObjName)
+ScpObject* ScpDirectoryObject::Clone(std::string strObjName)
 {
 	ScpDirectoryObject *obj = new ScpDirectoryObject;
 	if (obj)
@@ -472,9 +554,9 @@ ScpObject* ScpDirectoryObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }
-std::wstring ScpDirectoryObject::ToString()
+std::string ScpDirectoryObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp = directory;
 	return temp;
 }
@@ -482,16 +564,15 @@ void ScpDirectoryObject::Release()
 {
 	delete this;
 }
-BOOL ScpDirectoryObject::Open(std::wstring dir)
+BOOL ScpDirectoryObject::Open(std::string dir)
 {
 	directory = dir;
 	if (!MyPathFileExist(dir.c_str()))
 	{
 #ifdef _WIN32
-		CreateDirectory(dir.c_str(), NULL);
+		CreateDirectoryA(dir.c_str(), NULL);
 #else
-		std::string dirpath = STDSTRINGEXT::W2UTF(dir);
-		mkdir(dirpath.c_str(), 0744);
+		mkdir(dir.c_str(), 0744);
 #endif
 	}
 	return TRUE;
@@ -525,41 +606,45 @@ void ScpDirectoryObject::EnumAll()
 	if (directory.length() == 0)
 		return;
 #ifdef _WIN32
-	wchar_t szFind[MAX_PATH] = { L"\0" };
-	WIN32_FIND_DATAW findFileData;
+	char szFind[MAX_PATH] = { "\0" };
+	WIN32_FIND_DATAA findFileData;
 	BOOL bRet;
 
-	wcscpy_s(szFind, MAX_PATH, directory.c_str());
-	wcscat_s(szFind, L"\\*.*");
+	strcpy_s(szFind, MAX_PATH, directory.c_str());
+	if (szFind[strlen(szFind) - 1] != '\\')
+	{
+		strcat_s(szFind, "\\");
+	}
+	strcat_s(szFind, "*.*");
 
-	HANDLE hFind = ::FindFirstFileW(szFind, &findFileData);
+	HANDLE hFind = ::FindFirstFileA(szFind, &findFileData);
 	if (INVALID_HANDLE_VALUE == hFind)
 	{
 		return;
 	}
 
-	//±éÀúÎÄ¼þ¼Ð
+	//éåŽ†æ–‡ä»¶å¤¹
 	while (TRUE)
 	{
 		if (findFileData.cFileName[0] != L'.')
 		{
-			wchar_t pathname[MAX_PATH] = { 0 };
-			if (directory.substr(directory.length() - 1, 1) == L"\\")
+			char pathname[MAX_PATH] = { 0 };
+			if (directory.substr(directory.length() - 1, 1) == "\\")
 			{
 				directory = directory.substr(0, directory.length() - 1);
 			}
-			swprintf(pathname, L"%s\\%s", directory.c_str(), findFileData.cFileName);
-			all.push_back(pathname);
+			sprintf_s(pathname, "%s\\%s", directory.c_str(), findFileData.cFileName);
+			all.push_back(STDSTRINGEXT::AToU(pathname));
 			if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				allsubdir.push_back(pathname);
+				allsubdir.push_back(STDSTRINGEXT::AToU(pathname));
 			}
 			else
 			{
-				allfiles.push_back(pathname);
+				allfiles.push_back(STDSTRINGEXT::AToU(pathname));
 			}
 		}
-		bRet = ::FindNextFileW(hFind, &findFileData);
+		bRet = ::FindNextFileA(hFind, &findFileData);
 		if (!bRet)
 		{
 			break;
@@ -572,7 +657,7 @@ void ScpDirectoryObject::EnumAll()
 	DIR * dir = NULL;
 	struct dirent *ptr;
 	int ret = 0;
-	dir = opendir(STDSTRINGEXT::W2UTF(directory).c_str());
+	dir = opendir(directory.c_str());
 	if (NULL == dir)
 	{
 		return ;
@@ -589,44 +674,44 @@ void ScpDirectoryObject::EnumAll()
 		{
 			continue;
 		}
-		snprintf(chBuf, 4096, "%s/%s", STDSTRINGEXT::W2UTF(directory).c_str(), ptr->d_name);
+		snprintf(chBuf, 4096, "%s/%s", directory.c_str(), ptr->d_name);
 		if (is_dir(chBuf))
 		{
-			allsubdir.push_back(STDSTRINGEXT::UTF2W(chBuf));
+			allsubdir.push_back(chBuf);
 		}
 		else
 		{
-			allfiles.push_back(STDSTRINGEXT::UTF2W(chBuf));
+			allfiles.push_back(chBuf);
 		}
 	}
 	(void)closedir(dir);
 	return ;
 #endif
 }
-BOOL ScpDirectoryObject::Copy(std::wstring source, std::wstring dest)
+BOOL ScpDirectoryObject::Copy(std::string source, std::string dest)
 {
 	BOOL re = FALSE;
 #ifdef _WIN32
 	re = copy_dir(source, dest);
 #else
-    re=copy_dir(STDSTRINGEXT::W2UTF(source).c_str(),STDSTRINGEXT::W2UTF(dest).c_str());
+    re=copy_dir(source.c_str(),dest.c_str());
 #endif
 	return re;
 }
-BOOL ScpDirectoryObject::Move(std::wstring source, std::wstring dest)
+BOOL ScpDirectoryObject::Move(std::string source, std::string dest)
 {
 #ifdef WIN32
-	return MoveFileW(source.c_str(), dest.c_str());
+	return MoveFileA(source.c_str(), dest.c_str());
 #else
-	return (rename(STDSTRINGEXT::W2UTF(source).c_str(), STDSTRINGEXT::W2UTF(dest).c_str()) != -1);
+	return (rename(source.c_str(),dest.c_str()) != -1);
 #endif
 }
-BOOL ScpDirectoryObject::FindAllFiles(ScpObjectSpace* currentObjectSpace, ScpTableObject* tableobj, std::wstring driectory, std::wstring matchrule)
+BOOL ScpDirectoryObject::FindAllFiles(ScpObjectSpace* currentObjectSpace, ScpTableObject* tableobj, std::string driectory, std::string matchrule)
 {
 	VTSTRINGS allmyfile;
 	myFindAllFiles(driectory, matchrule, allmyfile);
-	int count = allmyfile.size();
-	for (int i = 0;i < count;i++)
+	size_t count = allmyfile.size();
+	for (size_t i = 0;i < count;i++)
 	{
 		ScpStringObject* string1 = new ScpStringObject();
 		string1->objname = allmyfile.at(i);
@@ -639,20 +724,20 @@ BOOL ScpDirectoryObject::FindAllFiles(ScpObjectSpace* currentObjectSpace, ScpTab
 ScpTableObject* ScpDirectoryObject::EnumAllFiles(ScpObjectSpace* currentObjectSpace, ScpObject* reobj)
 {
 	ScpTableObject* tableobj = new ScpTableObject();
-	int dircount = allfiles.size();
+	size_t dircount = allfiles.size();
 	if (dircount == 0)
 	{
 		EnumAll();
 		dircount = allfiles.size();
 	}
-	for (int i = 0;i < dircount;i++)
+	for (size_t i = 0;i < dircount;i++)
 	{
 		if (((ScpRegExpObject*)reobj)->Find(allfiles.at(i)))
 		{
 
 			ScpStringObject* string1 = new ScpStringObject();
 
-			string1->objname = STDSTRINGEXT::Format(L"%s%s%d", directory.c_str(), str_EN_ObjFile, i);
+			string1->objname = STDSTRINGEXT::Format("%s%s%d", directory.c_str(), str_EN_ObjFile, i);
 
 			string1->content = allfiles.at(i);
 			tableobj->AddElement(string1->objname, string1);
@@ -669,17 +754,17 @@ ScpTableObject* ScpDirectoryObject::EnumAllFiles(ScpObjectSpace* currentObjectSp
 {
 
 	ScpTableObject* tableobj = new ScpTableObject();
-	int dircount = allfiles.size();
+	size_t dircount = allfiles.size();
 	if (dircount == 0)
 	{
 		EnumAll();
 		dircount = allfiles.size();
 	}
-	for (int i = 0;i < dircount;i++)
+	for (size_t i = 0;i < dircount;i++)
 	{
 		ScpStringObject* string1 = new ScpStringObject();
 
-		string1->objname = STDSTRINGEXT::Format(L"%s%s%d", directory.c_str(), str_EN_ObjFile, i);
+		string1->objname = STDSTRINGEXT::Format("%s%s%d", directory.c_str(), str_EN_ObjFile, i);
 
 		string1->content = allfiles.at(i);
 		tableobj->AddElement(string1->objname, string1);
@@ -689,23 +774,29 @@ ScpTableObject* ScpDirectoryObject::EnumAllFiles(ScpObjectSpace* currentObjectSp
 		}
 		currentObjectSpace->AddObject(string1->objname, string1);
 	}
+	std::string retname= STDSTRINGEXT::Format("%senumfiles", directory.c_str());
+	if (currentObjectSpace->FindObject(retname))
+	{
+		currentObjectSpace->EraseObject(retname);
+	}
+	currentObjectSpace->AddObject(retname, tableobj);
 	return tableobj;
 }
 ScpTableObject* ScpDirectoryObject::EnumAllSubDir(ScpObjectSpace* currentObjectSpace)
 {
 
 	ScpTableObject* tableobj = new ScpTableObject();
-	int dircount = allsubdir.size();
+	size_t dircount = allsubdir.size();
 	if (dircount == 0)
 	{
 		EnumAll();
-		dircount = allfiles.size();
+		dircount = allsubdir.size();
 	}
-	for (int i = 0;i < dircount;i++)
+	for (size_t i = 0;i < dircount;i++)
 	{
 		ScpStringObject* string1 = new ScpStringObject();
 
-		string1->objname = STDSTRINGEXT::Format(L"%s%s%d", directory.c_str(), str_EN_ObjSubDir, i);
+		string1->objname = STDSTRINGEXT::Format("%s%s%d", directory.c_str(), str_EN_ObjSubDir, i);
 
 
 		string1->content = allsubdir.at(i);
@@ -716,6 +807,12 @@ ScpTableObject* ScpDirectoryObject::EnumAllSubDir(ScpObjectSpace* currentObjectS
 		}
 		currentObjectSpace->AddObject(string1->objname, string1);
 	}
+	std::string retname = STDSTRINGEXT::Format("%senumdirs", directory.c_str());
+	if (currentObjectSpace->FindObject(retname))
+	{
+		currentObjectSpace->EraseObject(retname);
+	}
+	currentObjectSpace->AddObject(retname, tableobj);
 	return tableobj;
 }
 BOOL ScpDirectoryObject::Delete()
@@ -723,23 +820,23 @@ BOOL ScpDirectoryObject::Delete()
 #ifdef _WIN32
 	return DeleteDirectory(directory.c_str());
 #else
-	return delete_dir(STDSTRINGEXT::W2UTF(directory).c_str());
+	return delete_dir(directory.c_str());
 #endif
 }
-BOOL ScpDirectoryObject::Delete(std::wstring dir)
+BOOL ScpDirectoryObject::Delete(std::string dir)
 {
 #ifdef _WIN32
 	return DeleteDirectory(dir.c_str());
 #else
-	return delete_dir(STDSTRINGEXT::W2UTF(dir).c_str());
+	return delete_dir(dir.c_str());
 #endif
 }
-BOOL  ScpDirectoryObject::PathOrFileExist(std::wstring dir)
+BOOL  ScpDirectoryObject::PathOrFileExist(std::string dir)
 {
 	BOOL ret = FALSE;
 #ifdef _WIN32
 	DWORD dwAttribute = INVALID_FILE_ATTRIBUTES;
-	dwAttribute = GetFileAttributesW(dir.c_str());
+	dwAttribute = GetFileAttributesA(dir.c_str());
 	if (dwAttribute == INVALID_FILE_ATTRIBUTES)
 	{
 		ret = FALSE;
@@ -747,8 +844,7 @@ BOOL  ScpDirectoryObject::PathOrFileExist(std::wstring dir)
 	ret = TRUE;
 #else
 	DIR* d_dir;
-	std::string dirpath = STDSTRINGEXT::W2UTF(dir);
-	d_dir = opendir(dirpath.c_str());
+	d_dir = opendir(dir.c_str());
 	if (d_dir != NULL)
 	{
 		ret = TRUE;
@@ -757,11 +853,11 @@ BOOL  ScpDirectoryObject::PathOrFileExist(std::wstring dir)
 #endif
 	return ret;
 }
-BOOL ScpDirectoryObject::IsDir(std::wstring dir)
+BOOL ScpDirectoryObject::IsDir(std::string dir)
 {
 #ifdef _WIN32
 	DWORD dwAttribute = INVALID_FILE_ATTRIBUTES;
-	dwAttribute = GetFileAttributesW(dir.c_str());
+	dwAttribute = GetFileAttributesA(dir.c_str());
 	if ((dwAttribute & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return TRUE;
@@ -769,7 +865,7 @@ BOOL ScpDirectoryObject::IsDir(std::wstring dir)
 	return FALSE;
 #else
 	struct stat st;
-	stat(STDSTRINGEXT::W2UTF(dir).c_str(), &st);
+	stat(dir.c_str(), &st);
 	if (st.st_mode&S_IFDIR == S_IFDIR)
 	{
 		return TRUE;
@@ -777,12 +873,12 @@ BOOL ScpDirectoryObject::IsDir(std::wstring dir)
 	return FALSE;
 #endif
 }
-BOOL ScpDirectoryObject::Create(std::wstring dir)
+BOOL ScpDirectoryObject::Create(std::string dir)
 {
 #ifdef _WIN32
-	return CreateDirectoryW(dir.c_str(), NULL);
+	return CreateDirectoryA(dir.c_str(), NULL);
 #else
-	return (mkdir(STDSTRINGEXT::W2UTF(dir).c_str(), S_IRWXU) == 0);
+	return (mkdir(dir.c_str(), S_IRWXU) == 0);
 #endif
 }
 ScpObject * ScpDirectoryObject::InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
@@ -794,7 +890,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_Get(ScpObject * thisObject, VTPARA
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -829,7 +925,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_enum(ScpObject * thisObject, VTPAR
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -852,8 +948,8 @@ ScpObject * ScpDirectoryObject::InnerFunction_enum(ScpObject * thisObject, VTPAR
 	else if (parameters->size() == 2)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring name2 = parameters->at(1);
-		std::wstring param0 = parameters->at(0);
+		std::string name2 = parameters->at(1);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		StringStripQuote(name2);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
@@ -885,9 +981,9 @@ ScpObject * ScpDirectoryObject::InnerFunction_enum(ScpObject * thisObject, VTPAR
 	if (parameters->size() == 3)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring & name2 = parameters->at(1);
-		std::wstring & name3 = parameters->at(2);
-		std::wstring param0 = parameters->at(0);
+		std::string & name2 = parameters->at(1);
+		std::string & name3 = parameters->at(2);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		StringStripQuote(name2);
 		StringStripQuote(name3);
@@ -918,8 +1014,8 @@ ScpObject * ScpDirectoryObject::InnerFunction_find(ScpObject * thisObject, VTPAR
 {
 	if (parameters->size() == 2)
 	{
-		std::wstring findtype = parameters->at(0);
-		std::wstring matchrule = parameters->at(1);
+		std::string findtype = parameters->at(0);
+		std::string matchrule = parameters->at(1);
 		StringStripQuote(findtype);
 		StringStripQuote(matchrule);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(findtype);
@@ -947,7 +1043,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_copy(ScpObject * thisObject, VTPAR
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring name = parameters->at(0);
+		std::string name = parameters->at(0);
 		StringStripQuote(name);
 		ScpObject* obj = currentObjectSpace->FindLocalObject(name);
 
@@ -980,7 +1076,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_move(ScpObject * thisObject, VTPAR
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring name = parameters->at(0);
+		std::string name = parameters->at(0);
 		StringStripQuote(name);
 		ScpObject* obj = currentObjectSpace->FindLocalObject(name);
 		if (obj && obj->GetType() == ObjString)
@@ -1009,7 +1105,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_create(ScpObject * thisObject, VTP
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring name = parameters->at(0);
+		std::string name = parameters->at(0);
 		StringStripQuote(name);
 		ScpObject* obj = currentObjectSpace->FindLocalObject(name);
 		if (obj && obj->GetType() == ObjString)
@@ -1042,7 +1138,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_open(ScpObject * thisObject, VTPAR
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace* currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring name = parameters->at(0);
+		std::string name = parameters->at(0);
 		StringStripQuote(name);
 		ScpObject* obj = currentObjectSpace->FindLocalObject(name);
 		if (obj && obj->GetType() == ObjString)
@@ -1070,7 +1166,7 @@ ScpObject * ScpDirectoryObject::InnerFunction_open(ScpObject * thisObject, VTPAR
 	}
 	return nullptr;
 }
-bool ScpDirectoryObject::IsInnerFunction(std::wstring& functionname)
+bool ScpDirectoryObject::IsInnerFunction(std::string& functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -1079,7 +1175,7 @@ bool ScpDirectoryObject::IsInnerFunction(std::wstring& functionname)
 	return false;
 
 }
-ScpObject* ScpDirectoryObject::CallInnerFunction(std::wstring& functionname, VTPARAMETERS* parameters, CScriptEngine* engine)
+ScpObject* ScpDirectoryObject::CallInnerFunction(std::string& functionname, VTPARAMETERS* parameters, CScriptEngine* engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -1093,9 +1189,9 @@ ScpObject * __stdcall ScpDirectoryObjectFactory(VTPARAMETERS * paramters, CScrip
 {
 	if (paramters->size() >= 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
-		std::wstring content;
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
+		std::string content;
 		if (paramters->size() == 3)
 			content = paramters->at(2);
 		StringStripQuote(content);

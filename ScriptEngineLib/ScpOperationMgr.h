@@ -8,21 +8,21 @@
 #include "addin.h"
 typedef struct _tag_BinaryOperationItem
 {
-	std::wstring op;
+	std::string op;
 	ScpObjectType obj1Type;
 	ScpObjectType obj2Type;
 	pBinaryOpertaion BinaryOpertaionFunc;
 }BinaryOperationItem,*pBinaryOperationItem;
-//ÔËËã·û¹ÜÀí
-//ÓÃÓÚÊµÏÖÔËËã·ûµÄ¶¯Ì¬×¢²á£¬ÒÔ´ËÊµÏÖÔËËã·ûµÄÖØÔØ
+//è¿ç®—ç¬¦ç®¡ç†
+//ç”¨äºå®ç°è¿ç®—ç¬¦çš„åŠ¨æ€æ³¨å†Œï¼Œä»¥æ­¤å®ç°è¿ç®—ç¬¦çš„é‡è½½
 class ScpOperationMgr
 {
 public:
 	ScpOperationMgr();
 	~ScpOperationMgr();
 	static ScpOperationMgr * GetInstance();
-	BOOL RegisterBinaryOperation(const wchar_t * op, ScpObjectType obj1Type,ScpObjectType obj2Type,	pBinaryOpertaion BinaryOpertaionFunc);
-	pBinaryOpertaion GetBinaryOperation(const wchar_t * op, ScpObjectType obj1Type, ScpObjectType obj2Type);
+	BOOL RegisterBinaryOperation(const char * op, ScpObjectType obj1Type,ScpObjectType obj2Type,	pBinaryOpertaion BinaryOpertaionFunc);
+	pBinaryOpertaion GetBinaryOperation(const char * op, ScpObjectType obj1Type, ScpObjectType obj2Type);
 	std::vector<BinaryOperationItem> BinaryOperations;
 };
 

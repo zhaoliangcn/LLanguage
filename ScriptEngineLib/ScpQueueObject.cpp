@@ -22,7 +22,7 @@ ScpQueueObject::ScpQueueObject()
 	BindObjectInnerFuction(scpcommand_en_add, InnerFunction_add);
 
 	BindObjectInnerFuction(scpcommand_cn_pop, InnerFunction_pop);
-	BindObjectInnerFuction(scpcommand_cn_pop, InnerFunction_pop);
+	BindObjectInnerFuction(scpcommand_en_pop, InnerFunction_pop);
 
 	BindObjectInnerFuction(scpcommand_cn_getsize, InnerFunction_getsize);
 	BindObjectInnerFuction(scpcommand_en_getsize, InnerFunction_getsize);
@@ -49,16 +49,16 @@ void ScpQueueObject::Show(CScriptEngine * engine)
 	}
 }
 
-ScpObject * ScpQueueObject::Clone(std::wstring strObjName)
+ScpObject * ScpQueueObject::Clone(std::string strObjName)
 {
 	ScpQueueObject * tmpobj = new ScpQueueObject;
 	tmpobj->scpqueue = scpqueue;
 	return tmpobj;
 }
 
-std::wstring ScpQueueObject::ToString()
+std::string ScpQueueObject::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 
 void ScpQueueObject::Release()
@@ -66,7 +66,7 @@ void ScpQueueObject::Release()
 	delete this;
 }
 
-bool ScpQueueObject::IsInnerFunction(std::wstring & functionname)
+bool ScpQueueObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -75,7 +75,7 @@ bool ScpQueueObject::IsInnerFunction(std::wstring & functionname)
 	return false;
 }
 
-ScpObject * ScpQueueObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpQueueObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -95,7 +95,7 @@ ScpObject * ScpQueueObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -124,7 +124,7 @@ ScpObject * ScpQueueObject::InnerFunction_add(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters && parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindLocalObject(objname);
 		if (obj)

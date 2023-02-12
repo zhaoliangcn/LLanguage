@@ -5,18 +5,18 @@
 class ScpLex
 {
 public:	
-	explicit ScpLex(std::wstring commandstring);
+	explicit ScpLex(std::string commandstring);
 	~ScpLex(void);
-	std::wstring GetNextToken();
-	std::wstring GetLastToken();
-	std::wstring GetCurrentToken();
-	BOOL IsUnaryOperator(std::wstring & Token);  //是否是一元运算符
-	BOOL IsBinaryOperator(std::wstring & token); //是否是二元运算符
+	std::string GetNextToken();
+	std::string GetLastToken();
+	std::string GetCurrentToken();
+	BOOL IsUnaryOperator(std::string & Token);  //鏄惁鏄竴鍏冭繍绠楃
+	BOOL IsBinaryOperator(std::string & token); //鏄惁鏄簩鍏冭繍绠楃
 private:
-	std::wstring Expression;
-	std::wstring last;
-	std::wstring current;
-	std::wstring next;
+	std::string Expression;
+	std::string last;
+	std::string current;
+	std::string next;
 	ULONG startpos;
 };
 

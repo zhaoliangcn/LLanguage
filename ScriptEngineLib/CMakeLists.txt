@@ -1,0 +1,64 @@
+cmake_minimum_required (VERSION 3.12)
+project (ScriptEngineLib) 
+SET(SCRIPTENGINELIB_SRCS
+	ScpArrayObject.cpp
+	ScpStackObject.cpp
+	ScpStringArrayObject.cpp
+	ScpStringObject.cpp
+	ScpStructObject.cpp
+	ScpTableObject.cpp
+	ScpTimeObject.cpp
+	ScpUserObject.cpp
+	ScpWhileStatementObject.cpp
+	ScriptByteCode.cpp
+	ScriptEngine.cpp
+	ScpAst.cpp
+	ScriptFile.cpp
+	ScriptScanner.cpp
+	UIMessage.cpp
+	ScpBigIntObject.cpp
+	ScpByteCode.cpp
+	ScpCFunctionObject.cpp
+	ScpClassInstanceObject.cpp
+	ScpClassObject.cpp
+	ScpCObject.cpp
+	ScpDebugger.cpp
+	ScpDirectoryObject.cpp
+	ScpDoubleObject.cpp
+	ScpExpressionAnalyser.cpp
+	ScpExpressionBlock.cpp
+	ScpExpressionsObject.cpp
+	Cross.cpp
+	ScpExtendObjectMgr.cpp
+	ScpFileObject.cpp
+	ScpFunctionObject.cpp
+	ScpGlobalCommandObject.cpp
+	ScpGlobalCommands.cpp
+	ScpGlobalObject.cpp
+	ScpIfStatementObject.cpp
+	ScpIntObject.cpp
+	ScpJsonObject.cpp
+	ScpLex.cpp
+	ScpListObject.cpp
+	ScpMapObject.cpp
+	ScpMathmaticLib.cpp
+	ScpMemoryObject.cpp
+	ScpNullObject.cpp
+	ScpObjectDefine.cpp
+	ScpObjectFactory.cpp
+	ScpObjectNammes.cpp
+	ScpObjectSpace.cpp
+	NumberHelp.cpp
+	ScpOperationMgr.cpp
+	ScpQueueObject.cpp
+	ScpRandomNumberObject.cpp
+	ScpRangeObject.cpp
+	ScpRegExpObject.cpp
+	ScpResourcePool.cpp
+	ScpRuntime.cpp
+	ScpRuntimeStack.cpp
+	ScpScriptCommand.cpp
+	ScpScriptLex.cpp
+)
+
+add_library(ScriptEngineLib STATIC ${SCRIPTENGINELIB_SRCS})

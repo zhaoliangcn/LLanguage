@@ -28,7 +28,7 @@ ScpArrayObject::~ScpArrayObject(void)
 {
 	arrayobjects.Destroy();
 }
-ScpObject * ScpArrayObject::Clone(std::wstring strObjName)
+ScpObject * ScpArrayObject::Clone(std::string strObjName)
 {
 	ScpArrayObject * obj = new ScpArrayObject;
 	if (obj)
@@ -41,9 +41,9 @@ void ScpArrayObject::Release()
 {
 	delete this;
 }
-std::wstring ScpArrayObject::ToString()
+std::string ScpArrayObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	ULONG size = GetSize();
 	for(ULONG i=0;i<size;i++)
 	{
@@ -64,11 +64,11 @@ ULONG ScpArrayObject::GetSize()
 {
 	return arrayobjects.GetSize();
 }
-BOOL ScpArrayObject::AddElement(std::wstring elementname,ScpObject * obj)
+BOOL ScpArrayObject::AddElement(std::string elementname,ScpObject * obj)
 {
 	return arrayobjects.MapObject(elementname,obj);
 }
-BOOL ScpArrayObject::AddElement(std::wstring elementname,ScpObjectSpace * objectSpace)
+BOOL ScpArrayObject::AddElement(std::string elementname,ScpObjectSpace * objectSpace)
 {
 
 	ScpObject * obj = objectSpace->FindObject(elementname);
@@ -80,7 +80,7 @@ BOOL ScpArrayObject::AddElement(std::wstring elementname,ScpObjectSpace * object
 
 	return FALSE;
 }
-BOOL ScpArrayObject::SetElement(std::wstring elementname,ULONG elementindex,ScpObject * obj)
+BOOL ScpArrayObject::SetElement(std::string elementname,ULONG elementindex,ScpObject * obj)
 {
 	if(Elementtype==ObjUnknown && Max!=0)
 	{
@@ -89,7 +89,7 @@ BOOL ScpArrayObject::SetElement(std::wstring elementname,ULONG elementindex,ScpO
 	}
 	return FALSE;
 }
-BOOL ScpArrayObject::SetElement(std::wstring elementname,ULONG elementindex,ScpObjectSpace * objectSpace)
+BOOL ScpArrayObject::SetElement(std::string elementname,ULONG elementindex,ScpObjectSpace * objectSpace)
 {
 
 	ScpObject * obj = objectSpace->FindObject(elementname);
@@ -101,7 +101,7 @@ BOOL ScpArrayObject::SetElement(std::wstring elementname,ULONG elementindex,ScpO
 
 	return FALSE;
 }
-BOOL ScpArrayObject::DeleteElement(std::wstring elementname)
+BOOL ScpArrayObject::DeleteElement(std::string elementname)
 {
 	if(arrayobjects.IsInMap(elementname))
 	{
@@ -115,7 +115,7 @@ BOOL ScpArrayObject::ReplaceElementObj(ScpObject * oldobj,ScpObject * obj)
 	BOOL bret = FALSE;
 	if(oldobj->GetType()==ObjNull)
 	{
-		std::wstring name = arrayobjects.GetObjectName(oldobj);
+		std::string name = arrayobjects.GetObjectName(oldobj);
 		ULONG elementindex = arrayobjects.GetObjectIndex(name);			
 		bret = SetElement(name,elementindex,obj);
 		delete oldobj;
@@ -133,7 +133,7 @@ BOOL ScpArrayObject::ReplaceElementObj(ULONG elementindex,ScpObject * obj)
 	}	
 	return bret;
 }
-BOOL ScpArrayObject::ReplaceElementObj(std::wstring elementname,ScpObject * obj)
+BOOL ScpArrayObject::ReplaceElementObj(std::string elementname,ScpObject * obj)
 {
 	BOOL bret = FALSE;
 	ScpObject * temp = arrayobjects.GetObject(elementname);
@@ -146,7 +146,7 @@ BOOL ScpArrayObject::ReplaceElementObj(std::wstring elementname,ScpObject * obj)
 	return bret;
 
 }
-ScpObject * ScpArrayObject::GetElement(std::wstring elementname)
+ScpObject * ScpArrayObject::GetElement(std::string elementname)
 {
 	if(arrayobjects.IsInMap(elementname))
 	{
@@ -154,7 +154,7 @@ ScpObject * ScpArrayObject::GetElement(std::wstring elementname)
 	}
 	return NULL;
 }
-ScpObjectType ScpArrayObject::GetElementType(std::wstring elementname)
+ScpObjectType ScpArrayObject::GetElementType(std::string elementname)
 {
 	return arrayobjects.GetType(elementname);
 }
@@ -173,9 +173,9 @@ ScpObjectType ScpArrayObject::GetElementType(ULONG elementindex)
 {
 	return ObjUnknown;
 }
-std::wstring ScpArrayObject::GetElementName(ULONG elementindex)
+std::string ScpArrayObject::GetElementName(ULONG elementindex)
 {
-	std::wstring temp;
+	std::string temp;
 	temp = arrayobjects.GetObjectName(elementindex);
 	return temp;
 	
@@ -190,7 +190,7 @@ ScpObject * ScpArrayObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -231,7 +231,7 @@ void ScpArrayObject::Show(CScriptEngine * engine)
 		}
 	}
 }
-bool ScpArrayObject::IsInnerFunction(std::wstring & functionname)
+bool ScpArrayObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -239,7 +239,7 @@ bool ScpArrayObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpArrayObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpArrayObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -251,15 +251,15 @@ ScpObject * ScpArrayObject::CallInnerFunction(std::wstring & functionname,VTPARA
 
 ScpObject * __stdcall ScpArrayObjectFactory(VTPARAMETERS * paramters, CScriptEngine * engine)
 {
-	std::wstring arrayobjname = paramters->at(1);
+	std::string arrayobjname = paramters->at(1);
 	if (paramters->size() == 2)
 	{
 		size_t pos1 = arrayobjname.find(scpLeftBracket);
 		size_t pos2 = arrayobjname.find(scpRightBracket);
-		if ((pos1 != std::wstring::npos) && (pos2 != std::wstring::npos))
+		if ((pos1 != std::string::npos) && (pos2 != std::string::npos))
 		{
-			std::wstring arrayname = arrayobjname.substr(0, pos1);
-			std::wstring arraylen = arrayobjname.substr(pos1 + 1, pos2 - pos1 - 1);
+			std::string arrayname = arrayobjname.substr(0, pos1);
+			std::string arraylen = arrayobjname.substr(pos1 + 1, pos2 - pos1 - 1);
 			if (IsStaticNumber(arraylen))
 			{
 				ScpArrayObject * obj = (ScpArrayObject *)engine->GetCurrentObjectSpace()->FindObject(arrayname);
@@ -273,7 +273,7 @@ ScpObject * __stdcall ScpArrayObjectFactory(VTPARAMETERS * paramters, CScriptEng
 						obj->Elementtype = ObjUnknown;
 						for (unsigned int i = 0;i < obj->Max;i++)
 						{
-							std::wstring elementname = STDSTRINGEXT::Format(L"nullobj%d", i);
+							std::string elementname = STDSTRINGEXT::Format("nullobj%d", i);
 							ScpNullObject * nullobj = new ScpNullObject;
 							nullobj->parentObj = obj;
 							obj->AddElement(elementname, nullobj);
@@ -295,7 +295,7 @@ ScpObject * __stdcall ScpArrayObjectFactory(VTPARAMETERS * paramters, CScriptEng
 				obj->arrayname = arrayobjname;
 				for (ULONG i = 2;i < paramters->size();i++)
 				{
-					std::wstring elementname = paramters->at(i);
+					std::string elementname = paramters->at(i);
 					ScpObject * tempobj = engine->GetCurrentObjectSpace()->FindObject(elementname);
 					if (tempobj)
 					{
@@ -315,7 +315,7 @@ ScpObject * __stdcall ScpArrayObjectFactory(VTPARAMETERS * paramters, CScriptEng
 					}
 					else
 					{
-						std::wstring elementtype;
+						std::string elementtype;
 						ScpObject * elementobj;
 						if (IsStaticNumber(elementname))
 						{

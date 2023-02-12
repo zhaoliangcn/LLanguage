@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//»ù±¾¶ÔÏóµÄ¹¤³§º¯Êý
+//åŸºæœ¬å¯¹è±¡çš„å·¥åŽ‚å‡½æ•°
 */
 #include "ScpObjectFactory.h"
 #include "ScpCommonObject.h"

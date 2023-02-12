@@ -25,10 +25,10 @@ ScriptByteCode::~ScriptByteCode()
 
 }
 
-bool ScriptByteCode::GenByteCodeFromSouceLine(std::wstring& wsSourceLine, ByteCodeMemoryStream& memstream)
+bool ScriptByteCode::GenByteCodeFromSouceLine(std::string& wsSourceLine, ByteCodeMemoryStream& memstream)
 {
 	int language = 0;
-	if (wsSourceLine == L"#scpeng")
+	if (wsSourceLine == "#scpeng")
 	{
 		language = 1;
 		int codelen = sizeof(unsigned char) + sizeof(unsigned int);
@@ -44,7 +44,7 @@ bool ScriptByteCode::GenByteCodeFromSouceLine(std::wstring& wsSourceLine, ByteCo
 			free(bytecode);
 		}
 	}
-	else if (wsSourceLine == L"#scpchs")
+	else if (wsSourceLine == "#scpchs")
 	{
 		language = 0;
 		int codelen = sizeof(unsigned char) + sizeof(unsigned int);
@@ -69,7 +69,7 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 	{
 	case vl_define:
 	{
-		std::wstring & strobjtype = vtparameters.at(0);
+		std::string & strobjtype = vtparameters.at(0);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobjtype.c_str());
 		if (engine->extend_obj_mgr.IsExtendObject(strobjtype.c_str()))
 		{
@@ -186,8 +186,8 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 						else
 						{
 
-							//������Ҫ���Ǻ����Ĳ����Ǳ���ʽ�����
-							std::wstring Expression = vtparameters.at(i);
+							//这里需要考虑函数的参数是表达式的情况
+							std::string Expression = vtparameters.at(i);
 							ULONG residexp = resourcepool->scpFindResource(vtparameters.at(i));
 							ULONG residname;
 							if (residexp == -1)
@@ -196,11 +196,11 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 								VTPARAMETERS param;
 								if (IsStaticNumber(Expression))
 								{
-									std::wstring name = L"tempint";
+									std::string name = "tempint";
 									residname = resourcepool->scpFindResource(name);
 									while (residname != -1)
 									{
-										name += L"0";
+										name += "0";
 										residname = resourcepool->scpFindResource(name);
 									}
 									residname = resourcepool->AppendResource(name);
@@ -209,7 +209,7 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 									bytecodemem->AppendByteCode(&stream);
 									stream.Release();
 
-									param.push_back(L"int");
+									param.push_back("int");
 									param.push_back(name);
 									param.push_back(Expression);
 									GenByteCodeObjectDefine(ObjInt, param, stream);
@@ -229,11 +229,11 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 								}
 								else if (IsStaticString(Expression))
 								{
-									std::wstring name = L"tempstring";
+									std::string name = "tempstring";
 									residname = resourcepool->scpFindResource(name);
 									while (residname != -1)
 									{
-										name += L"0";
+										name += "0";
 										residname = resourcepool->scpFindResource(name);
 									}
 									residname = resourcepool->AppendResource(name);
@@ -242,7 +242,7 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 									bytecodemem->AppendByteCode(&stream);
 									stream.Release();
 
-									param.push_back(L"string");
+									param.push_back("string");
 									param.push_back(name);
 									param.push_back(Expression);
 									GenByteCodeObjectDefine(ObjString, param, stream);
@@ -267,13 +267,14 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 				}
 				if (func->BindParameters(engine) != -1)
 				{
-					std::wstring objname = objectSpace->GetObjectNameR(func);
+					std::string objname = objectSpace->GetObjectNameR(func);
 
 					VTPARAMETERS param;
 					for (int i = 1;i < vtparameters.size();i++)
 					{
 						param.push_back(vtparameters.at(i));
 					}
+					//函数没有调用过，没有生成函数定义和函数体的字节码
 					if (func->bytecodemem_funcbody.codelength == 0)
 					{
 
@@ -296,10 +297,16 @@ bool ScriptByteCode::GenByteCodeFromCommand(const unsigned int & commandvalue, V
 				}
 				engine->SetCurrentObjectSpace(objectSpace);
 				func->FunctionObjectSpace->parentspace = parentspaceold;
-			}			
+			}
 		}
 		break;
 	}
+	case vl_loop:
+	{
+		GetByteCodeLoop(vtparameters, memstream, engine);
+		break;
+	}
+
 	default:
 		break;
 	}
@@ -312,14 +319,14 @@ bool ScriptByteCode::GenByteCodeObjectDefine(ScpObjectType type, VTPARAMETERS & 
 	{
 		ULONG residobjname;
 		ULONG residobjcontent;
-		std::wstring name = vtparameters.at(1);
-		std::wstring content;
+		std::string name = vtparameters.at(1);
+		std::string content;
 		unsigned int codelen = 0;
 		residobjname = resourcepool->scpFindResource(name);
 		if (residobjname == -1)
 		{
 			residobjname = resourcepool->AppendResource(name);
-			std::string nameutf = STDSTRINGEXT::W2UTF(name);
+			std::string nameutf = name;
 			int namelen = nameutf.length() + 1;
 			codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 			unsigned char * code = (unsigned char *)malloc(codelen);
@@ -348,7 +355,7 @@ bool ScriptByteCode::GenByteCodeObjectDefine(ScpObjectType type, VTPARAMETERS & 
 		{
 			residobjcontent = 0;
 		}
-		std::string contentutf = STDSTRINGEXT::W2UTF(content);
+		std::string contentutf = content;
 		int contentlen = contentutf.length() + 1;
 		if (contentlen > 1)
 		{
@@ -394,15 +401,14 @@ bool ScriptByteCode::GenByteCodeClassObjectDefine(ScpObjectType type, VTPARAMETE
 	if (vtparameters.size() == 2)
 	{
 		ULONG residobjname;
-		ULONG residobjcontent;
-		std::wstring name = vtparameters.at(1);
-		std::wstring content;
+		std::string name = vtparameters.at(1);
+		std::string content;
 		unsigned int codelen = 0;
 		residobjname = resourcepool->scpFindResource(name);
 		if (residobjname == -1)
 		{
 			residobjname = resourcepool->AppendResource(name);
-			std::string nameutf = STDSTRINGEXT::W2UTF(name);
+			std::string nameutf = name;
 			int namelen = nameutf.length() + 1;
 			codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 			unsigned char * code = (unsigned char *)malloc(codelen);
@@ -446,16 +452,16 @@ bool ScriptByteCode::GenByteCodeClassInstanceDefine(ScpObjectType type, VTPARAME
 	{
 		ULONG residclassname;
 		ULONG residobjname;
-		std::wstring classname = vtparameters.at(0);
-		std::wstring name = vtparameters.at(1);
-		std::wstring content;
+		std::string classname = vtparameters.at(0);
+		std::string name = vtparameters.at(1);
+		std::string content;
 		unsigned int codelen = 0;
 		residclassname = resourcepool->scpFindResource(classname);
 		residobjname = resourcepool->scpFindResource(name);
 		if (residobjname == -1)
 		{
 			residobjname = resourcepool->AppendResource(name);
-			std::string nameutf = STDSTRINGEXT::W2UTF(name);
+			std::string nameutf = name;
 			int namelen = nameutf.length() + 1;
 			codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 			unsigned char * code = (unsigned char *)malloc(codelen);
@@ -500,7 +506,7 @@ bool ScriptByteCode::GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, Byte
 	if (vtparameters.size() >= 2)
 	{
 		ULONG residobjname;		
-		std::wstring name = vtparameters.at(1);	
+		std::string name = vtparameters.at(1);	
 		ScpFunctionObject * func=(ScpFunctionObject * )engine->GetCurrentObjectSpace()->FindObject(name);
 		ULONG residparentobj=0;
 		if(func->ParenObject)
@@ -510,7 +516,7 @@ bool ScriptByteCode::GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, Byte
 		if (residobjname == -1)
 		{
 			residobjname = resourcepool->AppendResource(name);
-			std::string nameutf = STDSTRINGEXT::W2UTF(name);
+			std::string nameutf = name;
 			int namelen = nameutf.length() + 1;
 			codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 			unsigned char * code = (unsigned char *)malloc(codelen);
@@ -527,7 +533,7 @@ bool ScriptByteCode::GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, Byte
 				*pcode = 0;
 				pcode++;
 				//memstream.AppendByteCode(code, codelen);
-				//ֱ�����ӵ�ȫ���ֽ���
+				//直接添加到全局字节码
 				bytecodemem->AppendByteCode(code, codelen);
 				free(code);
 			}
@@ -536,9 +542,9 @@ bool ScriptByteCode::GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, Byte
 		
 		for (int i = 2;i < vtparameters.size();i++)
 		{
-			std::wstring paramname = vtparameters.at(i);
+			std::string paramname = vtparameters.at(i);
 			ULONG residparam = resourcepool->AppendResource(paramname);
-			std::string paramnameutf = STDSTRINGEXT::W2UTF(paramname);
+			std::string paramnameutf = paramname;
 
 			int contentlen = paramnameutf.length() + 1;
 			if (contentlen > 1)
@@ -585,7 +591,7 @@ bool ScriptByteCode::GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, Byte
 			
 			for (int i = 2;i < vtparameters.size();i++)
 			{
-				std::wstring paramname = vtparameters.at(i);
+				std::string paramname = vtparameters.at(i);
 				ULONG paramresid = resourcepool->scpFindResource(paramname);
 
 				memcpy(pcode, (unsigned char *)&paramresid, sizeof(paramresid));
@@ -601,18 +607,18 @@ bool ScriptByteCode::GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, Byte
 
 bool ScriptByteCode::GenByteCodeLoad(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream)
 {
-	std::wstring & strobjtype = vtparameters.at(0);
+	std::string & strobjtype = vtparameters.at(0);
 	if (strobjtype == ScpObjectNames::GetSingleInsatnce()->strObjExtObj)
 	{
 		if (vtparameters.size() == 2)
 		{
 			ULONG residobjname;
-			std::wstring name = vtparameters.at(1);
+			std::string name = vtparameters.at(1);
 			unsigned int codelen = 0;
 			if (resourcepool->scpFindResource(name) == -1)
 			{
 				residobjname = resourcepool->AppendResource(name);
-				std::string nameutf = STDSTRINGEXT::W2UTF(name);
+				std::string nameutf = name;
 				int namelen = nameutf.length() + 1;
 				codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 				unsigned char * code = (unsigned char *)malloc(codelen);
@@ -654,19 +660,19 @@ bool ScriptByteCode::GenByteCodeLoad(VTPARAMETERS & vtparameters, ByteCodeMemory
 
 bool ScriptByteCode::GenByteCodeImport(VTPARAMETERS & vtparameters, ByteCodeMemoryStream & memstream)
 {
-	std::wstring & strobjtype = vtparameters.at(0);
+	std::string & strobjtype = vtparameters.at(0);
 	if (strobjtype == str_EN_ObjLib)
 	{
 		if (vtparameters.size() == 2)
 		{
 			ULONG residobjname;
-			std::wstring name = vtparameters.at(1);
+			std::string name = vtparameters.at(1);
 			StringStripQuote(name);
 			unsigned int codelen = 0;
 			if (resourcepool->scpFindResource(name) == -1)
 			{
 				residobjname = resourcepool->AppendResource(name);
-				std::string nameutf = STDSTRINGEXT::W2UTF(name);
+				std::string nameutf = name;
 				int namelen = nameutf.length() + 1;
 				codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 				unsigned char * code = (unsigned char *)malloc(codelen);
@@ -706,14 +712,14 @@ bool ScriptByteCode::GenByteCodeImport(VTPARAMETERS & vtparameters, ByteCodeMemo
 	return false;
 }
 
-bool ScriptByteCode::GetByteCodeInitRes(std::wstring res, ByteCodeMemoryStream & memstream, ULONG &resid)
+bool ScriptByteCode::GetByteCodeInitRes(std::string res, ByteCodeMemoryStream & memstream, ULONG &resid)
 {
-	std::wstring name = res;
+	std::string name = res;
 	unsigned int codelen = 0;
 	//if (resourcepool->scpFindResource(name) == -1)
 	{
 		resid = resourcepool->scpFindResource(name);
-		std::string nameutf = STDSTRINGEXT::W2UTF(name);
+		std::string nameutf = name;
 		int namelen = nameutf.length() + 1;
 		codelen = sizeof(unsigned char) + sizeof(unsigned int) + namelen;
 		unsigned char * code = (unsigned char *)malloc(codelen);
@@ -737,7 +743,7 @@ bool ScriptByteCode::GetByteCodeInitRes(std::wstring res, ByteCodeMemoryStream &
 	return false;
 }
 
-bool ScriptByteCode::GetByteCodeBinaryOp(std::wstring op, ULONG idret, ULONG idleft, ULONG idright, ByteCodeMemoryStream& memstream)
+bool ScriptByteCode::GetByteCodeBinaryOp(std::string op, ULONG idret, ULONG idleft, ULONG idright, ByteCodeMemoryStream& memstream)
 {
 	unsigned int codelen = 0;
 	if (scpOperationLessthan == op ||
@@ -869,7 +875,7 @@ bool ScriptByteCode::GetByteCodeBinaryOp(std::wstring op, ULONG idret, ULONG idl
 	return false;
 }
 
-bool ScriptByteCode::GenByteCodeUnaryOp(std::wstring op, ULONG idobj, ByteCodeMemoryStream & memstream)
+bool ScriptByteCode::GenByteCodeUnaryOp(std::string op, ULONG idobj, ByteCodeMemoryStream & memstream)
 {
 	unsigned int codelen = 0;
 	codelen = sizeof(unsigned char) + sizeof(unsigned int);
@@ -891,7 +897,7 @@ bool ScriptByteCode::GenByteCodeUnaryOp(std::wstring op, ULONG idobj, ByteCodeMe
 	return false;
 }
 
-bool ScriptByteCode::GenByteCodeCallInner(std::wstring objectname, std::wstring innerfuncname, VTPARAMETERS & vtparameters, ByteCodeMemoryStream & memstream)
+bool ScriptByteCode::GenByteCodeCallInner(std::string objectname, std::string innerfuncname, VTPARAMETERS & vtparameters, ByteCodeMemoryStream & memstream, CScriptEngine * engine)
 {
 	unsigned int codelen = 0;
 	int paramcount = vtparameters.size();
@@ -917,7 +923,13 @@ bool ScriptByteCode::GenByteCodeCallInner(std::wstring objectname, std::wstring 
 
 			for (int i = 0;i < paramcount;i++)
 			{
-				id = resourcepool->scpFindResource(vtparameters.at(i));
+				std::string param = vtparameters.at(i);
+				ScpObject * objparam = engine->GetCurrentObjectSpace()->FindObject(param);
+				if (objparam &&objparam->GetType() == ObjString)
+				{
+					param = ((ScpStringObject *)objparam)->content;
+				}
+				id = resourcepool->scpFindResource(param);
 				memcpy(pcode, (void*)&id, sizeof(id));
 				pcode += sizeof(id);
 			}
@@ -970,7 +982,7 @@ bool ScriptByteCode::GetByteCodeCompute(VTPARAMETERS & vtparameters, ByteCodeMem
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	for (int i = 0;i < vtparameters.size();i++)
 	{
-		std::wstring expression = vtparameters.at(i);
+		std::string expression = vtparameters.at(i);
 		ScpObject *obj2 = currentObjectSpace->FindObject(expression);
 		if (obj2 && obj2->GetType() == ObjString)
 		{
@@ -998,7 +1010,7 @@ bool ScriptByteCode::GetByteCodeCompute(VTPARAMETERS & vtparameters, ByteCodeMem
 	return false;
 }
 
-bool ScriptByteCode::GenByteCodeCallFunc(std::wstring funcname, VTPARAMETERS & vtparameters, ByteCodeMemoryStream & memstream)
+bool ScriptByteCode::GenByteCodeCallFunc(std::string funcname, VTPARAMETERS & vtparameters, ByteCodeMemoryStream & memstream)
 {
 	unsigned int codelen = 0;
 	int paramcount = vtparameters.size();
@@ -1040,7 +1052,7 @@ bool ScriptByteCode::GenByteCodeReturn(VTPARAMETERS & vtparameters, ByteCodeMemo
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters.size() == 1)
 	{
-		std::wstring expression = vtparameters.at(0);
+		std::string expression = vtparameters.at(0);
 		ScpStringObject *strobjexpression = (ScpStringObject *)currentObjectSpace->FindObject(expression);
 		if (strobjexpression)
 		{
@@ -1059,7 +1071,7 @@ bool ScriptByteCode::GenByteCodeReturn(VTPARAMETERS & vtparameters, ByteCodeMemo
 				stream.Release();
 				if (retobj)
 				{
-					std::wstring name = currentObjectSpace->GetObjectNameR(retobj);
+					std::string name = currentObjectSpace->GetObjectNameR(retobj);
 					ULONG resid = resourcepool->scpFindResource(name);
 					memstream.AppendByteCode((unsigned char*)&BC_RETURN, 1);
 					memstream.AppendByteCode((unsigned char*)&resid, sizeof(resid));
@@ -1101,6 +1113,60 @@ bool ScriptByteCode::GenByteCodeWhilestatement(ByteCodeMemoryStream & streamcond
 	return false;
 }
 
+bool ScriptByteCode::GetByteCodeLoop(VTPARAMETERS & vtparameters, ByteCodeMemoryStream & memstream, CScriptEngine * engine)
+{
+	//LOOP指令的生成实际上会生成多条指令，如果BC_LOOP调用的函数此时没有被调用过，那么
+	//要先生成函数的定义和函数体，后跟BC_LOOP 和 BC_CALL
+	if (vtparameters.size() == 2)
+	{
+		std::string funcname = vtparameters.at(1);
+		
+		ScpFunctionObject* func = (ScpFunctionObject*)engine->GetCurrentObjectSpace()->FindObject(funcname);
+		if (func)
+		{
+			//函数没有调用过，没有生成函数定义和函数体的字节码
+			if (func->bytecodemem_funcbody.codelength == 0)
+			{
+				ByteCodeMemoryStream stream;
+				func->functionexpressionblock->GenByteCode(engine, stream);
+				GenByteCodeFunctionBody(stream);
+				func->bytecodemem_funcbody.AppendByteCode(&stream);
+
+				memstream.AppendByteCode(&func->bytecodemem_funcdef);
+				memstream.AppendByteCode(&func->bytecodemem_funcbody);
+
+			}
+		}
+		
+
+		std::string strloopcount= vtparameters.at(0);
+		unsigned int codelen = 0;
+		
+		codelen = SIZE_OF_BYTECODE_COMMAND + SIZE_OF_LOOPCOUNT;
+		unsigned char * code = (unsigned char *)malloc(codelen);
+		if (code)
+		{
+			unsigned char * pcode = code;
+			*pcode = BC_LOOP;
+			pcode++;
+			
+			ULONG loopcount = StringToInt(strloopcount);
+			memcpy(pcode, (void*)&loopcount, sizeof(loopcount));
+			pcode += sizeof(loopcount);
+			
+			VTPARAMETERS vtparameters_empty;
+			ByteCodeMemoryStream  memstreamfunccall;
+			GenByteCodeCallFunc(funcname, vtparameters_empty, memstreamfunccall);
+
+			memstream.AppendByteCode(code, codelen);
+			memstream.AppendByteCode(&memstreamfunccall);
+			free(code);
+			return true;
+		}
+	}
+	return false;
+}
+
 
 
 
@@ -1115,30 +1181,33 @@ void ScriptByteCode::Init()
 	{
 		resourcepool = new ScpResourcePool();
 	}
-	std::wstring temp(L"");
+	std::string temp("");
 	resourcepool->AppendResource(temp);
-	resourcepool->AppendResource(std::wstring(L"show"));
-	resourcepool->AppendResource(std::wstring(L"int"));
-	resourcepool->AppendResource(std::wstring(L"int64"));
-	resourcepool->AppendResource(std::wstring(L"double"));
-	resourcepool->AppendResource(std::wstring(L"string"));
-	resourcepool->AppendResource(std::wstring(L"file"));
+	resourcepool->AppendResource(std::string("show"));
+	resourcepool->AppendResource(std::string("int"));
+	resourcepool->AppendResource(std::string("int64"));
+	resourcepool->AppendResource(std::string("double"));
+	resourcepool->AppendResource(std::string("string"));
+	resourcepool->AppendResource(std::string("file"));
 	
 }
 
-bool ScriptByteCode::DumpToFile(const wchar_t * bytecodefile)
+bool ScriptByteCode::DumpToFile(const char * bytecodefile)
 {
 	bool bret = false;
 #ifdef _WIN32
-    HANDLE hFile = CreateFileW(bytecodefile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileA(bytecodefile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE != hFile)
     {
         DWORD dwWriteCount = 0;
-		bret = WriteFile(hFile, bytecodemem->membuf, bytecodemem->codelength, &dwWriteCount, NULL);
+		if (WriteFile(hFile, bytecodemem->membuf, bytecodemem->codelength, &dwWriteCount, NULL))
+		{
+			bret = true;
+		}
         CloseHandle(hFile);
     }
 #else
-	int file = ::open(STDSTRINGEXT::W2UTF(bytecodefile).c_str(), O_WRONLY | O_CREAT,  00700);
+	int file = ::open(bytecodefile, O_WRONLY | O_CREAT,  00700);
 	if (file > 0)
 	{
 		::lseek(file, 0, SEEK_SET);
@@ -1154,7 +1223,7 @@ bool ScriptByteCode::DumpToFile(const wchar_t * bytecodefile)
     return bret;
 }
 
-ByteCodeMemoryStream::ByteCodeMemoryStream() :membuf(NULL), bufsize(0), curpos(NULL), codelength(0)
+ByteCodeMemoryStream::ByteCodeMemoryStream() :membuf(NULL), bufsize(0), curpos(NULL), codelength(NULL)
 {
 
 }
@@ -1220,7 +1289,7 @@ unsigned char * ByteCodeMemoryStream::AppendByteCode(unsigned char * code, unsig
 	}
 	else
 	{
-		DWORD dwlen = curpos - membuf;
+		size_t dwlen = curpos - membuf;
 		if ((bufsize - dwlen) < codelen)
 		{
 			bufsize *= 2;

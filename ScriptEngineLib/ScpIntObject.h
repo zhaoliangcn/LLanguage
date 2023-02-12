@@ -8,29 +8,36 @@
 #define _H_SCPINTOBJECT
 #include "ScpObject.h"
 
-const static wchar_t* scpcommand_square_CN = L"平方";
-const static wchar_t* scpcommand_squareroot_CN = L"平方根";
-const static wchar_t* scpcommand_cubic_CN = L"立方";
-const static wchar_t* scpcommand_cuberoot_CN = L"立方根";
-const static wchar_t* scpcommand_abs_CN = L"绝对值";
-const static wchar_t* scpcommand_acos_CN = L"反余弦";
-const static wchar_t* scpcommand_cos_CN = L"余弦";
-const static wchar_t* scpcommand_asin_CN = L"反正弦";
-const static wchar_t* scpcommand_sin_CN = L"正弦";
-const static wchar_t* scpcommand_atan_CN = L"反正切";
-const static wchar_t* scpcommand_tan_CN = L"正切";
+const static char * scpcommand_square_CN = "平方";
+const static char * scpcommand_squareroot_CN = "平方根";
+const static char * scpcommand_cubic_CN = "立方";
+const static char * scpcommand_cuberoot_CN = "立方根";
+const static char * scpcommand_abs_CN = "绝对值";
+const static char * scpcommand_acos_CN = "反余弦";
+const static char * scpcommand_cos_CN = "余弦";
+const static char * scpcommand_asin_CN = "反正弦";
+const static char * scpcommand_sin_CN = "正弦";
+const static char * scpcommand_atan_CN = "反正切";
+const static char * scpcommand_tan_CN = "正切";
+const static char * scpcommand_pow_CN = "次方";
+const static char * scpcommand_add_CN = "加";
+const static char * scpcommand_sub_CN = "减";
 
-const static wchar_t* scpcommand_square_EN = L"square";
-const static wchar_t* scpcommand_squareroot_EN = L"sqrt";
-const static wchar_t* scpcommand_cubic_EN = L"cubic";
-const static wchar_t* scpcommand_cuberoot_EN = L"cuberoot";
-const static wchar_t* scpcommand_abs_EN = L"abs";
-const static wchar_t* scpcommand_acos_EN = L"acos";
-const static wchar_t* scpcommand_cos_EN = L"cos";
-const static wchar_t* scpcommand_asin_EN = L"asin";
-const static wchar_t* scpcommand_sin_EN = L"sin";
-const static wchar_t* scpcommand_atan_EN = L"atan";
-const static wchar_t* scpcommand_tan_EN = L"tan";
+const static char * scpcommand_square_EN = "square";
+const static char * scpcommand_squareroot_EN = "sqrt";
+const static char * scpcommand_cubic_EN = "cubic";
+const static char * scpcommand_cuberoot_EN = "cuberoot";
+const static char * scpcommand_abs_EN = "abs";
+const static char * scpcommand_acos_EN = "acos";
+const static char * scpcommand_cos_EN = "cos";
+const static char * scpcommand_asin_EN = "asin";
+const static char * scpcommand_sin_EN = "sin";
+const static char * scpcommand_atan_EN = "atan";
+const static char * scpcommand_tan_EN = "tan";
+const static char * scpcommand_pow_EN = "pow";
+const static char * scpcommand_add_EN = "add";
+const static char * scpcommand_sub_EN = "sub";
+
 class ScpIntObject : public ScpObject
 {
 public:
@@ -39,11 +46,11 @@ public:
 	
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);	
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);	
 	int value;
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
@@ -60,7 +67,10 @@ public:
 	static ScpObject * InnerFunction_sin(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_atan(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_tan(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject * InnerFunction_pow(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 
+	static ScpObject* InnerFunction_add(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine);
+	static ScpObject* InnerFunction_sub(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine);
 
 };
 

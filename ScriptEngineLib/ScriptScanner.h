@@ -1,7 +1,7 @@
 #ifndef _H_SCRIPTSCANNER
 #define _H_SCRIPTSCANNER
 
-//ฝลฑพิดด๚ย๋ษจร่ฦ๗
+//่ๆฌๆบไปฃ็ ๆซๆๅจ
 #include <string>
 class ScriptScanner
 {

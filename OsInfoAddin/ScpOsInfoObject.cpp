@@ -9,6 +9,7 @@
 #include "../Common/netaddressutil.h"
 #else 
 #define  wcsicmp wcscasecmp
+#define _stricmp strcasecmp
 #include <stdio.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
@@ -159,22 +160,22 @@ void ScpOsInfoObject::Show(CScriptEngine * engine)
 {
 }
 
-ScpObject * ScpOsInfoObject::Clone(std::wstring strObjName)
+ScpObject * ScpOsInfoObject::Clone(std::string strObjName)
 {
 	ScpOsInfoObject *obj = new ScpOsInfoObject;
 	return obj;
 }
 
-std::wstring ScpOsInfoObject::ToString()
+std::string ScpOsInfoObject::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 
 void ScpOsInfoObject::Release()
 {
 }
 
-bool ScpOsInfoObject::IsInnerFunction(std::wstring & functionname)
+bool ScpOsInfoObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -183,7 +184,7 @@ bool ScpOsInfoObject::IsInnerFunction(std::wstring & functionname)
 	return false;
 }
 
-ScpObject * ScpOsInfoObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpOsInfoObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -203,7 +204,7 @@ ScpObject * ScpOsInfoObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -223,11 +224,11 @@ ScpObject * ScpOsInfoObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 		}
 		if (strOsVersion_CN == wsparam || strOsVersion_EN == wsparam)
 		{
-			ScpStringObject * obj = (ScpStringObject *)BaseObjectFactory(ObjString);;
-			obj->content = GetVersionString();
+			ScpStringObject * obj = (ScpStringObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
+			obj->content = STDSTRINGEXT::W2UTF(GetVersionString());
 			return obj;
 		}
-		else if (wcsicmp(wsparam.c_str(), L"ip") == 0)
+		else if (_stricmp(wsparam.c_str(), "ip") == 0)
 		{
 			std::string ip, mac;
 #ifdef _WIN32
@@ -235,55 +236,55 @@ ScpObject * ScpOsInfoObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 #else
                         ip = get_ipaddressall();
 #endif 
-			ScpStringObject * obj = (ScpStringObject *)BaseObjectFactory(ObjString);;
-			obj->content = STDSTRINGEXT::AToW(ip);
+			ScpStringObject * obj = (ScpStringObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
+			obj->content = ip;
 			return obj;
 		}
-		else if (wcsicmp(wsparam.c_str(), L"mac") == 0)
+		else if (_stricmp(wsparam.c_str(), "mac") == 0)
 		{
 			std::string ip, mac;
 #ifdef _WIN32
 			GetIpMacAddressA(ip, mac);
 #endif 
-			ScpStringObject * obj = (ScpStringObject *)BaseObjectFactory(ObjString);;
-			obj->content = STDSTRINGEXT::AToW(mac);
+			ScpStringObject * obj = (ScpStringObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
+			obj->content = mac;
 			return obj;
 		}
 
 	}
         else if (parameters->size() == 3)
         {
-            std::wstring wsparam = parameters->at(0);
+            std::string wsparam = parameters->at(0);
             StringStripQuote(wsparam);
             ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(wsparam);
             if (objparam0 && objparam0->GetType() == ObjString)
             {
                      wsparam = ((ScpStringObject *)objparam0)->content;
             }
-            std::wstring wsparam1 = parameters->at(1);
+            std::string wsparam1 = parameters->at(1);
             StringStripQuote(wsparam1);
             ScpObject * objparam1 = engine->GetCurrentObjectSpace()->FindObject(wsparam1);
             if (objparam1 && objparam1->GetType() == ObjString)
             {
                      wsparam1 = ((ScpStringObject *)objparam1)->content;
             }
-            std::wstring wsparam2 = parameters->at(2);
+            std::string wsparam2 = parameters->at(2);
             StringStripQuote(wsparam2);
             ScpObject * objparam2 = engine->GetCurrentObjectSpace()->FindObject(wsparam2);
             if (objparam2 && objparam2->GetType() == ObjString)
             {
                      wsparam2 = ((ScpStringObject *)objparam2)->content;
             }
-            if (wcsicmp(wsparam.c_str(), L"ip") == 0)
+            if (_stricmp(wsparam.c_str(), "ip") == 0)
             {
                     std::string ip, mac;
 #ifdef _WIN32
                     GetIpMacAddressA(ip, mac);
 #else
-                    ip = get_ipaddress(STDSTRINGEXT::W2UTF(wsparam1).c_str(),STDSTRINGEXT::W2UTF(wsparam2).c_str());
+                    ip = get_ipaddress(wsparam1.c_str(), wsparam2.c_str());
 #endif
-                    ScpStringObject * obj = (ScpStringObject *)BaseObjectFactory(ObjString);;
-                    obj->content = STDSTRINGEXT::AToW(ip);
+                    ScpStringObject * obj = (ScpStringObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
+                    obj->content = ip;
                     return obj;
             }
         }

@@ -33,7 +33,7 @@ ScpIntObject ScpRandomNumberObject::GetRandom()
 	
 	ScpIntObject ret ;
 #ifdef _WIN32
-	std::tr1::mt19937 eng;
+	std::mt19937 eng;
 	LARGE_INTEGER li;
 	QueryPerformanceCounter(&li);
 	eng.seed((ULONG)li.QuadPart); 
@@ -76,7 +76,7 @@ ScpObject * ScpRandomNumberObject::InnerFunction_Get(ScpObject * thisObject, VTP
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -112,7 +112,7 @@ void ScpRandomNumberObject::Show(CScriptEngine * engine)
 {
 	value.Show(engine);
 }
-ScpObject * ScpRandomNumberObject::Clone(std::wstring strObjName)
+ScpObject * ScpRandomNumberObject::Clone(std::string strObjName)
 {
 	ScpRandomNumberObject * obj = new ScpRandomNumberObject;
 	if (obj)
@@ -122,16 +122,16 @@ ScpObject * ScpRandomNumberObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpRandomNumberObject::ToString()
+std::string ScpRandomNumberObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpRandomNumberObject::Release() 
 {
 	delete this;
 }
-bool ScpRandomNumberObject::IsInnerFunction(std::wstring & functionname)
+bool ScpRandomNumberObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -139,7 +139,7 @@ bool ScpRandomNumberObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpRandomNumberObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpRandomNumberObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -154,8 +154,8 @@ ScpObject * __stdcall ScpRandomNumberObjectFactory(VTPARAMETERS * paramters, CSc
 {
 	if (paramters->size() == 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
 		
 		ScpRandomNumberObject *obj = new ScpRandomNumberObject;
 		if (obj)

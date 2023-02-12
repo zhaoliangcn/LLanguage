@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//L脚本语言的类实例
+//L鑴氭湰璇█鐨勭被瀹炰緥
 */
 #ifndef _H_SCPCLASSINSTANCEOBJECT
 #define _H_SCPCLASSINSTANCEOBJECT
@@ -13,12 +13,12 @@ class ScpClassInstanceObject :
 {
 public:
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
+	virtual ScpObject * Clone(std::string strObjName);
 	ScpObjectType RealObjType();
 	ScpClassInstanceObject(void);
 	~ScpClassInstanceObject(void);
 	ScpClassObject * instanceOf;
-	std::wstring classname;
+	std::string classname;
 	ScpObjectType realobjtype;
 };
 

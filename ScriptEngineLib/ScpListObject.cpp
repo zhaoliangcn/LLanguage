@@ -60,7 +60,7 @@ void ScpListObject::Show(CScriptEngine * engine)
 	}
 }
 
-ScpObject * ScpListObject::Clone(std::wstring strObjName)
+ScpObject * ScpListObject::Clone(std::string strObjName)
 {
 	ScpListObject * tmpobj = new ScpListObject;
 	tmpobj->listname = strObjName;
@@ -68,15 +68,15 @@ ScpObject * ScpListObject::Clone(std::wstring strObjName)
 	return tmpobj;
 }
 
-std::wstring ScpListObject::ToString()
+std::string ScpListObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	ULONG size = GetSize();
 	for (ULONG i = 0;i < size;i++)
 	{
 		ScpObject * element = (ScpObject *)GetElement(i);
 		temp += element->ToString();
-		temp += L",";
+		temp += ",";
 	}
 	return temp;
 }
@@ -86,7 +86,7 @@ void ScpListObject::Release()
 	delete this;
 }
 
-bool ScpListObject::IsInnerFunction(std::wstring & functionname)
+bool ScpListObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -95,7 +95,7 @@ bool ScpListObject::IsInnerFunction(std::wstring & functionname)
 	return false;
 }
 
-ScpObject * ScpListObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpListObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -115,7 +115,7 @@ void ScpListObject::Combine(ScpObject * tbl)
 	ULONG size = ((ScpListObject*)tbl)->members.size();
 	for (unsigned int i = 0;i < size;i++)
 	{
-		std::wstring & elementname = ((ScpListObject*)tbl)->members.at(i).first;
+		std::string & elementname = ((ScpListObject*)tbl)->members.at(i).first;
 		ScpObject * obj = ((ScpListObject*)tbl)->members.at(i).second;
 		if (!this->GetElement(elementname))
 		{
@@ -135,7 +135,7 @@ void ScpListObject::Exclude(ScpObject * tbl)
 	ULONG size = ((ScpListObject*)tbl)->members.size();
 	for (unsigned int i = 0;i < size;i++)
 	{
-		std::wstring & elementname = ((ScpListObject*)tbl)->members.at(i).first;
+		std::string & elementname = ((ScpListObject*)tbl)->members.at(i).first;
 		if (this->GetElement(elementname))
 		{
 			this->DeleteElement(elementname);
@@ -147,7 +147,7 @@ void ScpListObject::Intersection(ScpObject * tbl)
 {
 	for (unsigned int i = 0;i < ((ScpListObject*)tbl)->GetSize();i++)
 	{
-		std::wstring & elementname = ((ScpListObject*)tbl)->members.at(i).first;
+		std::string & elementname = ((ScpListObject*)tbl)->members.at(i).first;
 		if (!this->GetElement(elementname))
 		{
 			this->DeleteElement(elementname);
@@ -155,7 +155,7 @@ void ScpListObject::Intersection(ScpObject * tbl)
 	}
 	for (unsigned int i = 0;i < ((ScpListObject*)tbl)->GetSize();i++)
 	{
-		std::wstring & elementname = ((ScpListObject*)tbl)->members.at(i).first;
+		std::string & elementname = ((ScpListObject*)tbl)->members.at(i).first;
 		if (!((ScpListObject*)tbl)->GetElement(this->members.at(i).first))
 		{
 			this->DeleteElement(this->members.at(i).first);
@@ -164,7 +164,7 @@ void ScpListObject::Intersection(ScpObject * tbl)
 	}
 }
 
-BOOL ScpListObject::AddElement(std::wstring elementname, ScpObject * obj)
+BOOL ScpListObject::AddElement(std::string elementname, ScpObject * obj)
 {
 	if (!GetElement(elementname))
 	{
@@ -175,7 +175,7 @@ BOOL ScpListObject::AddElement(std::wstring elementname, ScpObject * obj)
 	return FALSE;
 }
 
-BOOL ScpListObject::AddElement(std::wstring elementname, ScpObjectSpace * objectSpace)
+BOOL ScpListObject::AddElement(std::string elementname, ScpObjectSpace * objectSpace)
 {
 	ScpObject * obj = objectSpace->FindObject(elementname);
 	if (obj)
@@ -186,7 +186,7 @@ BOOL ScpListObject::AddElement(std::wstring elementname, ScpObjectSpace * object
 	return FALSE;
 }
 
-BOOL ScpListObject::InsertElement(int index, std::wstring elementname, ScpObject * obj)
+BOOL ScpListObject::InsertElement(int index, std::string elementname, ScpObject * obj)
 {
 	if (!GetElement(elementname))
 	{
@@ -198,7 +198,7 @@ BOOL ScpListObject::InsertElement(int index, std::wstring elementname, ScpObject
 	return 0;
 }
 
-BOOL ScpListObject::DeleteElement(std::wstring elementname)
+BOOL ScpListObject::DeleteElement(std::string elementname)
 {
 	for(ITNamedPOBJECTS it = members.begin();it!= members.end();it++)
 	{
@@ -220,7 +220,7 @@ void ScpListObject::EmptyElement()
 	}
 }
 
-ScpObject * ScpListObject::GetElement(std::wstring elementname)
+ScpObject * ScpListObject::GetElement(std::string elementname)
 {
 	ScpObject * obj = nullptr;
 	for (int i = 0;i < members.size();i++)
@@ -233,7 +233,7 @@ ScpObject * ScpListObject::GetElement(std::wstring elementname)
 	return obj;
 }
 
-ScpObjectType ScpListObject::GetElementType(std::wstring elementname)
+ScpObjectType ScpListObject::GetElementType(std::string elementname)
 {
 	ScpObject * obj = GetElement(elementname);
 	if (obj)
@@ -286,7 +286,7 @@ ScpObject * ScpListObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -327,7 +327,7 @@ ScpObject * ScpListObject::InnerFunction_insert(ScpObject * thisObject, VTPARAME
 	if (parameters->size() == 2)
 	{
 		int index = -1;
-		std::wstring indexstr = parameters->at(0);
+		std::string indexstr = parameters->at(0);
 		StringStripQuote(indexstr);
 		ScpObject * intobj = engine->GetCurrentObjectSpace()->FindObject(indexstr);
 		if (intobj && intobj->GetType() == ObjInt)
@@ -343,8 +343,8 @@ ScpObject * ScpListObject::InnerFunction_insert(ScpObject * thisObject, VTPARAME
 			engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorIndexOutofSize);
 			return NULL;
 		}
-		//ÓÉÓÚ¿ÉÄÜÊÇÔÚº¯ÊýÖÐµ÷ÓÃ£¬²»ÄÜ°ó¶¨ÎªÐÎÊ½²ÎÊýµÄÃû³Æ£¬ÐèÒªÏòÉÏµÝ¹é²éÕÒµ½ÕæÊµÃû³Æ
-		std::wstring name = parameters->at(1);
+		//ç”±äºŽå¯èƒ½æ˜¯åœ¨å‡½æ•°ä¸­è°ƒç”¨ï¼Œä¸èƒ½ç»‘å®šä¸ºå½¢å¼å‚æ•°çš„åç§°ï¼Œéœ€è¦å‘ä¸Šé€’å½’æŸ¥æ‰¾åˆ°çœŸå®žåç§°
+		std::string name = parameters->at(1);
 		StringStripQuote(name);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 		if (obj)
@@ -401,8 +401,8 @@ ScpObject * ScpListObject::InnerFunction_append(ScpObject * thisObject, VTPARAME
 {
 	for (int i = 0;i < parameters->size();i++)
 	{
-		//ÓÉÓÚ¿ÉÄÜÊÇÔÚº¯ÊýÖÐµ÷ÓÃ£¬²»ÄÜ°ó¶¨ÎªÐÎÊ½²ÎÊýµÄÃû³Æ£¬ÐèÒªÏòÉÏµÝ¹é²éÕÒµ½ÕæÊµÃû³Æ
-		std::wstring name = parameters->at(i);
+		//ç”±äºŽå¯èƒ½æ˜¯åœ¨å‡½æ•°ä¸­è°ƒç”¨ï¼Œä¸èƒ½ç»‘å®šä¸ºå½¢å¼å‚æ•°çš„åç§°ï¼Œéœ€è¦å‘ä¸Šé€’å½’æŸ¥æ‰¾åˆ°çœŸå®žåç§°
+		std::string name = parameters->at(i);
 		StringStripQuote(name);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 		if (obj)
@@ -459,7 +459,7 @@ ScpObject * ScpListObject::InnerFunction_traverse(ScpObject * thisObject, VTPARA
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (parameters->size() == 1)
 	{
-		std::wstring funcname = parameters->at(0);
+		std::string funcname = parameters->at(0);
 		StringStripQuote(funcname);
 		ScpListObject * listobj = (ScpListObject*)thisObject;
 		ScpFunctionObject * func = (ScpFunctionObject*)currentObjectSpace->FindObject(funcname);
@@ -472,13 +472,13 @@ ScpObject * ScpListObject::InnerFunction_traverse(ScpObject * thisObject, VTPARA
 				ScpObject * elementobj = listobj->GetElement(index);
 				if (elementobj)
 				{
-					std::wstring elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
+					std::string elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
 
 					BOOL Clone = FALSE;
-					std::wstring OldName;
+					std::string OldName;
 					if (currentObjectSpace->IsMyParentSpace(func->FunctionObjectSpace) || currentObjectSpace == func->FunctionObjectSpace)
 					{
-						//	//ËµÃ÷ÊÇµÝ¹éµÄº¯Êýµ÷ÓÃ		
+						//	//è¯´æ˜Žæ˜¯é€’å½’çš„å‡½æ•°è°ƒç”¨		
 						Clone = TRUE;
 					}
 					ScpObjectSpace * OldObjectSpace = NULL;
@@ -532,9 +532,9 @@ ScpObject * ScpListObject::InnerFunction_getelement(ScpObject * thisObject, VTPA
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring &indexstr = parameters->at(0);
+		std::string &indexstr = parameters->at(0);
 		StringStripQuote(indexstr);
-		//ÏÈ°´Ãû×Ö²éÕÒ
+		//å…ˆæŒ‰åå­—æŸ¥æ‰¾
 		ScpObject * elementobj = ((ScpListObject*)thisObject)->GetElement(indexstr);
 		if (elementobj)
 		{
@@ -575,7 +575,7 @@ ScpObject * ScpListObject::InnerFunction_delete(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (obj)
@@ -594,7 +594,7 @@ ScpObject * ScpListObject::InnerFunction_erase(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (obj)

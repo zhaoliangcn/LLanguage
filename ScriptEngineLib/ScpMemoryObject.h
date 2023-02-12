@@ -7,8 +7,8 @@
 #ifndef _H_SCPMEMORYOBJECT
 #define _H_SCPMEMORYOBJECT
 #include "ScpObject.h"
-static const wchar_t * scpcommand_cn_extend = L"扩展";
-static const wchar_t * scpcommand_en_extend = L"extend";
+static const char * scpcommand_cn_extend = "扩展";
+static const char * scpcommand_en_extend = "extend";
 
 
 
@@ -18,23 +18,23 @@ public:
 	ScpMemoryObject();
 	~ScpMemoryObject();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 	BOOL Acquare(ULONG aSize);
 	BOOL Extend(ULONG exSize);
 	BOOL ReleaseMem();
 	BOOL Read(void * dest,ULONG aSize);
-	BOOL Read(std::wstring & wstr);
+	BOOL Read(std::string & wstr);
 	BOOL Read(void * dest, ULONG pos, ULONG aSize);
-	BOOL Read(std::wstring & wstr, ULONG pos);
+	BOOL Read(std::string & wstr, ULONG pos);
 	BOOL Write(void * src,ULONG aSize);
 	BOOL Write(std::wstring & wstr);
 	BOOL Write(std::string & astr);
 	BOOL Write(void * src, ULONG pos,ULONG aSize);
-	BOOL Write(std::wstring & wstr,ULONG pos );
+	BOOL Write(std::string & wstr,ULONG pos );
 	BOOL CopyTo(ScpMemoryObject * dest);
 	BOOL CopyFrom(ScpMemoryObject * src);
 	ULONG GetSize();
@@ -61,7 +61,7 @@ public:
 	static ScpObject * InnerFunction_release(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_compare(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_extend(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
-	static ScpObject * InnerFunction_hash(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	//static ScpObject * InnerFunction_hash(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_find(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_copy(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 

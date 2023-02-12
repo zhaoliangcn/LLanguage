@@ -9,7 +9,7 @@ ScpObject *  __stdcall PipeObjectFactory(VTPARAMETERS * paramters, CScriptEngine
 	if (paramters->size() == 3)
 	{
 		ScpPipeObject * pipeobj = new ScpPipeObject();
-		std::wstring pipename = paramters->at(2);
+		std::string pipename = paramters->at(2);
 		StringStripQuote(pipename);
 		pipeobj->wsPipeName = pipename;
 		return pipeobj;
@@ -21,15 +21,15 @@ BOOL WINAPI Pipe_Open_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring strobj = vtparameters->at(0);
-		std::wstring userobjname = vtparameters->at(1);
+		std::string strobj = vtparameters->at(0);
+		std::string userobjname = vtparameters->at(1);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 		if (ObjPipe == type)
 		{
 			ScpPipeObject * obj = (ScpPipeObject *)currentObjectSpace->FindObject(userobjname);
 			if (obj && obj->GetType() == ObjPipe)
 			{
-				std::wstring func = scpcommand_en_open;
+				std::string func = scpcommand_en_open;
 				((ScpPipeObject*)obj)->CallInnerFunction(func, NULL, engine);
 				return TRUE;
 			}
@@ -43,9 +43,9 @@ BOOL WINAPI Pipe_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine * engi
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 3)
 	{
-		std::wstring memobj = vtparameters->at(0);
-		std::wstring name = vtparameters->at(1);
-		std::wstring objname = vtparameters->at(2);
+		std::string memobj = vtparameters->at(0);
+		std::string name = vtparameters->at(1);
+		std::string objname = vtparameters->at(2);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
 		
 		if (ObjPipe == type)
@@ -56,7 +56,7 @@ BOOL WINAPI Pipe_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine * engi
 				if (pipe->GetType() == ObjPipe)
 				{
 
-					std::wstring func = scpcommand_en_write;
+					std::string func = scpcommand_en_write;
 					VTPARAMETERS param;
 					param.push_back(objname);
 					((ScpPipeObject*)pipe)->CallInnerFunction(func, &param, engine);
@@ -78,8 +78,8 @@ BOOL WINAPI Pipe_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine * engi
 	}
 	else if (vtparameters->size() == 2)
 	{
-		std::wstring name = vtparameters->at(0);
-		std::wstring objname = vtparameters->at(1);
+		std::string name = vtparameters->at(0);
+		std::string objname = vtparameters->at(1);
 		ScpObject * obj = currentObjectSpace->FindObject(name);
 		if (obj)
 		{
@@ -90,7 +90,7 @@ BOOL WINAPI Pipe_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine * engi
 				if (pipe)
 				{
 
-					std::wstring func = scpcommand_en_write;
+					std::string func = scpcommand_en_write;
 					VTPARAMETERS param;
 					param.push_back(objname);
 					((ScpPipeObject*)pipe)->CallInnerFunction(func, &param, engine);
@@ -118,8 +118,8 @@ BOOL WINAPI Pipe_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 	if (vtparameters->size() == 2)
 	{
 
-		std::wstring name = vtparameters->at(0);
-		std::wstring objname = vtparameters->at(1);
+		std::string name = vtparameters->at(0);
+		std::string objname = vtparameters->at(1);
 		ScpObject * obj = currentObjectSpace->FindObject(name);
 		if (obj)
 		{
@@ -130,7 +130,7 @@ BOOL WINAPI Pipe_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 				if (pipe)
 				{
 
-					//std::wstring func = scpcommand_en_read;
+					//std::string func = scpcommand_en_read;
 					//VTPARAMETERS param;
 					//param.push_back(objname);
 					//((ScpPipeObject*)pipe)->CallInnerFunction(func, &param, engine);
@@ -146,7 +146,7 @@ BOOL WINAPI Pipe_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 							{
 								memset(buffer,0,1024);
 								pipe->Read(buffer,1024);
-								strobj1->content = STDSTRINGEXT::AToW(buffer);
+								strobj1->content =buffer;
 								free(buffer);
 							}
 						}
@@ -158,9 +158,9 @@ BOOL WINAPI Pipe_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 	}
 	else if (vtparameters->size() == 3)
 	{
-		std::wstring memobj = vtparameters->at(0);
-		std::wstring memname = vtparameters->at(1);
-		std::wstring objname = vtparameters->at(2);
+		std::string memobj = vtparameters->at(0);
+		std::string memname = vtparameters->at(1);
+		std::string objname = vtparameters->at(2);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
 		if (ObjPipe == type)
 		{
@@ -169,7 +169,7 @@ BOOL WINAPI Pipe_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 			{
 				if (pipe->GetType() == ObjPipe)
 				{
-/*					std::wstring func = scpcommand_en_read;
+/*					std::string func = scpcommand_en_read;
 					VTPARAMETERS param;
 					param.push_back(objname);
 					ScpStringObject *str = (ScpStringObject *)((ScpPipeObject*)pipe)->CallInnerFunction(func, &param, engine);
@@ -198,7 +198,7 @@ BOOL WINAPI Pipe_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 							{
 								memset(buffer, 0, 1024);
 								pipe->Read(buffer, 1024);
-								strobj1->content = STDSTRINGEXT::AToW(buffer);
+								strobj1->content = buffer;
 								free(buffer);
 							}
 						}
@@ -248,7 +248,7 @@ ScpObject * ScpPipeObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -283,7 +283,7 @@ ScpObject * ScpPipeObject::InnerFunction_read(ScpObject * thisObject, VTPARAMETE
 		{
 			memset(buffer, 0, 1024);
 			((ScpPipeObject*)thisObject)->Read(buffer, 1024);
-			strobj1->content = STDSTRINGEXT::AToW(buffer);
+			strobj1->content =buffer;
 			free(buffer);
 
 		}
@@ -297,13 +297,13 @@ ScpObject * ScpPipeObject::InnerFunction_write(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		ScpStringObject *strobj1 = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(objname);
 		if (strobj1)
 		{
 			if (strobj1->GetType() == ObjString)
 			{
-				std::string content = STDSTRINGEXT::WToA(strobj1->content);
+				std::string content =strobj1->content;
 				((ScpPipeObject*)thisObject)->Write(content.c_str(), content.length());
 			}
 		}
@@ -319,11 +319,11 @@ ScpObject * ScpPipeObject::InnerFunction_close(ScpObject * thisObject, VTPARAMET
 
 ScpObject * ScpPipeObject::InnerFunction_open(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
-	((ScpPipeObject*)thisObject)->Open(((ScpPipeObject*)thisObject)->wsPipeName.c_str());
+	((ScpPipeObject*)thisObject)->Open(STDSTRINGEXT::UTF2W(((ScpPipeObject*)thisObject)->wsPipeName).c_str());
 	return nullptr;
 }
 
-ScpObject * ScpPipeObject::Clone(std::wstring strObjName)
+ScpObject * ScpPipeObject::Clone(std::string strObjName)
 {
 	ScpPipeObject * obj = new ScpPipeObject;
 	if (obj)
@@ -333,9 +333,9 @@ ScpObject * ScpPipeObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpPipeObject::ToString()
+std::string ScpPipeObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpPipeObject::Release() 
@@ -383,7 +383,7 @@ void ScpPipeObject::CLose()
 	Pipe.ClosePipe(hPipe);
 #endif
 }
-bool ScpPipeObject::IsInnerFunction(std::wstring & functionname)
+bool ScpPipeObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -391,7 +391,7 @@ bool ScpPipeObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpPipeObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpPipeObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{

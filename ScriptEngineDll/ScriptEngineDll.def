@@ -35,4 +35,5 @@ LIBRARY ScriptEngineDll.dll
 	ScriptSetScriptFileName @33
 	ScriptGetObjectType @34
 	ScriptGetObjectFuncList @35
+	ScriptSetBuild @36
 	

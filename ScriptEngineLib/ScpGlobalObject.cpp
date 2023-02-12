@@ -2,10 +2,12 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//»´æ÷∂‘œÛ√˚≥∆π‹¿Ì£¨Ω®¡¢∂‘œÛ√˚≥∆∫Õ∂‘œÛ¿‡–ÕID÷Æº‰µƒ”≥…‰πÿœµ
+//ÂÖ®Â±ÄÂØπË±°ÂêçÁß∞ÁÆ°ÁêÜÔºåÂª∫Á´ãÂØπË±°ÂêçÁß∞ÂíåÂØπË±°Á±ªÂûãID‰πãÈó¥ÁöÑÊò†Â∞ÑÂÖ≥Á≥ª
 */
 #include "ScpGlobalObject.h"
 #include "../Common/MapFindKeyByValue.hpp"
+#include "../Common/stdstringext.hpp"
+
 ScpGlobalObject ScpGlobalObject::singleton;
 
 ScpGlobalObject::ScpGlobalObject(void)
@@ -19,7 +21,7 @@ ScpGlobalObject::~ScpGlobalObject(void)
 	chsobjectmap.clear();
 	engobjectmap.clear();
 }
-BOOL ScpGlobalObject::Register(const wchar_t * objname_cn,const wchar_t * objname_en,ULONG TypeID)
+BOOL ScpGlobalObject::Register(const char * objname_cn,const char * objname_en,ULONG TypeID)
 {
 	if(chsobjectmap.find(objname_cn)==chsobjectmap.end() 
 		&& engobjectmap.find(objname_en)==engobjectmap.end())
@@ -38,8 +40,6 @@ void ScpGlobalObject::Init()
 #endif
 
 	chsobjectmap[str_CN_ObjFile]=ObjFile;
-
-
 	chsobjectmap[str_CN_ObjCode]=ObjCode;
 	chsobjectmap[str_CN_ObjMsgBox]=ObjMsgBox;
 	chsobjectmap[str_CN_ObjProc]=ObjProc;	
@@ -108,6 +108,9 @@ void ScpGlobalObject::Init()
 	chsobjectmap[str_CN_ObjBigInt]=ObjBigInt;
 	chsobjectmap[str_CN_ObjList] = ObjList;
 	chsobjectmap[str_CN_ObjRange] = ObjRange;
+
+
+
 	engobjectmap[str_EN_ObjFile]=ObjFile;
 	engobjectmap[str_EN_ObjCode]=ObjCode;
 	engobjectmap[str_EN_ObjMsgBox]=ObjMsgBox;
@@ -178,7 +181,7 @@ void ScpGlobalObject::Init()
 	engobjectmap[str_EN_ObjList] = ObjList;
 	engobjectmap[str_EN_ObjRange] = ObjRange;
 }
-ScpObjectType ScpGlobalObject::GetType(const wchar_t * strObj)
+ScpObjectType ScpGlobalObject::GetType(const char * strObj)
 {
 	ScpObjectType type=ObjUnknown;
 	if(language==0)
@@ -216,9 +219,9 @@ ScpObjectType ScpGlobalObject::GetType(const wchar_t * strObj)
 
 	return type;
 }
-std::wstring ScpGlobalObject::GetTypeName(ScpObjectType type)
+std::string ScpGlobalObject::GetTypeName(ScpObjectType type)
 {
-	std::wstring temp;
+	std::string temp;
 	if(language==0)
 	{
 		temp=FindKeyByValue(chsobjectmap,type,temp);

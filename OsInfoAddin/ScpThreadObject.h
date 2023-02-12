@@ -12,9 +12,9 @@
 const static ScpObjectType	ObjThread = 47;
 
 
-const static wchar_t * str_CN_ObjThread = L"线程";
+const static char * str_CN_ObjThread = "线程";
 
-const static wchar_t * str_EN_ObjThread = L"thread";
+const static char * str_EN_ObjThread = "thread";
 
 class ScpThreadObject :
 	public ScpObject
@@ -26,7 +26,7 @@ public:
 	{
 		CScriptEngine * pscriptengine;
 		VTPARAMETERS RealParameters;
-		std::wstring ThreadFuncionName;
+		std::string ThreadFuncionName;
 		
 	}Param,*PParam;
 
@@ -34,20 +34,20 @@ public:
 	~ScpThreadObject(void);
 
 	virtual void Show(CScriptEngine * engine) ;
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
-	void ThreadDefine(std::wstring Name,std::wstring FunctionName);
+	void ThreadDefine(std::string Name,std::string FunctionName);
 	void Run(VTPARAMETERS &Parameters,CScriptEngine * pscriptengine);
 	void Wait();	
 
 	VTPARAMETERS RealParameters;
 	CScriptEngine * scriptengine;
-	std::wstring ThreadName;
-	std::wstring ThreadFuncionName;
+	std::string ThreadName;
+	std::string ThreadFuncionName;
 
 #ifdef WIN32 
 	HANDLE hThread;

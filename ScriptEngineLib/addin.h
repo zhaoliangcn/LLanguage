@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-À©Õ¹¶ÔÏóĞèÒªÊµÏÖ²¢µ¼³öµÄ½Ó¿Úº¯Êı
+æ‰©å±•å¯¹è±¡éœ€è¦å®ç°å¹¶å¯¼å‡ºçš„æ¥å£å‡½æ•°
 */
 #ifndef _H_ADDIN
 #define _H_ADDIN
@@ -16,31 +16,31 @@
 typedef DWORD (__stdcall *pGetUniqObjectId)();
 typedef ExtObjCreateFactoryFunction (__stdcall *pGetObjFactory)();
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯Êı»ñµÃÀ©Õ¹¶ÔÏóµÄ¶ÔÏóÀàĞÍID
-typedef DWORD(__stdcall *pGetUniqObjectIdEx)(const wchar_t * ObjTypeName);
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°è·å¾—æ‰©å±•å¯¹è±¡çš„å¯¹è±¡ç±»å‹ID
+typedef DWORD(__stdcall *pGetUniqObjectIdEx)(const char * ObjTypeName);
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯Êı»ñµÃÀ©Õ¹¶ÔÏóµÄ¹¤³§º¯Êı
-typedef ExtObjCreateFactoryFunction (__stdcall *pGetObjFactoryEx)(const wchar_t * ObjTypeName);
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°è·å¾—æ‰©å±•å¯¹è±¡çš„å·¥å‚å‡½æ•°
+typedef ExtObjCreateFactoryFunction (__stdcall *pGetObjFactoryEx)(const char * ObjTypeName);
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯Êı»ñµÃ¸ÃÀ©Õ¹¶ÔÏóÖ§³ÖµÄÃüÁî¸öÊı
-typedef DWORD(__stdcall * pExtObjCommandCount)(const wchar_t * ObjTypeName);
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°è·å¾—è¯¥æ‰©å±•å¯¹è±¡æ”¯æŒçš„å‘½ä»¤ä¸ªæ•°
+typedef DWORD(__stdcall * pExtObjCommandCount)(const char * ObjTypeName);
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯ÊıÊµÏÖ¶ÔÀ©Õ¹¶ÔÏóµÄ¶¯Ì¬×¢²á
-typedef BOOL (__stdcall * pExtObjCommandRegisterFunction)(const wchar_t * ObjTypeName, DWORD dwIndex,DWORD *dwObjectId, DWORD* dwCommandId, wchar_t * CommandNameCn, wchar_t *CommandNameEn, ExtObjectCommandFunction *command);
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°å®ç°å¯¹æ‰©å±•å¯¹è±¡çš„åŠ¨æ€æ³¨å†Œ
+typedef BOOL (__stdcall * pExtObjCommandRegisterFunction)(const char * ObjTypeName, DWORD dwIndex,DWORD *dwObjectId, DWORD* dwCommandId, char * CommandNameCn, char *CommandNameEn, ExtObjectCommandFunction *command);
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯Êı»ñµÃ¶¯Ì¬¿âÖĞÊµÏÖµÄÀ©Õ¹¶ÔÏó¸öÊı
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°è·å¾—åŠ¨æ€åº“ä¸­å®ç°çš„æ‰©å±•å¯¹è±¡ä¸ªæ•°
 typedef DWORD(__stdcall *pGetObjectCount)();
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯Êı»ñµÃ¶¯Ì¬¿âÖĞ¸÷¸öÀ©Õ¹¶ÔÏóµÄÃû³Æ¡¢ÀàĞÍID
-typedef BOOL(__stdcall *pGetObjectNameId)(DWORD dwIndex, wchar_t * ObjTypeNameCn, DWORD ObjTypeNameCnSize,wchar_t * ObjTypeNameEn, DWORD ObjTypeNameEnSize, DWORD * dwObjectId);
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°è·å¾—åŠ¨æ€åº“ä¸­å„ä¸ªæ‰©å±•å¯¹è±¡çš„åç§°ã€ç±»å‹ID
+typedef BOOL(__stdcall *pGetObjectNameId)(DWORD dwIndex, char * ObjTypeNameCn, DWORD ObjTypeNameCnSize, char * ObjTypeNameEn, DWORD ObjTypeNameEnSize, DWORD * dwObjectId);
 
-//¶şÔªÔËËã·ûº¯ÊıÔ­ĞÍ
+//äºŒå…ƒè¿ç®—ç¬¦å‡½æ•°åŸå‹
 typedef ScpObject * (__stdcall *pBinaryOpertaion)(ScpObject * x, ScpObject * y, ScpObjectSpace * objectSpace);
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯Êı»ñµÃ¶¯Ì¬¿âÖĞÖØÔØµÄ¶şÔªÔËËã·û¸öÊı
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°è·å¾—åŠ¨æ€åº“ä¸­é‡è½½çš„äºŒå…ƒè¿ç®—ç¬¦ä¸ªæ•°
 typedef DWORD(__stdcall *pGetBinaryOperationCount)();
 
-//À©Õ¹¶ÔÏó¹ÜÀíÆ÷Í¨¹ı¸Ãº¯ÊıÊµÏÖ¶¯Ì¬¿âÖĞ¶şÔªÔËËã·ûµÄ¶¯Ì¬×¢²á
-typedef BOOL(__stdcall *pBinaryOperationRegister)(DWORD dwIndex, wchar_t * Operation, DWORD OperationSize, ScpObjectType &obj1Type, ScpObjectType &obj2Type, pBinaryOpertaion * op);
+//æ‰©å±•å¯¹è±¡ç®¡ç†å™¨é€šè¿‡è¯¥å‡½æ•°å®ç°åŠ¨æ€åº“ä¸­äºŒå…ƒè¿ç®—ç¬¦çš„åŠ¨æ€æ³¨å†Œ
+typedef BOOL(__stdcall *pBinaryOperationRegister)(DWORD dwIndex, char * Operation, DWORD OperationSize, ScpObjectType &obj1Type, ScpObjectType &obj2Type, pBinaryOpertaion * op);
 
 #endif //_H_ADDIN

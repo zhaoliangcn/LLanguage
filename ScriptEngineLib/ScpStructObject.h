@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//½á¹¹Ìå¶ÔÏó
+//ç»“æ„ä½“å¯¹è±¡
 */
 #ifndef _H_SCPSTRUCTOBJECT
 #define _H_SCPSTRUCTOBJECT
@@ -15,26 +15,26 @@ class ScpStructObject :
 public:
 	ScpStructObject(void);
 	~ScpStructObject(void);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
 	virtual void Show(CScriptEngine * engine);
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 	int AllocStructMemory();
 	void FreeStructMemory();
 	int GetBiggestMemberSize();
 	int GetObjectSize(ScpObject * memberobj);
-	int GetStructMemorySize();                                        //»ñµÃÕû¸ö½á¹¹ÌåÕ¼ÓÃµÄÄÚ´æ´óĞ¡
-	void * MemoryBlockAddress;                                        //½á¹¹ÌåÊµ¼ÊµÄÄÚ´æÎ»ÖÃ
-	BOOL FillMember(ScpObject * memberobj,int order);                 //½«Ò»¸ö¶ÔÏóÌîÈë½á¹¹ÌåµÄ½ô´ÕÄÚ´æÖĞ
-	BOOL GetMember(ScpObject * memberobj,int order);                  //´Ó½á¹¹ÌåµÄ½ô´ÕÄÚ´æÖĞÌáÈ¡Ò»¸ö¶ÔÏó
-	int CalcMemberMemoryPosInStruct(ScpObject * memberobj,int order);//¼ÆËã¶ÔÏóÔÚ½á¹¹ÌåÖĞĞèÒªÕ¼ÓÃµÄÄÚ´æ¿Õ¼äµÄÎ»ÖÃ£¬ÒÔ×Ö½ÚÎªµ¥Î»µÄÆ«ÒÆ
-	int bytealignment;                                                //×Ö½Ú¶ÔÆë,1,2,4,8
-	std::wstring Name;                                                //½á¹¹ÌåµÄÃû×Ö
-	VTSTRINGS Boday;                                                  //Ô­Ê¼µÄ½á¹¹Ìå¶¨Òå´úÂë
-	VTSTRINGS MemberNameList;                                         //ÓĞĞòµÄ³ÉÔ±ÃûÁĞ±í  
-	VTPOBJECTS MemberObjects;                                         //³ÉÔ±¶ÔÏóÊı×é
+	int GetStructMemorySize();                                        //è·å¾—æ•´ä¸ªç»“æ„ä½“å ç”¨çš„å†…å­˜å¤§å°
+	void * MemoryBlockAddress;                                        //ç»“æ„ä½“å®é™…çš„å†…å­˜ä½ç½®
+	BOOL FillMember(ScpObject * memberobj,int order);                 //å°†ä¸€ä¸ªå¯¹è±¡å¡«å…¥ç»“æ„ä½“çš„ç´§å‡‘å†…å­˜ä¸­
+	BOOL GetMember(ScpObject * memberobj,int order);                  //ä»ç»“æ„ä½“çš„ç´§å‡‘å†…å­˜ä¸­æå–ä¸€ä¸ªå¯¹è±¡
+	int CalcMemberMemoryPosInStruct(ScpObject * memberobj,int order);//è®¡ç®—å¯¹è±¡åœ¨ç»“æ„ä½“ä¸­éœ€è¦å ç”¨çš„å†…å­˜ç©ºé—´çš„ä½ç½®ï¼Œä»¥å­—èŠ‚ä¸ºå•ä½çš„åç§»
+	int bytealignment;                                                //å­—èŠ‚å¯¹é½,1,2,4,8
+	std::string Name;                                                //ç»“æ„ä½“çš„åå­—
+	VTSTRINGS Boday;                                                  //åŸå§‹çš„ç»“æ„ä½“å®šä¹‰ä»£ç 
+	VTSTRINGS MemberNameList;                                         //æœ‰åºçš„æˆå‘˜ååˆ—è¡¨  
+	VTPOBJECTS MemberObjects;                                         //æˆå‘˜å¯¹è±¡æ•°ç»„
 	VTINT MemberSizeInStruct;
 	VTINT MemberPosInStruct;
 	ScpObjectSpace StructObjectSpace;

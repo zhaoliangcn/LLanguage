@@ -12,8 +12,9 @@ float _wtof(const wchar_t* wstr);
 static inline int StringCaseCompare(const char * src, const char* dest)
 {
 #ifdef _WIN32
-	return stricmp(src, dest);
+	return _stricmp(src, dest);
 #else
 	return strcasecmp(src, dest);
 #endif 
 }
+wchar_t * wstringdup(const wchar_t * src);

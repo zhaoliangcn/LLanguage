@@ -18,13 +18,13 @@ ScpExpressionsObject::~ScpExpressionsObject(void)
 void ScpExpressionsObject::Show(CScriptEngine * engine) 
 {
 }
-ScpObject * ScpExpressionsObject::Clone(std::wstring strObjName)
+ScpObject * ScpExpressionsObject::Clone(std::string strObjName)
 {
 	return NULL;
 }
-std::wstring ScpExpressionsObject::ToString()
+std::string ScpExpressionsObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpExpressionsObject::Release() 
@@ -32,12 +32,12 @@ void ScpExpressionsObject::Release()
 	delete this;
 }
 
-bool ScpExpressionsObject::IsInnerFunction(std::wstring & functionname)
+bool ScpExpressionsObject::IsInnerFunction(std::string & functionname)
 {
 	return false;
 }
 
-ScpObject * ScpExpressionsObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpExpressionsObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	return NULL;
 }

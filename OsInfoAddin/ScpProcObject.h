@@ -7,34 +7,34 @@
 #include "../ScriptEngineLib/ScpIntObject.h"
 #include "../ScriptEngineLib/ScriptEngine.h"
 
-const static wchar_t * str_EN_option = L"option";
-const static wchar_t * str_CN_option = L"选项";
-const static wchar_t * str_EN_output = L"output";
-const static wchar_t * str_CN_output = L"输出";
+const static char * str_EN_option = "option";
+const static char * str_CN_option = "选项";
+const static char * str_EN_output = "output";
+const static char * str_CN_output = "输出";
 
 class ScpProcObject:public ScpObject
 {
 public:
 	ScpProcObject();
 	~ScpProcObject();
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
 	virtual void Show(CScriptEngine * engine);
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
-	BOOL Open(std::wstring path,std::wstring param);
+	BOOL Open(std::string path,std::string param);
 	BOOL ShutDown();
 	BOOL Wait(DWORD dwWaitTime);
 	BOOL Restart();
 	static BOOL ShutDown(DWORD dwPid);
-	static BOOL ShutDown(std::wstring processname);
-	static BOOL Enum(ScpObject * tableobj,std::wstring enumtype);
-	std::wstring procobjname;
-	std::wstring procpathname;
-	std::wstring Parameter;
-	std::wstring procoutput;
+	static BOOL ShutDown(std::string processname);
+	static BOOL Enum(ScpObject * tableobj,std::string enumtype);
+	std::string procobjname;
+	std::string procpathname;
+	std::string Parameter;
+	std::string procoutput;
 	bool isUIProcess;
 	
 #ifdef _WIN32

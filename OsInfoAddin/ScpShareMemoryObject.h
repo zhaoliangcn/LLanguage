@@ -10,9 +10,9 @@ const static ScpObjectType	ObjShareMemory = 80;
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #endif
-const static wchar_t * str_CN_ObjShareMemory = L"共享内存";
+const static char * str_CN_ObjShareMemory = "共享内存";
 
-const static wchar_t * str_EN_ObjShareMemory = L"sharememory";
+const static char * str_EN_ObjShareMemory = "sharememory";
 class ScpShareMemoryObject :
 	public ScpObject
 {
@@ -22,21 +22,21 @@ public:
 
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
-	BOOL Open(std::wstring Name,size_t Size);
-	BOOL Read(std::wstring & content);
-	BOOL Write(std::wstring & content);
+	BOOL Open(std::string Name,size_t Size);
+	BOOL Read(std::string & content);
+	BOOL Write(std::string & content);
 	BOOL Read(void * pBuffer,DWORD dwReadPos,DWORD dwReadCount);
 	BOOL Write(void * pBuffer,DWORD dwWritePos,DWORD dwWriteCount);
 	BOOL Close();
 
 	size_t sharememSize;
-	std::wstring sharememName;
+	std::string sharememName;
 
 
 #ifdef _WIN32

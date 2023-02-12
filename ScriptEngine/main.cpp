@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+
 void Useage()
 {
 	printf("author: zhaoliangcn@126.com\r\n");
@@ -14,6 +15,7 @@ int main(int argc, char* argv[])
 	if(argc>=2)
 	{
 		int Jit = 0;
+		int Build = 0;
 		for (int i = 1;i < argc;i++)
 		{
 			if (strcasecmp(argv[i], "/g") == 0 ||
@@ -21,14 +23,23 @@ int main(int argc, char* argv[])
 			{
 				Jit = 1;
 			}
+			if (strcasecmp(argv[i], "/b") == 0 ||
+				strcasecmp(argv[i], "-b") == 0)
+			{
+				Build = 1;
+			}
 		}
 		CScriptEngine scriptengine;
 
-		scriptengine.SetScriptFileName(STDSTRINGEXT::AToW(argv[1]).c_str());
+		scriptengine.SetScriptFileName(argv[1]);
 
 		if (Jit)
 		{
 			scriptengine.Jit = Jit;
+		}
+		if (Build)
+		{
+			scriptengine.Build = Build;
 		}
 		if (strstr(argv[1], ".scpb") != 0)
 		{
@@ -36,7 +47,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			scriptengine.DoScript(STDSTRINGEXT::AToW(argv[1]));
+			scriptengine.DoScript(argv[1]);
 		}
 		//system("pause");
 	}
@@ -50,7 +61,7 @@ int main(int argc, char* argv[])
 #include "../ScriptEngineDll/ScriptEngineDll.h"
 #include <tchar.h>
 #include <stdlib.h>
-
+#include "../Common/commonutil.hpp"
 
 #ifdef _DEBUG
 #define new   new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -66,6 +77,7 @@ struct ScriptEngineContext
 	FUNC_ScriptDoByteCode ScriptDoByteCode ;
 	FUNC_ScriptSetJit ScriptSetJit ;
 	FUNC_ScriptDumpByteCode ScriptDumpByteCode;
+	FUNC_ScriptSetBuild ScriptSetBuild;
 }g_context;
 #ifdef _WIN32
 #define _CRTDBG_MAP_ALLOC
@@ -112,23 +124,35 @@ void Leak()
 #else
 #endif
 
-int wmain(int argc, wchar_t* argv[])
+int main(int argc, char* argv[])
 {
-
 	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	//_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 	//	system("pause");
+	
 	if(argc>=2)
 	{
 		//Leak();
+		DWORD dwStart = GetCurrentTickCount();
 		memset(&g_context, 0, sizeof(g_context));
 		SetConsoleCtrlHandler((PHANDLER_ROUTINE)ctrlhandler, true);
 		int Jit = 0;
+		int Build = 0;
+		int CountTime = 0;
 		for (int i=1;i<argc;i++)
 		{
-			if (wcsicmp(argv[i], L"/g") == 0)
+			if ((_stricmp(argv[i], "/g") == 0) || (_stricmp(argv[i], "-g") == 0))
 			{
 				Jit = 1;
+			}
+			else if ((_stricmp(argv[i], "/b") == 0) || (_stricmp(argv[i], "--build") == 0) || (_stricmp(argv[i], "-b") == 0))
+			{
+				Jit = 1;
+				Build = 1;
+			}
+			if ((_stricmp(argv[i], "/t") == 0) || (_stricmp(argv[i], "-t") == 0))
+			{
+				CountTime = 1;
 			}
 		}
 		g_context.hDLL = LoadLibraryW(L"ScriptEngineDll.dll");
@@ -141,11 +165,15 @@ int wmain(int argc, wchar_t* argv[])
 			g_context.ScriptDoByteCode=(FUNC_ScriptDoByteCode)GetProcAddress(g_context.hDLL, "ScriptDoByteCode");
 			g_context.ScriptSetJit = (FUNC_ScriptSetJit)GetProcAddress(g_context.hDLL, "ScriptSetJit");
 			g_context.ScriptDumpByteCode = (FUNC_ScriptDumpByteCode)GetProcAddress(g_context.hDLL, "ScriptDumpByteCode");
+			g_context.ScriptSetBuild = (FUNC_ScriptSetBuild)GetProcAddress(g_context.hDLL, "ScriptSetBuild");
 			if(g_context.CreateScriptEngine && 
 				g_context.ScriptDoScript && 
 				g_context.CloseScriptEngine &&
 				g_context.ScriptRegisterGlobalCommand &&
-				g_context.ScriptDoByteCode)
+				g_context.ScriptDoByteCode && 
+				g_context.ScriptSetJit &&
+				g_context.ScriptDumpByteCode &&
+				g_context.ScriptSetBuild)
 			{
 				g_context.hscript = g_context.CreateScriptEngine();
 				if(g_context.hscript)
@@ -158,9 +186,16 @@ int wmain(int argc, wchar_t* argv[])
 							g_context.ScriptSetJit(g_context.hscript, 1);
 						}
 					}
-					if (wcsstr(argv[1], L".scpb") != 0)
+					if(Build)
 					{
-						g_context.ScriptDoByteCode(g_context.hscript, argv[1], RUN_NORMAL);
+						if (g_context.ScriptSetBuild)
+						{
+							g_context.ScriptSetBuild(g_context.hscript, 1);
+						}
+					}
+					if (strstr(argv[1], ".scpb") != 0)
+					{
+						g_context.ScriptDoByteCode(g_context.hscript,argv[1], RUN_NORMAL);
 					}
 					else
 					{
@@ -173,11 +208,17 @@ int wmain(int argc, wchar_t* argv[])
 		}
 
 		//system("pause");
+		if (CountTime)
+		{
+			DWORD dwEnd = GetCurrentTickCount();
+			printf("%d\n", dwEnd - dwStart);
+		}
 	}
 	else 
 	{
 		Useage();
 	}
+	
 	//_CrtDumpMemoryLeaks();
 	return 0 ;
 }

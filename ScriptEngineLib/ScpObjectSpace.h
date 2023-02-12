@@ -12,13 +12,15 @@
 typedef enum _SPACETYPE
 {
 	Space_Unkonwn,
-	Space_Global,	//È«¾ÖÃû×Ö¿Õ¼ä
-	Space_Class,	//ÀàµÄÃû×Ö¿Õ¼ä
-	Space_Function,	//º¯ÊıµÄÃû×Ö¿Õ¼ä
-	Space_While,	//Ñ­»·Óï¾äµÄÃû×Ö¿Õ¼ä
-	Space_Block,	//´úÂë¿éµÄÃû×Ö¿Õ¼ä£¨Î´ÊµÏÖ£©
-	Space_Struct,	//½á¹¹ÌåµÄÃû×Ö¿Õ¼ä
-	Space_If,		//Ìõ¼şÓï¾äµÄÃû×Ö¿Õ¼ä
+	Space_Global,	//å…¨å±€åå­—ç©ºé—´
+	Space_Class,	//ç±»çš„åå­—ç©ºé—´
+	Space_Function,	//å‡½æ•°çš„åå­—ç©ºé—´
+	Space_While,	//å¾ªç¯è¯­å¥çš„åå­—ç©ºé—´
+	Space_Block,	//ä»£ç å—çš„åå­—ç©ºé—´ï¼ˆæœªå®ç°ï¼‰
+	Space_Struct,	//ç»“æ„ä½“çš„åå­—ç©ºé—´
+	Space_If,		//æ¡ä»¶è¯­å¥çš„åå­—ç©ºé—´
+	Space_Library,	//åº“çš„åå­—ç©ºé—´
+	Space_UserDef,	//ç”¨æˆ·å®šä¹‰çš„åå­—ç©ºé—´
 }SPACETYPE;
 
 class ScpObjectSpace
@@ -27,63 +29,63 @@ public:
 	ScpObjectSpace(void);
 	~ScpObjectSpace(void);
 	/*
-	ÅĞ¶ÏÒ»¸öÃû×Ö¿Õ¼ä¶ÔÏóÊÇ·ñÊÇ×Ô¼ºµÄ¸¸Ãû×Ö¿Õ¼ä¶ÔÏó
+	åˆ¤æ–­ä¸€ä¸ªåå­—ç©ºé—´å¯¹è±¡æ˜¯å¦æ˜¯è‡ªå·±çš„çˆ¶åå­—ç©ºé—´å¯¹è±¡
 	*/
 	BOOL IsMyParentSpace(ScpObjectSpace * space);
 	/*
-	°´ÕÕ¶ÔÏóÃû×Ö²éÕÒÒ»¸ö¶ÔÏó£¬Èç¹ûµ±Ç°Ãû×Ö¿Õ¼äÖĞÕÒ²»µ½£¬¾ÍÔÚ¸¸¿Õ¼äÖĞ²éÕÒ£¬Ö±µ½×î¶¥²ã¿Õ¼ä
+	æŒ‰ç…§å¯¹è±¡åå­—æŸ¥æ‰¾ä¸€ä¸ªå¯¹è±¡ï¼Œå¦‚æœå½“å‰åå­—ç©ºé—´ä¸­æ‰¾ä¸åˆ°ï¼Œå°±åœ¨çˆ¶ç©ºé—´ä¸­æŸ¥æ‰¾ï¼Œç›´åˆ°æœ€é¡¶å±‚ç©ºé—´
 	*/
-    ScpObject * FindObject(const std::wstring& objname);
+    ScpObject * FindObject(const std::string& objname);
 	/*
-	ÔÚÈ«¾ÖÃû×Ö¿Õ¼äÖĞ²éÕÒÒ»¸ö¶ÔÏó
+	åœ¨å…¨å±€åå­—ç©ºé—´ä¸­æŸ¥æ‰¾ä¸€ä¸ªå¯¹è±¡
 	*/
-    ScpObject * FindGlobalObject(const std::wstring& objname);
+    ScpObject * FindGlobalObject(const std::string& objname);
 	/*
-	ÔÚµ±Ç°Ãû×Ö¿Õ¼äÖĞ²éÕÒÒ»¸ö¶ÔÏó
+	åœ¨å½“å‰åå­—ç©ºé—´ä¸­æŸ¥æ‰¾ä¸€ä¸ªå¯¹è±¡
 	*/
-    ScpObject * FindLocalObject(const std::wstring& objname);
+    ScpObject * FindLocalObject(const std::string& objname);
 	/*
-	¸ù¾İÏÂ±ê¸ñÊ½µÄ±íÔªËØ£¬ÔÚµ±Ç°Ãû×Ö¿Õ¼äÖĞ²éÕÒ¶ÔÓ¦µÄ¶ÔÏó
+	æ ¹æ®ä¸‹æ ‡æ ¼å¼çš„è¡¨å…ƒç´ ï¼Œåœ¨å½“å‰åå­—ç©ºé—´ä¸­æŸ¥æ‰¾å¯¹åº”çš„å¯¹è±¡
 	table[0]
 	table[element1]
 	*/
-    ScpObject * FindTableElement(const std::wstring& objname);
+    ScpObject * FindTableElement(const std::string& objname);
 	/*
-	¸ù¾İÏÂ±ê¸ñÊ½µÄÊı×éÔªËØ£¬ÔÚµ±Ç°Ãû×Ö¿Õ¼äÖĞ²éÕÒ¶ÔÓ¦µÄ¶ÔÏó
+	æ ¹æ®ä¸‹æ ‡æ ¼å¼çš„æ•°ç»„å…ƒç´ ï¼Œåœ¨å½“å‰åå­—ç©ºé—´ä¸­æŸ¥æ‰¾å¯¹åº”çš„å¯¹è±¡
 	table[0]
 	table[element1]
 	*/
-    ScpObject * FindArrayElement(const std::wstring& objname);
+    ScpObject * FindArrayElement(const std::string& objname);
 	/*
-	ÔÚµ±Ç°Ãû×Ö¿Õ¼äÖĞ²éÕÒÀàµÄ³ÉÔ±±äÁ¿
+	åœ¨å½“å‰åå­—ç©ºé—´ä¸­æŸ¥æ‰¾ç±»çš„æˆå‘˜å˜é‡
 	classname.classmember
 	*/
-    ScpObject * FindClassMemberVariable(const std::wstring& objname);
+    ScpObject * FindClassMemberVariable(const std::string& objname);
 	/*
-	ÔÚµ±Ç°Ãû×Ö¿Õ¼äÖĞ²éÕÒ½á¹¹ÌåµÄ³ÉÔ±
+	åœ¨å½“å‰åå­—ç©ºé—´ä¸­æŸ¥æ‰¾ç»“æ„ä½“çš„æˆå‘˜
 	*/
-    ScpObject * FindStructMemberVariable(const std::wstring& objname);
+    ScpObject * FindStructMemberVariable(const std::string& objname);
 
-    ScpObject * FindClassOrStructMemberVariable(const std::wstring& objname);
+    ScpObject * FindClassOrStructMemberVariable(const std::string& objname);
 	/*
-	»ñÈ¡¶ÔÏóËùÊôÃû×Ö¿Õ¼äµÄÃû×Ö
+	è·å–å¯¹è±¡æ‰€å±åå­—ç©ºé—´çš„åå­—
 	*/
-	std::wstring GetObjectSpace(std::wstring objname);
+	std::string GetObjectSpace(std::string objname);
 	/*
-	½«Ò»¸ö¶ÔÏóÓ³Éäµ½µ±Ç°Ãû×Ö¿Õ¼ä
+	å°†ä¸€ä¸ªå¯¹è±¡æ˜ å°„åˆ°å½“å‰åå­—ç©ºé—´
 	*/
-	BOOL AddObject(std::wstring strObjname,ScpObject *obj,std::wstring scope=L"");
+	BOOL AddObject(std::string strObjname,ScpObject *obj,std::string scope="");
 	/*
-	´Óµ±Ç°Ãû×Ö¿Õ¼äÖĞÉ¾³ıÒ»¸ö¶ÔÏó
+	ä»å½“å‰åå­—ç©ºé—´ä¸­åˆ é™¤ä¸€ä¸ªå¯¹è±¡
 	*/
-	void EraseObject(std::wstring strObjname);
+	void EraseObject(std::string strObjname);
 	void EraseObject(ScpObject *Obj);
 	/*
-	´Óµ±Ç°Ãû×Ö¿Õ¼äÖĞ²éÕÒÒ»¸ö¶ÔÏó£¬·µ»ØÕâ¸ö¶ÔÏóµÄÀàĞÍ
+	ä»å½“å‰åå­—ç©ºé—´ä¸­æŸ¥æ‰¾ä¸€ä¸ªå¯¹è±¡ï¼Œè¿”å›è¿™ä¸ªå¯¹è±¡çš„ç±»å‹
 	*/
-	ScpObjectType GetType(std::wstring strObjname);
-	std::wstring GetObjectName(ScpObject * obj);
-	std::wstring GetObjectNameR(ScpObject * obj);
+	ScpObjectType GetType(std::string strObjname);
+	std::string GetObjectName(ScpObject * obj);
+	std::string GetObjectNameR(ScpObject * obj);
 
 	ScpObject * AcquireTempObject(ScpObjectType type);
 	void ReleaseTempObject(ScpObject * tempobj);
@@ -101,34 +103,34 @@ public:
 	VTPOBJECTS UnusedTemp_ExpressionNode_Objects;
 	
 
-	std::wstring GetNewTempObjectName();
+	std::string GetNewTempObjectName();
 
 	/*
-	//´Óµ±Ç°Ãû×Ö¿Õ¼äÒÆ¶¯¶ÔÏóµ½ÁíÒ»¸öÃû×Ö¿Õ¼ä
+	//ä»å½“å‰åå­—ç©ºé—´ç§»åŠ¨å¯¹è±¡åˆ°å¦ä¸€ä¸ªåå­—ç©ºé—´
 	*/
 	bool MoveToSpace(ScpObject * obj, ScpObjectSpace * space);
 	/*
-	//ÕÒµ½È«¾ÖÃû×Ö¿Õ¼ä
+	//æ‰¾åˆ°å…¨å±€åå­—ç©ºé—´
 	*/
 	ScpObjectSpace * GetGlobalSpace();
 	ScpObjectSpace * FindObject_ObjectSpace(ScpObject* obj);
 
 
 
-	ScpObjectSpace *parentspace;		//Ö¸Ïò¸¸Ãû×Ö¿Õ¼äµÄÖ¸Õë
-	ScpUserObject userobject;			//µ±Ç°Ãû×Ö¿Õ¼äÖĞ±£´æµÄ¶ÔÏó
-	std::wstring spacename;				//µ±Ç°Ãû×Ö¿Õ¼äµÄÃû×Ö
-	SPACETYPE ObjectSpaceType;			//µ±Ç°Ãû×Ö¿Õ¼äµÄÀàĞÍ
-	ScpObject * belongto;				//µ±Ç°Ãû×Ö¿Õ¼äµÄÊôÖ÷£¬ÈçÊôÓÚÒ»¸öº¯Êı¶ÔÏó»òÊôÓÚÒ»¸öÑ­»·Óï¾ä¶ÔÏó
+	ScpObjectSpace *parentspace;		//æŒ‡å‘çˆ¶åå­—ç©ºé—´çš„æŒ‡é’ˆ
+	ScpUserObject userobject;			//å½“å‰åå­—ç©ºé—´ä¸­ä¿å­˜çš„å¯¹è±¡
+	std::string spacename;				//å½“å‰åå­—ç©ºé—´çš„åå­—
+	SPACETYPE ObjectSpaceType;			//å½“å‰åå­—ç©ºé—´çš„ç±»å‹
+	ScpObject * belongto;				//å½“å‰åå­—ç©ºé—´çš„å±ä¸»ï¼Œå¦‚å±äºä¸€ä¸ªå‡½æ•°å¯¹è±¡æˆ–å±äºä¸€ä¸ªå¾ªç¯è¯­å¥å¯¹è±¡
 
 
-	int breakingout;					//Õë¶ÔÑ­»·Óï¾ä¶ÔÏóµÄÃû×Ö¿Õ¼ä£¬Èç¹ûÔÚÑ­»·Óï¾äÖĞÖÃÎ»£¬ÔòÌø³öÑ­»·Óï¾ä
-	int continuewhile;					//Õë¶ÔÑ­»·Óï¾ä¶ÔÏóµÄÃû×Ö¿Õ¼ä£¬Èç¹ûÔÚÑ­»·Óï¾ä¶ÔÏóÖĞÖÃÎ»£¬Ôò»Øµ½Ñ­»·Óï¾äµÄÆğÊ¼Î»ÖÃÖØĞÂ¿ªÊ¼ÏÂÒ»¸öÑ­»·
+	int breakingout;					//é’ˆå¯¹å¾ªç¯è¯­å¥å¯¹è±¡çš„åå­—ç©ºé—´ï¼Œå¦‚æœåœ¨å¾ªç¯è¯­å¥ä¸­ç½®ä½ï¼Œåˆ™è·³å‡ºå¾ªç¯è¯­å¥
+	int continuewhile;					//é’ˆå¯¹å¾ªç¯è¯­å¥å¯¹è±¡çš„åå­—ç©ºé—´ï¼Œå¦‚æœåœ¨å¾ªç¯è¯­å¥å¯¹è±¡ä¸­ç½®ä½ï¼Œåˆ™å›åˆ°å¾ªç¯è¯­å¥çš„èµ·å§‹ä½ç½®é‡æ–°å¼€å§‹ä¸‹ä¸€ä¸ªå¾ªç¯
 	
-	int enddepths;//½áÊøÓï¾äµÄÉî¶È
+	int enddepths;//ç»“æŸè¯­å¥çš„æ·±åº¦
 
 	ULONG lastcommand;
-	std::wstring LastTempObjectName;
+	std::string LastTempObjectName;
 	int LastTempObjAppendix;
 	int lastTestResult;
 

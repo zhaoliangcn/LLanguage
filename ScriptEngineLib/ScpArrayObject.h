@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//Êı×é¶ÔÏó¼°Æä³ÉÔ±·ÃÎÊÖ§³Ö
+//æ•°ç»„å¯¹è±¡åŠå…¶æˆå‘˜è®¿é—®æ”¯æŒ
 */
 #ifndef _H_SCPARRAYOBJECT
 #define _H_SCPARRAYOBJECT
@@ -18,54 +18,54 @@ public:
 	~ScpArrayObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	/*
-	»ñµÃµ±Ç°Êı×é¶ÔÏóµÄ´óĞ¡
+	è·å¾—å½“å‰æ•°ç»„å¯¹è±¡çš„å¤§å°
 	*/
 	ULONG GetSize();
 	/*
-	ÔÚµ±Ç°Êı×é¶ÔÏóÖĞÌí¼ÓÒ»¸öÔªËØ
+	åœ¨å½“å‰æ•°ç»„å¯¹è±¡ä¸­æ·»åŠ ä¸€ä¸ªå…ƒç´ 
 	*/
-	BOOL AddElement(std::wstring elementname,ScpObject * obj);
-	BOOL AddElement(std::wstring elementname,ScpObjectSpace * objectSpace);
-	BOOL SetElement(std::wstring elementname,ULONG elementindex,ScpObject * obj);
-	BOOL SetElement(std::wstring elementname,ULONG elementindex,ScpObjectSpace * objectSpace);
+	BOOL AddElement(std::string elementname,ScpObject * obj);
+	BOOL AddElement(std::string elementname,ScpObjectSpace * objectSpace);
+	BOOL SetElement(std::string elementname,ULONG elementindex,ScpObject * obj);
+	BOOL SetElement(std::string elementname,ULONG elementindex,ScpObjectSpace * objectSpace);
 	/*
-	É¾³ıµ±Ç°Êı×é¶ÔÏóÖĞµÄÔªËØ
+	åˆ é™¤å½“å‰æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ 
 	*/
-	BOOL DeleteElement(std::wstring elementname);
+	BOOL DeleteElement(std::string elementname);
 	BOOL DeleteElement(ULONG elementindex);
 	/*
-	Ìæ»»µ±Ç°Êı×é¶ÔÏóÖĞµÄÔªËØ
+	æ›¿æ¢å½“å‰æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ 
 	*/
 	BOOL ReplaceElementObj(ScpObject * oldobj,ScpObject * obj);
 	BOOL ReplaceElementObj(ULONG elementindex,ScpObject * obj);
-	BOOL ReplaceElementObj(std::wstring elementname,ScpObject * obj);
+	BOOL ReplaceElementObj(std::string elementname,ScpObject * obj);
 	/*
-	»ñÈ¡µ±Ç°Êı×é¶ÔÏóÖĞµÄÔªËØµÄ¶ÔÏóÖ¸Õë
+	è·å–å½“å‰æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ çš„å¯¹è±¡æŒ‡é’ˆ
 	*/
-	ScpObject * GetElement(std::wstring elementname);
+	ScpObject * GetElement(std::string elementname);
 	ScpObject * GetElement(ULONG elementindex);
 	/*
-	»ñÈ¡µ±Ç°Êı×é¶ÔÏóÖĞµÄÔªËØµÄÀàĞÍ
+	è·å–å½“å‰æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ çš„ç±»å‹
 	*/
-	ScpObjectType GetElementType(std::wstring elementname);	
+	ScpObjectType GetElementType(std::string elementname);	
 	ScpObjectType GetElementType(ULONG elementindex);
 	/*
-	»ñÈ¡µ±Ç°Êı×é¶ÔÏóÖĞµÄÔªËØµÄÃû×Ö
+	è·å–å½“å‰æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ çš„åå­—
 	*/
-	std::wstring GetElementName(ULONG elementindex);
+	std::string GetElementName(ULONG elementindex);
 
 	ULONG Max;
-	ScpObjectType Elementtype;				//Êı×é¶ÔÏóÖĞµÄÔªËØµÄÀàĞÍ£¨Êı×é¶ÔÏóÖĞµÄÔªËØÀàĞÍÎ¨Ò»£©
-	ScpUserObject3 arrayobjects;			//Êı×é¶ÔÏóÖĞµÄÔªËØµÄ¼¯ºÏ
+	ScpObjectType Elementtype;				//æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ çš„ç±»å‹ï¼ˆæ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ ç±»å‹å”¯ä¸€ï¼‰
+	ScpUserObject3 arrayobjects;			//æ•°ç»„å¯¹è±¡ä¸­çš„å…ƒç´ çš„é›†åˆ
 
-	std::wstring arrayname;
+	std::string arrayname;
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_Get(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

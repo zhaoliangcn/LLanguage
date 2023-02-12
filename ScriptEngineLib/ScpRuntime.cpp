@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//L½Å±¾ÓïÑÔÔËÐÐÊ±¿â£¬¶þÔªÔËËã·û¡¢Ò»ÔªÔËËã·ûµÄ¹¦ÄÜÊµÏÖ
+//Lè„šæœ¬è¯­è¨€è¿è¡Œæ—¶åº“ï¼ŒäºŒå…ƒè¿ç®—ç¬¦ã€ä¸€å…ƒè¿ç®—ç¬¦çš„åŠŸèƒ½å®žçŽ°
 */
 #include "ScpRuntime.h"
 #include "ScpCommonObject.h"
@@ -15,7 +15,7 @@ ScpObject * Add(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = NULL;
-	pBinaryOpertaion BinaryOpertaionFunc= ScpOperationMgr::GetInstance()->GetBinaryOperation(L"+", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc= ScpOperationMgr::GetInstance()->GetBinaryOperation("+", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret =  BinaryOpertaionFunc(x, y, objectSpace);
@@ -82,11 +82,11 @@ ScpObject * Add(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		else if (x->GetType() == ObjString && y->GetType() == ObjString)
 		{
 			ret = objectSpace->AcquireTempObject(ObjString);
-			ret = (ScpObject *)Connect((ScpStringObject*)x, (ScpStringObject*)y, (ScpStringObject*)ret);
+			ret = (ScpObject *)ScpStringObject::Connect((ScpStringObject*)x, (ScpStringObject*)y, (ScpStringObject*)ret);
 		}
 		else
 		{
-			std::wstring error = L"Invalid Add Operation ";
+			std::string error = "Invalid Add Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -99,7 +99,7 @@ ScpObject * Sub(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = NULL;
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"-", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("-", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -170,7 +170,7 @@ ScpObject * Sub(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid Sub Operation ";
+			std::string error = "Invalid Sub Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -183,7 +183,7 @@ ScpObject * Mul( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = NULL;
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"*", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("*", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -237,7 +237,7 @@ ScpObject * Mul( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid Mul Operation ";
+			std::string error = "Invalid Mul Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -321,7 +321,7 @@ ScpObject * Div(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid Div Operation ";
+		std::string error = "Invalid Div Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -355,7 +355,7 @@ ScpObject * Mod(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid Mod Operation ";
+		std::string error = "Invalid Mod Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -366,7 +366,7 @@ ScpObject * Assign(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = x;
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"=", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("=", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -376,6 +376,18 @@ ScpObject * Assign(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		if (x->GetType() == ObjInt && y->GetType() == ObjInt)
 		{
 			((ScpIntObject *)x)->value = ((ScpIntObject *)y)->value;
+		}
+		else if (x->GetType() == ObjInt && y->GetType() == ObjCInt32)
+		{
+			((ScpIntObject*)x)->value = ((ScpObjCInt32*)y)->Value;
+		}
+		else if (x->GetType() == ObjCInt32 && y->GetType() == ObjCInt32)
+		{
+			((ScpObjCInt32*)x)->Value = ((ScpObjCInt32*)y)->Value;
+		}
+		else if (x->GetType() == ObjCInt32 && y->GetType() == ObjInt)
+		{
+			((ScpObjCInt32*)x)->Value = ((ScpIntObject*)y)->value;
 		}
 		else if (x->GetType() == ObjDouble && y->GetType() == ObjDouble)
 		{
@@ -388,7 +400,7 @@ ScpObject * Assign(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		else if (x->GetType() == ObjInt && y->GetType() == ObjDouble)
 		{
 			((ScpIntObject*)x)->value = (int)((ScpDoubleObject*)y)->value;
-			//ÌáÊ¾Êý¾Ý½Ø¶Ï 
+			//æç¤ºæ•°æ®æˆªæ–­ 
 		}
 		else if (x->GetType() == ObjPointerofWchar && y->GetType() == ObjString)
 		{
@@ -419,6 +431,10 @@ ScpObject * Assign(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		else if (x->GetType() == ObjString && y->GetType() == ObjString)
 		{
 			((ScpStringObject *)x)->content = ((ScpStringObject *)y)->content;
+		}
+		else if (x->GetType() == ObjString && y->GetType() == ObjPointerofChar)
+		{
+			((ScpStringObject*)x)->content = ((ScpObjPointerofChar*)y)->Value;
 		}
 		else if (x->GetType() == ObjTable && y->GetType() == ObjTable)
 		{
@@ -460,18 +476,22 @@ ScpObject * Assign(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else if (x->GetType() == ObjClassInstance && y->GetType() == ObjClassInstance)
 		{
-			//È·±£ÊÇÏàÍ¬ÀàµÄÊµÀý
+			//ç¡®ä¿æ˜¯ç›¸åŒç±»çš„å®žä¾‹
 			if (((ScpClassInstanceObject *)x)->instanceOf == ((ScpClassInstanceObject *)y)->instanceOf)
 			{
 				((ScpClassInstanceObject *)x)->UserClassObjectSpace.userobject.Destroy();
 				((ScpClassInstanceObject *)x)->UserClassObjectSpace.userobject.DeepCopy(&((ScpClassInstanceObject *)y)->UserClassObjectSpace.userobject);
-				//¿½±´Àà³ÉÔ±µÄÊôÐÔ
+				//æ‹·è´ç±»æˆå‘˜çš„å±žæ€§
 				((ScpClassInstanceObject *)x)->memberattrmap = ((ScpClassInstanceObject *)y)->memberattrmap;
 			}
 		}
+		else if (x->GetType() == ObjFile && y->GetType() == ObjFile)
+		{
+			((ScpFileObject*)x)->filename = ((ScpFileObject*)y)->filename;
+		}
 		else
 		{
-			std::wstring error = L"Invalid Assign Operation ";
+			std::string error = "Invalid Assign Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -546,7 +566,7 @@ ScpObject * Equal(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid Equal Operation ";
+		std::string error = "Invalid Equal Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -603,7 +623,7 @@ ScpObject * Lessthan(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid LessThan Operation ";
+		std::string error = "Invalid LessThan Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -660,7 +680,7 @@ ScpObject * LessorEqual(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid LessOrEqual Operation ";
+		std::string error = "Invalid LessOrEqual Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -716,7 +736,7 @@ ScpObject * Bigthan(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BigThan Operation ";
+		std::string error = "Invalid BigThan Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -773,7 +793,7 @@ ScpObject * BigorEqual(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BigOrEqual Operation ";
+		std::string error = "Invalid BigOrEqual Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -870,7 +890,7 @@ ScpObject * NotEqual(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid NotEqual Operation ";
+		std::string error = "Invalid NotEqual Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -893,18 +913,18 @@ ScpObject * BitAnd(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	else if (x->GetType() == ObjTable && y->GetType() == ObjTable)
 	{
 		ret = objectSpace->AcquireTempObject(ObjTable);
-		((ScpTableObject *)ret)->Combine(x);//Ò»¸ö¿ÕµÄ±í¶ÔÏóºÍÁíÒ»¸ö·Ç¿ÕµÄ±í¶ÔÏóºÏ²¢Êµ¼ÊÉÏ¾ÍÊÇ¸´ÖÆ
-		((ScpTableObject *)ret)->Intersection(y);//Çó½»¼¯
+		((ScpTableObject *)ret)->Combine(x);//ä¸€ä¸ªç©ºçš„è¡¨å¯¹è±¡å’Œå¦ä¸€ä¸ªéžç©ºçš„è¡¨å¯¹è±¡åˆå¹¶å®žé™…ä¸Šå°±æ˜¯å¤åˆ¶
+		((ScpTableObject *)ret)->Intersection(y);//æ±‚äº¤é›†
 	}
 	else if (x->GetType() == ObjList && y->GetType() == ObjList)
 	{
 		ret = objectSpace->AcquireTempObject(ObjList);
-		((ScpListObject *)ret)->Combine(x);//Ò»¸ö¿ÕµÄ±í¶ÔÏóºÍÁíÒ»¸ö·Ç¿ÕµÄ±í¶ÔÏóºÏ²¢Êµ¼ÊÉÏ¾ÍÊÇ¸´ÖÆ
-		((ScpListObject *)ret)->Intersection(y);//Çó½»¼¯
+		((ScpListObject *)ret)->Combine(x);//ä¸€ä¸ªç©ºçš„è¡¨å¯¹è±¡å’Œå¦ä¸€ä¸ªéžç©ºçš„è¡¨å¯¹è±¡åˆå¹¶å®žé™…ä¸Šå°±æ˜¯å¤åˆ¶
+		((ScpListObject *)ret)->Intersection(y);//æ±‚äº¤é›†
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitAnd Operation ";
+		std::string error = "Invalid BitAnd Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -927,7 +947,7 @@ ScpObject * BitOr(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitOr Operation ";
+		std::string error = "Invalid BitOr Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -950,7 +970,7 @@ ScpObject * BitNot(ScpObject * x, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitNot Operation ";
+		std::string error = "Invalid BitNot Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -974,7 +994,7 @@ ScpObject * BitXor(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitXor Operation ";
+		std::string error = "Invalid BitXor Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -997,7 +1017,7 @@ ScpObject * LogicalAnd(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid LogicalAnd Operation ";
+		std::string error = "Invalid LogicalAnd Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1020,7 +1040,7 @@ ScpObject * LogicalOr(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid LogicalOr Operation ";
+		std::string error = "Invalid LogicalOr Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1073,7 +1093,7 @@ ScpObject * BitShiftLeft(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitShiftLeft Operation ";
+		std::string error = "Invalid BitShiftLeft Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1100,7 +1120,7 @@ ScpObject * BitShiftRight(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitShiftRight Operation ";
+		std::string error = "Invalid BitShiftRight Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1110,7 +1130,7 @@ ScpObject * AddAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = x;
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"+=", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("+=", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -1176,7 +1196,7 @@ ScpObject * AddAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 				&& type != ObjWhileStatement
 				)
 			{				
-				std::wstring name = engine->GetCurrentObjectSpace()->GetObjectNameR(y);
+				std::string name = engine->GetCurrentObjectSpace()->GetObjectNameR(y);
 				if (type == ObjFunction) 
 				{
 					((ScpClassInstanceObject *)x)->MemberVariableAttribute = ScpClassObject::Attr_Public;
@@ -1194,7 +1214,7 @@ ScpObject * AddAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid AddAndAssign Operation ";
+			std::string error = "Invalid AddAndAssign Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -1205,7 +1225,7 @@ ScpObject * SubAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = x;
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"-=", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("-=", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -1260,7 +1280,7 @@ ScpObject * SubAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid SubAndAssign Operation ";
+			std::string error = "Invalid SubAndAssign Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -1271,7 +1291,7 @@ ScpObject * MulAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpObject * ret = x;
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"*=", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("*=", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -1316,7 +1336,7 @@ ScpObject * MulAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid MulAndAssign Operation ";
+			std::string error = "Invalid MulAndAssign Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -1351,7 +1371,7 @@ ScpObject * DivAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 			return ret;
 		}
 	}
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"/=", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("/=", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -1396,7 +1416,7 @@ ScpObject * DivAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid DivAndAssign Operation ";
+			std::string error = "Invalid DivAndAssign Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -1428,7 +1448,7 @@ ScpObject * ModAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 			return ret;
 		}
 	}
-	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation(L"/=", x->GetType(), y->GetType());
+	pBinaryOpertaion BinaryOpertaionFunc = ScpOperationMgr::GetInstance()->GetBinaryOperation("/=", x->GetType(), y->GetType());
 	if (BinaryOpertaionFunc)
 	{
 		ret = BinaryOpertaionFunc(x, y, NULL);
@@ -1453,7 +1473,7 @@ ScpObject * ModAndAssign( ScpObject * x, ScpObject * y, CScriptEngine * engine)
 		}
 		else
 		{
-			std::wstring error = L"Invalid ModAndAssign Operation ";
+			std::string error = "Invalid ModAndAssign Operation ";
 			error += engine->GetCurrentSourceLine();
 			engine->PrintError(error);
 		}
@@ -1474,15 +1494,15 @@ ScpObject * BitAndAndAssign(ScpObject * x, ScpObject * y, CScriptEngine * engine
 	}
 	else if (x->GetType() == ObjTable && y->GetType() == ObjTable)
 	{
-		((ScpTableObject *)ret)->Intersection(y);//Çó½»¼¯
+		((ScpTableObject *)ret)->Intersection(y);//æ±‚äº¤é›†
 	}
 	else if (x->GetType() == ObjList && y->GetType() == ObjList)
 	{
-		((ScpListObject *)ret)->Intersection(y);//Çó½»¼¯
+		((ScpListObject *)ret)->Intersection(y);//æ±‚äº¤é›†
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitAndAndAssign Operation ";
+		std::string error = "Invalid BitAndAndAssign Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1502,7 +1522,7 @@ ScpObject * BitOrAndAssign(ScpObject * x, ScpObject * y, CScriptEngine * engine)
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitOrAndAssign Operation ";
+		std::string error = "Invalid BitOrAndAssign Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1522,7 +1542,7 @@ ScpObject * BitNotAndAssign(ScpObject * x, ScpObject * y, CScriptEngine * engine
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitNotAndAssign Operation ";
+		std::string error = "Invalid BitNotAndAssign Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1542,7 +1562,7 @@ ScpObject * BitXorAndAssign(ScpObject * x, ScpObject * y, CScriptEngine * engine
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitXorAndAssign Operation ";
+		std::string error = "Invalid BitXorAndAssign Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1566,7 +1586,7 @@ ScpObject * BitShiftLeftAndAssign(ScpObject * x, ScpObject * y, CScriptEngine * 
 	}	
 	else
 	{
-		std::wstring error = L"Invalid BitShiftLeftAndAssign Operation ";
+		std::string error = "Invalid BitShiftLeftAndAssign Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}
@@ -1590,7 +1610,7 @@ ScpObject * BitShiftRightAndAssign(ScpObject * x, ScpObject * y, CScriptEngine *
 	}
 	else
 	{
-		std::wstring error = L"Invalid BitShiftRightAndAssign Operation ";
+		std::string error = "Invalid BitShiftRightAndAssign Operation ";
 		error += engine->GetCurrentSourceLine();
 		engine->PrintError(error);
 	}

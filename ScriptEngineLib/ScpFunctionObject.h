@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//º¯Êı¶ÔÏó£¬º¯ÊıĞÎ²ÎºÍÊµ²ÎµÄ°ó¶¨£¬½â°ó£¬º¯ÊıÌåµÄµ÷ÓÃ
+//å‡½æ•°å¯¹è±¡ï¼Œå‡½æ•°å½¢å‚å’Œå®å‚çš„ç»‘å®šï¼Œè§£ç»‘ï¼Œå‡½æ•°ä½“çš„è°ƒç”¨
 */
 #ifndef _H_SCPFUNCTIONOBJECT
 #define _H_SCPFUNCTIONOBJECT
@@ -11,6 +11,7 @@
 #include "ScriptEngine.h"
 #include "NumberHelp.h"
 #include "ScpExpressionBlock.h"
+#include "ScpListObject.h"
 class CScriptEngine;
 class ScpFunctionObject:public ScpObject
 {
@@ -21,37 +22,38 @@ public:
 	ScpFunctionObject();
 	~ScpFunctionObject();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	int Do(CScriptEngine *engine);	
 	int BindParameters(CScriptEngine *engine);
 	int UnBindParameters(CScriptEngine *engine);
 	void ClearLocalObjects();
 	int GetFormalParametersCount();
-	std::wstring GetCloneName();
+	std::string GetCloneName();
 	VTSTRINGS Boday;
 	VTPARAMETERS FormalParameters;
 	VTPARAMETERS RealParameters;
 	VTSTRINGS *pBoday;
 	VTPARAMETERS *pFormalParameters;
-	std::wstring Name;
+	std::string Name;
 	ScpObjectSpace * FunctionObjectSpace;
 	bool iscloned;
 	ScpObject * Result;
 	ScpExpressionBlock *functionexpressionblock;
 	unsigned char * ByteCode;
 	int ByteCodeLength;
-	//ÓÉÓÚº¯ÊıµÄ²ÎÊıÀàĞÍÎ´Öª£¬ËùÒÔĞèÒªÔÚº¯Êı±»µ÷ÓÃÊ±ÔÙÉú³Éº¯ÊıµÄ×Ö½ÚÂë
-	//ÎªÁËÊµÏÖº¯ÊıµÄ¶àÌ¬£¬¿ÉÒÔ¶Ô²»Í¬µÄ²ÎÊıÀàĞÍÉú³É²»Í¬µÄ×Ö½ÚÂë
+	//ç”±äºå‡½æ•°çš„å‚æ•°ç±»å‹æœªçŸ¥ï¼Œæ‰€ä»¥éœ€è¦åœ¨å‡½æ•°è¢«è°ƒç”¨æ—¶å†ç”Ÿæˆå‡½æ•°çš„å­—èŠ‚ç 
+	//ä¸ºäº†å®ç°å‡½æ•°çš„å¤šæ€ï¼Œå¯ä»¥å¯¹ä¸åŒçš„å‚æ•°ç±»å‹ç”Ÿæˆä¸åŒçš„å­—èŠ‚ç 
 	ByteCodeMemoryStream bytecodemem_funcdef;
 	ByteCodeMemoryStream bytecodemem_funcbody;
-	//¶ÔÓÚÀàµÄ³ÉÔ±º¯Êı£¬ÕâÀï±£´æÀàµÄÃû×Ö
-	std::wstring parentobjectname;
+	//å¯¹äºç±»çš„æˆå‘˜å‡½æ•°ï¼Œè¿™é‡Œä¿å­˜ç±»çš„åå­—
+	std::string parentobjectname;
 	ScpObject * ParenObject;
+	ScpListObject* paramlist;
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_Get(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

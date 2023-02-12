@@ -14,8 +14,8 @@ ScpObject *  __stdcall ShareMemroyObjectFactory(VTPARAMETERS * paramters, CScrip
 			if (sharemem)
 			{
 				ScpShareMemoryObject  * sharememobj = (ScpShareMemoryObject  *)sharemem;
-				std::wstring sharename = paramters->at(2);
-				std::wstring strSize = paramters->at(3);
+				std::string sharename = paramters->at(2);
+				std::string strSize = paramters->at(3);
 				size_t size = 0;
 				size = StringToInt(strSize);
 				sharememobj->sharememSize = size;
@@ -34,14 +34,14 @@ BOOL WINAPI ShareMemory_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEng
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if (vtparameters->size() == 1)
 		{
-			std::wstring text = vtparameters->at(0);
+			std::string text = vtparameters->at(0);
 			{
 				ScpObject *obj = (ScpObject *)currentObjectSpace->FindObject(text);
 				if (obj)
 				{
 					if (obj->GetType() == ObjShareMemory)
 					{
-						std::wstring func = scpcommand_en_close;
+						std::string func = scpcommand_en_close;
 						((ScpShareMemoryObject*)obj)->CallInnerFunction(func, NULL, engine);
 						return TRUE;
 					}
@@ -50,15 +50,15 @@ BOOL WINAPI ShareMemory_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEng
 		}
 		else if (vtparameters->size() == 2)
 		{
-			std::wstring strobj = vtparameters->at(0);
-			std::wstring text = vtparameters->at(1);
+			std::string strobj = vtparameters->at(0);
+			std::string text = vtparameters->at(1);
 			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 			if (ObjShareMemory == type)
 			{
 				ScpObject * obj = currentObjectSpace->FindObject(text);
 				if (obj)
 				{
-					std::wstring func = scpcommand_en_close;
+					std::string func = scpcommand_en_close;
 					((ScpShareMemoryObject*)obj)->CallInnerFunction(func, NULL, engine);
 					return TRUE;
 				}
@@ -74,8 +74,8 @@ BOOL WINAPI ShareMemory_Open_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if (vtparameters->size() == 2)
 		{
-			std::wstring strobj = vtparameters->at(0);
-			std::wstring userobjname = vtparameters->at(1);
+			std::string strobj = vtparameters->at(0);
+			std::string userobjname = vtparameters->at(1);
 			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 			if (ObjShareMemory == type)
 			{
@@ -85,7 +85,7 @@ BOOL WINAPI ShareMemory_Open_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 					if (obj->GetType() == ObjShareMemory)
 					{
 						//obj->Open(obj->sharememName,obj->sharememSize);	
-						std::wstring func = scpcommand_en_open;
+						std::string func = scpcommand_en_open;
 						((ScpShareMemoryObject*)obj)->CallInnerFunction(func, NULL, engine);
 						return TRUE;
 					}
@@ -102,16 +102,16 @@ BOOL WINAPI ShareMemory_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if (vtparameters->size() == 3)
 		{
-			std::wstring memobj = vtparameters->at(0);
-			std::wstring name = vtparameters->at(1);
-			std::wstring objname = vtparameters->at(2);
+			std::string memobj = vtparameters->at(0);
+			std::string name = vtparameters->at(1);
+			std::string objname = vtparameters->at(2);
 			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
 			if (ObjShareMemory == type)
 			{
 				ScpObject * obj = currentObjectSpace->FindObject(name);
 				if (obj)
 				{
-					std::wstring func = scpcommand_en_write;
+					std::string func = scpcommand_en_write;
 					VTPARAMETERS param;
 					param.push_back(objname);
 					((ScpShareMemoryObject*)obj)->CallInnerFunction(func, &param, engine);
@@ -130,8 +130,8 @@ BOOL WINAPI ShareMemory_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine
 		}
 		else if (vtparameters->size() == 2)
 		{
-			std::wstring name = vtparameters->at(0);
-			std::wstring objname = vtparameters->at(1);
+			std::string name = vtparameters->at(0);
+			std::string objname = vtparameters->at(1);
 			ScpObject * obj = currentObjectSpace->FindObject(name);
 			if (obj)
 			{
@@ -141,7 +141,7 @@ BOOL WINAPI ShareMemory_Write_Command(VTPARAMETERS * vtparameters, CScriptEngine
 					ScpObject * obj = currentObjectSpace->FindObject(name);
 					if (obj)
 					{
-						std::wstring func = scpcommand_en_write;
+						std::string func = scpcommand_en_write;
 						VTPARAMETERS param;
 						param.push_back(objname);
 						((ScpShareMemoryObject*)obj)->CallInnerFunction(func, &param, engine);
@@ -167,8 +167,8 @@ BOOL WINAPI ShareMemory_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring name = vtparameters->at(0);
-		std::wstring objname = vtparameters->at(1);
+		std::string name = vtparameters->at(0);
+		std::string objname = vtparameters->at(1);
 		ScpObject * obj = currentObjectSpace->FindObject(name);
 		if (obj)
 		{
@@ -183,7 +183,7 @@ BOOL WINAPI ShareMemory_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 					{
 						if (strobj1->GetType() == ObjString)
 						{
-							std::wstring func = scpcommand_en_read;
+							std::string func = scpcommand_en_read;
 							ScpStringObject * str = (ScpStringObject *)((ScpShareMemoryObject*)obj)->CallInnerFunction(func, NULL, engine);
 							if (str)
 							{
@@ -199,9 +199,9 @@ BOOL WINAPI ShareMemory_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 	}
 	else if (vtparameters->size() == 3)
 	{
-		std::wstring memobj = vtparameters->at(0);
-		std::wstring memname = vtparameters->at(1);
-		std::wstring objname = vtparameters->at(2);
+		std::string memobj = vtparameters->at(0);
+		std::string memname = vtparameters->at(1);
+		std::string objname = vtparameters->at(2);
 
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
 
@@ -215,7 +215,7 @@ BOOL WINAPI ShareMemory_Read_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 				{
 					if (strobj1->GetType() == ObjString)
 					{
-						std::wstring func = scpcommand_en_read;
+						std::string func = scpcommand_en_read;
 						ScpStringObject * str = (ScpStringObject *)((ScpShareMemoryObject*)obj)->CallInnerFunction(func, NULL, engine);
 						if (str)
 						{
@@ -277,7 +277,7 @@ void ScpShareMemoryObject::Show(CScriptEngine * engine)
 {
 
 }
-ScpObject * ScpShareMemoryObject::Clone(std::wstring strObjName)
+ScpObject * ScpShareMemoryObject::Clone(std::string strObjName)
 {
 	ScpShareMemoryObject *obj = new ScpShareMemoryObject;
 	if (obj)
@@ -288,16 +288,16 @@ ScpObject * ScpShareMemoryObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }
-std::wstring ScpShareMemoryObject::ToString()
+std::string ScpShareMemoryObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpShareMemoryObject::Release()
 {
 	delete this;
 }
-bool ScpShareMemoryObject::IsInnerFunction(std::wstring & functionname)
+bool ScpShareMemoryObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -305,7 +305,7 @@ bool ScpShareMemoryObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpShareMemoryObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpShareMemoryObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -314,16 +314,16 @@ ScpObject * ScpShareMemoryObject::CallInnerFunction(std::wstring & functionname,
 	}	
 	return NULL;
 }
-BOOL ScpShareMemoryObject::Open(std::wstring Name, size_t Size)
+BOOL ScpShareMemoryObject::Open(std::string Name, size_t Size)
 {
 	BOOL bRet = FALSE;
 #ifdef _WIN32
 	if (pwinsharemem == NULL)
 	{
 		pwinsharemem = new WindowsShareMemory(Size);
-		if (pwinsharemem->OpenShareMemory(Name.c_str()) != 0)
+		if (pwinsharemem->OpenShareMemory(STDSTRINGEXT::UTF2W(Name).c_str()) != 0)
 		{
-			if (pwinsharemem->CreateShareMemory(Name.c_str()) == 0)
+			if (pwinsharemem->CreateShareMemory(STDSTRINGEXT::UTF2W(Name).c_str()) == 0)
 			{
 				bRet = TRUE;
 			}
@@ -334,7 +334,7 @@ BOOL ScpShareMemoryObject::Open(std::wstring Name, size_t Size)
 		}
 	}
 #else
-	std::string shname = "/dev/shm/" + STDSTRINGEXT::WToA(Name);
+	std::string shname = "/dev/shm/" + Name;
 	key = ftok(shname.c_str(), 0);
 	if (key != -1)
 	{
@@ -404,7 +404,7 @@ ScpObject * ScpShareMemoryObject::InnerFunction_Get(ScpObject * thisObject, VTPA
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -443,7 +443,7 @@ ScpObject * ScpShareMemoryObject::InnerFunction_write(ScpObject * thisObject, VT
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpStringObject *strobj1 = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(objname);
 		if (strobj1)
@@ -470,8 +470,8 @@ ScpObject * ScpShareMemoryObject::InnerFunction_open(ScpObject * thisObject, VTP
 	{
 		if (parameters->size() == 2)
 		{
-			std::wstring sharename = parameters->at(0);
-			std::wstring strSize = parameters->at(1);
+			std::string sharename = parameters->at(0);
+			std::string strSize = parameters->at(1);
 			size_t size = 0;
 			
 			ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(sharename);
@@ -499,21 +499,21 @@ ScpObject * ScpShareMemoryObject::InnerFunction_open(ScpObject * thisObject, VTP
 	}
 	return nullptr;
 }
-BOOL ScpShareMemoryObject::Read(std::wstring & content)
+BOOL ScpShareMemoryObject::Read(std::string & content)
 {
 	BOOL bRet = FALSE;
 #ifdef _WIN32
 	if (pwinsharemem)
 	{
-		content = (wchar_t*)pwinsharemem->GetShareMemoryAddress();
+		content = (char*)pwinsharemem->GetShareMemoryAddress();
 		bRet = TRUE;
 	}
 #else
-	content = (wchar_t*)m_map;
+	content = (char*)m_map;
 #endif
 	return bRet;
 	}
-BOOL ScpShareMemoryObject::Write(std::wstring & content)
+BOOL ScpShareMemoryObject::Write(std::string & content)
 {
 	BOOL bRet = FALSE;
 #ifdef _WIN32

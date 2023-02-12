@@ -23,7 +23,7 @@ ScpStackObject::ScpStackObject()
 	BindObjectInnerFuction(scpcommand_en_push, InnerFunction_push);
 
 	BindObjectInnerFuction(scpcommand_cn_pop, InnerFunction_pop);
-	BindObjectInnerFuction(scpcommand_cn_pop, InnerFunction_pop);
+	BindObjectInnerFuction(scpcommand_en_pop, InnerFunction_pop);
 
 	BindObjectInnerFuction(scpcommand_cn_getsize, InnerFunction_getsize);
 	BindObjectInnerFuction(scpcommand_en_getsize, InnerFunction_getsize);
@@ -50,16 +50,16 @@ void ScpStackObject::Show(CScriptEngine * engine)
 	}
 }
 
-ScpObject * ScpStackObject::Clone(std::wstring strObjName)
+ScpObject * ScpStackObject::Clone(std::string strObjName)
 {
 	ScpStackObject * tmpobj = new ScpStackObject;
 	tmpobj->scpstack = scpstack;
 	return tmpobj;
 }
 
-std::wstring ScpStackObject::ToString()
+std::string ScpStackObject::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 
 void ScpStackObject::Release()
@@ -67,7 +67,7 @@ void ScpStackObject::Release()
 	delete this;
 }
 
-bool ScpStackObject::IsInnerFunction(std::wstring & functionname)
+bool ScpStackObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -76,7 +76,7 @@ bool ScpStackObject::IsInnerFunction(std::wstring & functionname)
 	return false;
 }
 
-ScpObject * ScpStackObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpStackObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -96,7 +96,7 @@ ScpObject * ScpStackObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -125,7 +125,7 @@ ScpObject * ScpStackObject::InnerFunction_push(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters && parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindLocalObject(objname);
 		if (obj)

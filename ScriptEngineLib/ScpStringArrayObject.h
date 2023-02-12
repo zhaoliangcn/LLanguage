@@ -15,17 +15,19 @@ public:
 	~ScpStringArrayObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
-	void Add(std::wstring strbody);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	void Add(std::string strbody);
 	void Clear();
 	BOOL Del(unsigned int index);
-	BOOL Del(std::wstring strbody);
+	BOOL Del(std::string strbody);
 	VTSTRINGS content;
 
 };
+//字符串数组对象的工厂函数
+ScpObject * __stdcall ScpStringArrayObjectFactory(VTPARAMETERS* paramters, CScriptEngine* engine);
 
 #endif //_H_SCPSTRINGARRAYOBJECT

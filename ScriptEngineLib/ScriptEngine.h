@@ -23,7 +23,7 @@
 #include "ScpAst.h"
 #include "ScriptByteCode.h"
 #include "ScpObject.h"
-//Óï·¨¶ÔÏó
+//è¯­æ³•å¯¹è±¡
 
 #include "ScpGlobalCommandObject.h"
 #include "ScpObjectSpace.h"
@@ -32,6 +32,7 @@
 #include "ScpExpressionAnalyser.h"
 #include "ScpExpressionsObject.h"
 #include "ScpExtendObjectMgr.h"
+#include "ScpObjectMgr.h"
 #include "ScpByteCode.h"
 #include "ScriptByteCode.h"
 
@@ -60,87 +61,85 @@ public:
 	~CScriptEngine();
 	
 	/*
-	×¢²á½çÃæÏûÏ¢»Øµ÷
+	æ³¨å†Œç•Œé¢æ¶ˆæ¯å›è°ƒ
 	*/
 	BOOL RegisterUICallBack(void * uiclass,UICallBack callback);
 	BOOL RegisterUIStepCallBack(void * uiclass,UICallBack callback);
 	/*
-	ÒÔµ÷ÊÔÄ£Ê½Ö´ĞĞĞòÁĞ»¯Îª×Ö·û´®µÄ½Å±¾
+	ä»¥è°ƒè¯•æ¨¡å¼æ‰§è¡Œåºåˆ—åŒ–ä¸ºå­—ç¬¦ä¸²çš„è„šæœ¬
 	*/
-	int DebugMemoryScript(const wchar_t * memroyscript);
+	int DebugMemoryScript(const char * memroyscript);
 	/*
-	µ¼Èë¿âÎÄ¼ş
+	å¯¼å…¥åº“æ–‡ä»¶
 	*/
-	int ImportLib(std::wstring libfilename,bool islib=true);
+	int ImportLib(std::string libfilename,bool islib=true);
 	int ImportLibFromMemory(void * Mem,bool islib=true);
-	int ParseLibBody(const wchar_t * libFileName,VTSTRINGS &LibBody,bool islib);
+	int ParseLibBody(const char * libFileName, VTSTRINGS &LibBody, bool islib);
 	/*
-	½«µ±Ç°½Å±¾×ª´¢ÎªÎÄ¼ş
+	å°†å½“å‰è„šæœ¬è½¬å‚¨ä¸ºæ–‡ä»¶
 	*/
-	int DumpScript(std::wstring newscriptfilename);
+	int DumpScript(std::string newscriptfilename);
 	/*
-	Ö´ĞĞ½Å±¾ÎÄ¼ş
+	æ‰§è¡Œè„šæœ¬æ–‡ä»¶
 	*/
-	int DoScript(std::wstring scriptfilename,SCRIPTRUNTYPE mode=RUN_NORMAL); //0 normal run 1 debug 2 singlestep
+	int DoScript(std::string scriptfilename,SCRIPTRUNTYPE mode=RUN_NORMAL); //0 normal run 1 debug 2 singlestep
 	/*
-	½«Ò»ĞĞ×Ö·û´®×÷Îª½Å±¾Ö´ĞĞ
+	å°†ä¸€è¡Œå­—ç¬¦ä¸²ä½œä¸ºè„šæœ¬æ‰§è¡Œ
 	*/
-	int DoString(std::wstring &script);
+	int DoString(std::string &script);
 	/*
-	½«º¯ÊıÖĞµÄÒ»ĞĞ½Å±¾Ô¤±àÒëÎªÄÚ²¿¸ñÊ½
+	å°†å‡½æ•°ä¸­çš„ä¸€è¡Œè„šæœ¬é¢„ç¼–è¯‘ä¸ºå†…éƒ¨æ ¼å¼
 	*/
 
 	/*
-	ÇåÀí½Å±¾ÒıÇæ
+	æ¸…ç†è„šæœ¬å¼•æ“
 	*/
 	void Cleanup();
 	/*
-	»ñµÃµ±Ç°Ö´ĞĞµÄ½Å±¾µÄĞĞºÅ
+	è·å¾—å½“å‰æ‰§è¡Œçš„è„šæœ¬çš„è¡Œå·
 	*/
 	int GetCurrentCommandLine();
 
 	/*
-	Ã¶¾ÙÈ«¾ÖÃû×Ö¿Õ¼äÖĞµÄ¶ÔÏóÃû
+	æšä¸¾å…¨å±€åå­—ç©ºé—´ä¸­çš„å¯¹è±¡å
 	*/
 	VTSTRINGS EnumObjects();
 	/*
-	ÏÔÊ¾Ö¸¶¨¶ÔÏóµÄÄÚ²¿ĞÅÏ¢
+	æ˜¾ç¤ºæŒ‡å®šå¯¹è±¡çš„å†…éƒ¨ä¿¡æ¯
 	*/
-	void DumpObject(std::wstring objectname);
+	void DumpObject(std::string objectname);
 	
 	/*
-	»ñµÃµ±Ç°Ãû×Ö¿Õ¼ä
+	è·å¾—å½“å‰åå­—ç©ºé—´
 	*/
 	ScpObjectSpace * GetCurrentObjectSpace();
 	/*
-	ÇĞ»»µ±Ç°Ãû×Ö¿Õ¼ä
+	åˆ‡æ¢å½“å‰åå­—ç©ºé—´
 	*/
 	void SetCurrentObjectSpace(ScpObjectSpace * objspace);
 	/*
-	»ñµÃÉÏÒ»Ìõ´íÎóĞÅÏ¢
+	è·å¾—ä¸Šä¸€æ¡é”™è¯¯ä¿¡æ¯
 	*/
-	std::wstring GetLastErrorString();
+	std::string GetLastErrorString();
 	/*
-	ÉèÖÃ×îºóÒ»Ìõ´íÎóÏûÏ¢
+	è®¾ç½®æœ€åä¸€æ¡é”™è¯¯æ¶ˆæ¯
 	*/
-	void SetLastErrorString(std::wstring &error);
+	void SetLastErrorString(const char * error);
 
 	/*
-	¸ù¾İÃüÁîÃûÓ³ÉäÃüÁî
+	æ ¹æ®å‘½ä»¤åæ˜ å°„å‘½ä»¤
 	*/
-	ULONG QueryCommandValue(const std::wstring & commandstring);
+	ULONG QueryCommandValue(const std::string & commandstring);
 	/*
-	²éÑ¯µ±Ç°ÔÊĞí×¢²áµÄÓÃ»§ÃüÁîÖµ
+	æŸ¥è¯¢å½“å‰å…è®¸æ³¨å†Œçš„ç”¨æˆ·å‘½ä»¤å€¼
 	*/
 	ULONG QueryCurrentUserCommand();
 
 	int GetLanguge();
 	
-	//std::string GetObjectNames(int lang);
+	std::string GetCurrentSourceLine();
 
-	std::wstring GetCurrentSourceLine();
-
-    bool RegisterGlobalFunction(const std::wstring chscommandstring, const std::wstring   engcommandstring, unsigned long commandid, GlobalCommandFunction Func);
+    bool RegisterGlobalFunction(const std::string chscommandstring, const std::string   engcommandstring, unsigned long commandid, GlobalCommandFunction Func);
     void  RegisterGlobalFunctions();
     ScpGlobalCommandObject globalcommand;
 
@@ -148,74 +147,76 @@ public:
 	int DoMemByteCode(const unsigned char* ByteCode, unsigned int length, SCRIPTRUNTYPE mode = RUN_NORMAL);
 	ScpByteCode scpbytecode;
 	int Jit;
-	int DumpByteCode(const wchar_t *ByteCodeFile);
+	int Build;
+	int DumpByteCode(const char *ByteCodeFile);
 	/*
-	ÉèÖÃµ÷ÊÔÆ÷ ÊµÀı
+	è®¾ç½®è°ƒè¯•å™¨ å®ä¾‹
 	*/
 	bool SetDebugger(IScriptDebugger * dbg);
-	void SetScriptFileName(const wchar_t*filePathName);
-	std::wstring GetCurrentScriptfilename() {
+	void SetScriptFileName(const char*filePathName);
+	std::string GetCurrentScriptfilename() {
 		return currentscriptfilename;;
 	}
+	std::string globallib;
 private:
 	/*
-	´´½¨´æ´¢µ±Ç°ÃüÁîĞĞ²ÎÊıµÄ±í¶ÔÏó
+	åˆ›å»ºå­˜å‚¨å½“å‰å‘½ä»¤è¡Œå‚æ•°çš„è¡¨å¯¹è±¡
 	*/
 	void Create_Global_CommndLine_TableObject();
 	void Create_Global_Environment_TableObject();
 	void Create_Global_CurrentTimeObject();
 	/*
-	³õÊ¼»¯½Å±¾ÒıÇæ
+	åˆå§‹åŒ–è„šæœ¬å¼•æ“
 	*/
 	void Init();
 	
 	/*
-	Ö¸ÁîÅÉ·¢£¬Ò»ĞĞ½Å±¾¶ÔÓ¦Ò»¸öÖ¸Áî
+	æŒ‡ä»¤æ´¾å‘ï¼Œä¸€è¡Œè„šæœ¬å¯¹åº”ä¸€ä¸ªæŒ‡ä»¤
 	*/
     BOOL FetchCommand(unsigned long commandvalue,VTPARAMETERS * vtparameters =NULL);
 	
 	/*
-	¼ÓÔØ½Å±¾
+	åŠ è½½è„šæœ¬
 	*/
-	bool LoadAllScript(std::wstring scriptfilename);
+	bool LoadAllScript(std::string scriptfilename);
 	/*
-	Ö´ĞĞÒÑ¼ÓÔØµÄ½Å±¾
-	ÖğĞĞ½âÎö²¢Ö´ĞĞ½Å±¾
+	æ‰§è¡Œå·²åŠ è½½çš„è„šæœ¬
+	é€è¡Œè§£æå¹¶æ‰§è¡Œè„šæœ¬
 	*/
 	int DoloadedScript(SCRIPTRUNTYPE mode=RUN_NORMAL);
 
-	//µ±Ç°ÓïÑÔ±ê¼Ç
+	//å½“å‰è¯­è¨€æ ‡è®°
 	int language;
-	//ÇĞ»»ÓïÑÔ
-	void SwitchLanguage(std::wstring &comment);
+	//åˆ‡æ¢è¯­è¨€
+	void SwitchLanguage(std::string &comment);
 	
 	
 	ULONG vl_usercommand;
 	DWORD dwTimeCount;
 	                                                                                                  
-	//Ö¸ÏòÈ«¾ÖÃû×Ö¿Õ¼ä
+	//æŒ‡å‘å…¨å±€åå­—ç©ºé—´
 	ScpObjectSpace * globalObjectSpace;
-	//Ö¸Ïòµ±Ç°Ãû×Ö¿Õ¼ä
+	//æŒ‡å‘å½“å‰åå­—ç©ºé—´
 	ScpObjectSpace * currentObjectSpace;
 	CScriptCommand * scriptcommand;
 		
-	//µ±Ç°ÔËĞĞµ½µÄ½Å±¾ĞĞºÅ
+	//å½“å‰è¿è¡Œåˆ°çš„è„šæœ¬è¡Œå·
 	int currentcommandline;
-	//±£´æËùÓĞ¶ÏµãµÄĞĞºÅ
+	//ä¿å­˜æ‰€æœ‰æ–­ç‚¹çš„è¡Œå·
 	VTINT breakpoints;
 
-	//µ±Ç°½Å±¾ÎÄ¼şÃû
-	std::wstring currentscriptfilename;
-	//µ±Ç°½Å±¾ÍêÕûÄÚÈİ
+	//å½“å‰è„šæœ¬æ–‡ä»¶å
+	std::string currentscriptfilename;
+	//å½“å‰è„šæœ¬å®Œæ•´å†…å®¹
 	VTSTRINGS allScriptBody;
-	//±£´æÒÑµ¼ÈëµÄ¿âÎÄ¼şÃû
+	//ä¿å­˜å·²å¯¼å…¥çš„åº“æ–‡ä»¶å
 	VTSTRINGS importedlibs;
 
 	CScriptFile scriptfile;
 
-	std::wstring LastErrorString;
+	std::string LastErrorString;
 
-	//±£´æµ±Ç°½Å±¾µÄ×Ö½ÚÂë
+	//ä¿å­˜å½“å‰è„šæœ¬çš„å­—èŠ‚ç 
 	ScriptByteCode bytecode;
 	
 	ScpScriptLex lex;
@@ -225,24 +226,28 @@ private:
 	IScriptDebugger * debugger;
 	
 public:
-	//À©Õ¹Ä£¿éÏà¹Ø
+
+	CScpObjectMgr obj_mgr;
+	//æ‰©å±•æ¨¡å—ç›¸å…³
 	ScpExtendObjectMgr extend_obj_mgr;
 
-	//Êä³öÖØ¶¨Ïò
+
+
+	//è¾“å‡ºé‡å®šå‘
 	CUIMessage uimessage;
-    void PrintError(const std::wstring& ErrorMessage, BOOL withnewline = TRUE)
+    void PrintError(const std::wstring& ErrorMessage, bool withnewline = true)
 	{
 		uimessage.PostUIMessage(ErrorMessage.c_str(), withnewline);
 	}
-    void PrintError(const std::string& ErrorMessage, BOOL withnewline = TRUE)
+    void PrintError(const std::string& ErrorMessage, bool withnewline = true)
 	{
 		uimessage.PostUIMessage(ErrorMessage.c_str(), withnewline);
 	}
-	void PrintError(const wchar_t * ErrorMessage, BOOL withnewline = TRUE)
+	void PrintError(const wchar_t * ErrorMessage, bool withnewline = true)
 	{
 		uimessage.PostUIMessage(ErrorMessage,withnewline);
 	}
-	void PrintError(const char * ErrorMessage, BOOL withnewline = TRUE)
+	void PrintError(const char * ErrorMessage, bool withnewline = true)
 	{
 		uimessage.PostUIMessage(ErrorMessage,withnewline);
 	}

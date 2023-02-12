@@ -1,10 +1,12 @@
 #include <windows.h>
 #include <string>
-
+/*
+使用系统页面文件作为共享内存
+*/
 class WindowsShareMemory
 {
 public:
-	explicit WindowsShareMemory(size_t BufferSize);
+	explicit WindowsShareMemory(size_t BufferSize);//using system paging file  调用者必须确保BufferSize一致
 	~WindowsShareMemory();
 	int OpenShareMemory(const wchar_t * szName);
 	int CreateShareMemory(const wchar_t * szName);
@@ -22,11 +24,13 @@ private:
 	SECURITY_DESCRIPTOR SecDesc;	
 
 };
-
+/*
+使用文件作为共享内存
+*/
 class WindowsFileShareMemory
 {
 public:
-	explicit WindowsFileShareMemory(size_t BufferSize);  
+	explicit WindowsFileShareMemory(size_t BufferSize);  //调用者必须确保BufferSize一致
 	~WindowsFileShareMemory();
 	int OpenFileShareMemory(const wchar_t * szFilePathName);
 	int CreateFileShareMemory(const wchar_t * szFilePathName);

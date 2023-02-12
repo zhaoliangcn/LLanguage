@@ -13,7 +13,7 @@ typedef struct _tag_ExtObjectCommand
 {
 	DWORD dwCommandId;
 	std::vector<DWORD> dwObjectIdList;
-	std::vector<std::wstring> CommandNames;
+	std::vector<std::string> CommandNames;
 	std::vector<ExtObjectCommandFunction> ExtCommands;
 }ExtObjectCommand,*PExtObjectCommand;
 
@@ -30,27 +30,31 @@ public:
 	ScpGlobalCommandObject(void);
 	~ScpGlobalCommandObject(void);
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
 	void InitBaseCommand();
-	ULONG QueryCommand(std::wstring commandstring);
-	BOOL RegisterCommand(int lang,std::wstring commandstring,ULONG commandvalue);
-	BOOL UnRegisterCommand(int lang, std::wstring commandstring);
+	ULONG QueryCommand(std::string commandstring);
+	BOOL RegisterCommand(int lang,std::string commandstring,ULONG commandvalue);
+	BOOL UnRegisterCommand(int lang, std::string commandstring);
 
 
-	bool RegisterGlobalFunction(std::wstring chscommandstring, std::wstring engcommandstring, DWORD commandid, GlobalCommandFunction Func);
-	GlobalCommandFunction GetGlobalCommandFunction(std::wstring commandstring);
+	bool RegisterGlobalFunction(std::string chscommandstring, std::string engcommandstring, DWORD commandid, GlobalCommandFunction Func);
+	GlobalCommandFunction GetGlobalCommandFunction(std::string commandstring);
 	GlobalCommandFunction GetGlobalCommandFunction(DWORD commandid);
+	bool IsGlobalCommandFunction(std::string commandstring);
+	bool IsGlobalCommandFunction(DWORD commandid);
 	//extend command
 	BOOL RegistExtCommand(ExtObjectCommand extobjcmd);
-	ULONG QueryExtCommand(std::wstring commandstring);
-	size_t GetExtCommandFunctionCount(std::wstring commandstring);
+	ULONG QueryExtCommand(std::string commandstring);
+	size_t GetExtCommandFunctionCount(std::string commandstring);
 	size_t GetExtCommandFunctionCount(DWORD commandid);
-	ExtObjectCommandFunction GetExtCommandFunctionAddress(std::wstring commandstring, size_t index);
+	ExtObjectCommandFunction GetExtCommandFunctionAddress(std::string commandstring, size_t index);
 	ExtObjectCommandFunction GetExtCommandFunctionAddress(DWORD commandid, size_t index);
+	bool IsExtCommandFunction(std::string commandstring, size_t index);
+	bool IsExtCommandFunction(DWORD commandid, size_t index);
 private:
 	IDGlobalCommandFunctionMap idcommnadmap;
 

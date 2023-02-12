@@ -62,6 +62,15 @@ ScpBigIntObject::ScpBigIntObject()
 
 	BindObjectInnerFuction(scpcommand_tan_CN, InnerFunction_tan);
 	BindObjectInnerFuction(scpcommand_tan_EN, InnerFunction_tan);
+
+	BindObjectInnerFuction(scpcommand_pow_CN, InnerFunction_pow);
+	BindObjectInnerFuction(scpcommand_pow_EN, InnerFunction_pow);
+	
+	BindObjectInnerFuction(scpcommand_add_CN, InnerFunction_add);
+	BindObjectInnerFuction(scpcommand_add_EN, InnerFunction_add);
+
+	BindObjectInnerFuction(scpcommand_sub_CN, InnerFunction_sub);
+	BindObjectInnerFuction(scpcommand_sub_EN, InnerFunction_sub);
 }
 ScpBigIntObject::~ScpBigIntObject()
 {
@@ -71,21 +80,21 @@ void ScpBigIntObject::Show(CScriptEngine * engine)
 {
 	engine->PrintError(ToString());
 }
-ScpObject *ScpBigIntObject:: Clone(std::wstring strObjName)
+ScpObject *ScpBigIntObject:: Clone(std::string strObjName)
 {
 	ScpBigIntObject * tmpobj= new ScpBigIntObject;
 	tmpobj->value=this->value;
 	return tmpobj;
 }
-std::wstring ScpBigIntObject::ToString()
+std::string ScpBigIntObject::ToString()
 {
-	return Int64ToWString(value);
+	return Int64ToString(value);
 }
 void ScpBigIntObject::Release() 
 {
 	delete this;
 }
-bool ScpBigIntObject::IsInnerFunction(std::wstring & functionname)
+bool ScpBigIntObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -93,7 +102,7 @@ bool ScpBigIntObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpBigIntObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpBigIntObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -114,7 +123,7 @@ ScpObject * ScpBigIntObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -144,7 +153,7 @@ ScpObject * ScpBigIntObject::InnerFunction_transform(ScpObject * thisObject, VTP
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -184,8 +193,8 @@ ScpObject * ScpBigIntObject::InnerFunction_squareroot(ScpObject * thisObject, VT
 {
 	if (parameters->size() == 0)
 	{
-		ScpBigIntObject *td = (ScpBigIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjBigInt);
-		td->value = sqrt((long double)((ScpBigIntObject *)thisObject)->value);
+		ScpDoubleObject *td = (ScpDoubleObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjDouble);
+		td->value = sqrt((double)((ScpBigIntObject *)thisObject)->value);
 		td->istemp = true;
 		return td;
 	}
@@ -221,7 +230,7 @@ ScpObject * ScpBigIntObject::InnerFunction_abs(ScpObject * thisObject, VTPARAMET
 	if (parameters->size() == 0)
 	{
 		ScpBigIntObject *tint = (ScpBigIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjBigInt);
-		tint->value = abs((long double)((ScpBigIntObject *)thisObject)->value);
+		tint->value = abs(((ScpBigIntObject *)thisObject)->value);
 		tint->istemp = true;
 		return tint;
 	}
@@ -300,13 +309,100 @@ ScpObject * ScpBigIntObject::InnerFunction_tan(ScpObject * thisObject, VTPARAMET
 	return nullptr;
 }
 
+ScpObject * ScpBigIntObject::InnerFunction_pow(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string param0 = parameters->at(0);
+		StringStripQuote(param0);
+		int c = 0;
+		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
+		if (objparam0 && objparam0->GetType() == ObjInt)
+		{
+			c = ((ScpIntObject *)objparam0)->value;
+		}
+		else if (IsStaticNumber(param0))
+		{
+			c = StringToInt(param0);
+		}
+		else
+		{
+			return nullptr;
+		}
+		ScpDoubleObject *tret = (ScpDoubleObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjDouble);
+		__int64 ret = ((ScpBigIntObject *)thisObject)->value;
+		tret->value = pow(ret, c);
+		tret->istemp = true;
+		return tret;
+	}
+	return nullptr;
+}
+
+ScpObject* ScpBigIntObject::InnerFunction_add(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string param0 = parameters->at(0);
+		StringStripQuote(param0);
+		__int64 c = 0;
+		ScpObject* objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
+		if (objparam0 && objparam0->GetType() == ObjInt)
+		{
+			c = ((ScpIntObject*)objparam0)->value;
+		}
+		else if (objparam0 && objparam0->GetType() == ObjBigInt)
+		{
+			c = ((ScpBigIntObject*)objparam0)->value;
+		}
+		else if (IsStaticNumber(param0))
+		{
+			c = StringToInt64(param0);
+		}
+		else
+		{
+			return nullptr;
+		}
+		((ScpBigIntObject*)thisObject)->value += c;
+	}
+	return thisObject;
+}
+
+ScpObject* ScpBigIntObject::InnerFunction_sub(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string param0 = parameters->at(0);
+		StringStripQuote(param0);
+		__int64 c = 0;
+		ScpObject* objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
+		if (objparam0 && objparam0->GetType() == ObjInt)
+		{
+			c = ((ScpIntObject*)objparam0)->value;
+		}
+		else if (objparam0 && objparam0->GetType() == ObjBigInt)
+		{
+			c = ((ScpBigIntObject*)objparam0)->value;
+		}
+		else if (IsStaticNumber(param0))
+		{
+			c = StringToInt(param0);
+		}
+		else
+		{
+			return nullptr;
+		}
+		((ScpBigIntObject*)thisObject)->value -= c;
+	}
+	return thisObject;
+}
+
 ScpObject * __stdcall ScpBigIntObjectFactory(VTPARAMETERS * paramters, CScriptEngine * engine)
 {
 	if (paramters->size() >= 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
-		std::wstring content;
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
+		std::string content;
 		if (paramters->size() == 3)
 			content = paramters->at(2);
 		ScpBigIntObject * obj = new ScpBigIntObject;

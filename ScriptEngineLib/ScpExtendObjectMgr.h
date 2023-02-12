@@ -10,8 +10,8 @@
 
 typedef struct tag_ExtendObjectItem
 {
-	wchar_t objtypename_cn[256];
-	wchar_t objtypename_en[256];
+	char objtypename_cn[256];
+	char objtypename_en[256];
 	ULONG uniqobjid;
 	ExtObjCreateFactoryFunction factory;
 }ExtendObjectItem,*PExtendObjectItem;
@@ -19,36 +19,40 @@ typedef struct tag_ExtendObjectItem
 typedef std::vector<ExtendObjectItem> VTExtendObject;
 typedef std::vector<ExtendObjectItem>::iterator ITExtendObject;
 
+/*
+* æ‰©å±•å¯¹è±¡ç®¡ç†ç±»ï¼Œç®¡ç†æ‰€æœ‰æ‰©å±•å¯¹è±¡çš„åç§°ã€å¯¹è±¡å®šä¹‰å·¥å‚å‡½æ•°
+*/
+
 class ScpExtendObjectMgr
 {
 public:
 	
 	ScpExtendObjectMgr(void);
 	~ScpExtendObjectMgr(void);
-	BOOL IsExtendObject(const wchar_t * objtypename);
+	BOOL IsExtendObject(const char * objtypename);
 	BOOL IsExtendObject(ULONG UniqObjId);
-	ULONG GetExtendObjectId(const wchar_t * objtypename);
-	ScpObject * CreateExtendObject(const wchar_t * objtypename,VTPARAMETERS * paramters, CScriptEngine * engine);
+	ULONG GetExtendObjectId(const char * objtypename);
+	ScpObject * CreateExtendObject(const char * objtypename,VTPARAMETERS * paramters, CScriptEngine * engine);
 	ScpObject * CreateExtendObject(ULONG UniqObjId, VTPARAMETERS * paramters, CScriptEngine * engine);
-	std::wstring GetExtendObjectName(ULONG UniqObjId);
+	std::string GetExtendObjectName(ULONG UniqObjId);
 	/*
-	×¢²áÀ©Õ¹¶ÔÏó
-	objtypename_cn ¶ÔÏóÖĞÎÄÃû
-	objtypename_en ¶ÔÏóÓ¢ÎÄÃû
-	UniqObjId ¶ÔÏóÎ¨Ò»ID
-	factoryfunc ¶ÔÏó¹¤³§º¯ÊıµØÖ·
+	æ³¨å†Œæ‰©å±•å¯¹è±¡
+	objtypename_cn å¯¹è±¡ä¸­æ–‡å
+	objtypename_en å¯¹è±¡è‹±æ–‡å
+	UniqObjId å¯¹è±¡å”¯ä¸€ID
+	factoryfunc å¯¹è±¡å·¥å‚å‡½æ•°åœ°å€
 	*/
-	BOOL RegistExtendObject(const wchar_t * objtypename_cn,const wchar_t * objtypename_en,ULONG UniqObjId,ExtObjCreateFactoryFunction factoryfunc);
+	BOOL RegistExtendObject(const char * objtypename_cn,const char * objtypename_en,ULONG UniqObjId,ExtObjCreateFactoryFunction factoryfunc);
 	void ClearExtendObject();
 
-	BOOL LoadExtensions(const  wchar_t * ModulePathName, ScpGlobalCommandObject * scpglobalcommands);
-	BOOL LoadExtension(const  wchar_t * ModuleName, ScpGlobalCommandObject * scpglobalcommands);
+	BOOL LoadExtensions(const  char * ModulePathName, ScpGlobalCommandObject * scpglobalcommands);
+	BOOL LoadExtension(const  char * ModuleName, ScpGlobalCommandObject * scpglobalcommands);
 	void FreeAllExtensions();
 private:
 	
 	VTExtendObject extendobjects;
 
-	//ÒÑ¼ÓÔØµÄÀ©Õ¹¶ÔÏó¶¯Ì¬¿âÎÄ¼şÃûºÍÄ£¿é¾ä±ú
+	//å·²åŠ è½½çš„æ‰©å±•å¯¹è±¡åŠ¨æ€åº“æ–‡ä»¶åå’Œæ¨¡å—å¥æŸ„
 	HANDLESMAP map_loadedExtension;
 
 	

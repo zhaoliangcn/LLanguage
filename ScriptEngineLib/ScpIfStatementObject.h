@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//Ãıº˛”Ôæ‰∂‘œÛ
+//Êù°‰ª∂ËØ≠Âè•ÂØπË±°
 */
 #ifndef _H_SCPIFSTATEMENTOBJECT
 #define _H_SCPIFSTATEMENTOBJECT
@@ -21,22 +21,22 @@ public:
 
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release();
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
 	
 
 	int Do(CScriptEngine *engine);
 	void ClearLocalObjects();
 	int ReComputeCondition();
 
-	
-	std::wstring ConditionExpression;
+	//IFËØ≠Âè•ÁöÑÊù°‰ª∂Ë°®ËææÂºè
+	std::string ConditionExpression;
 	int ConditionResult;
 	bool TrueBody;
-	std::wstring Name;
+	std::string Name;
 	ScpObjectSpace IfStatementObjectSpace;
 	CScriptEngine *engine;	
 	ScpExpressionBlock *trueblock;

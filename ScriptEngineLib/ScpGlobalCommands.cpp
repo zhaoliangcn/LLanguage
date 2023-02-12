@@ -15,17 +15,17 @@
 #include "ScpObjectNammes.h"
 namespace GlobalCommands
 {
-
+    
 	/*
-	¡°Ë¯Ãß¡±ÃüÁî
-	²ÎÊý£ººÁÃëÊý
+	â€œç¡çœ â€å‘½ä»¤
+	å‚æ•°ï¼šæ¯«ç§’æ•°
 	*/
 	BOOL __stdcall Do_Sleep_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if (vtparameters->size() == 1)
 		{
-			std::wstring strinterval = vtparameters->at(0);
+			std::string strinterval = vtparameters->at(0);
 			ULONG interval = StringToInt(strinterval.c_str());
 #ifdef _WIN32
 			Sleep(interval);
@@ -37,16 +37,16 @@ namespace GlobalCommands
 	}
 
 //
-//¡°Çå¿Õ¡±ÃüÁî
-//²Ù×÷¶ÔÏó£ºÎÄ¼þ¡¢×Ö·û´®¡¢ÄÚ´æ
+//â€œæ¸…ç©ºâ€å‘½ä»¤
+//æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶ã€å­—ç¬¦ä¸²ã€å†…å­˜
 //
 BOOL __stdcall Do_Clear_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring strobjtype = vtparameters->at(0);
-        std::wstring strobjname = vtparameters->at(1);
+        std::string strobjtype = vtparameters->at(0);
+        std::string strobjname = vtparameters->at(1);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobjtype.c_str());
         if(ObjFile==type)
         {
@@ -63,7 +63,7 @@ BOOL __stdcall Do_Clear_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
         else if (ObjString == type)
         {
             ScpStringObject *strobj1;
-            std::wstring objspace;
+            std::string objspace;
             strobj1=(ScpStringObject *)currentObjectSpace->FindObject(strobjname);
             if(strobj1)
             {
@@ -104,7 +104,7 @@ BOOL __stdcall Do_Clear_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     }
     else if(vtparameters->size()==1)
     {
-        std::wstring strobjname = vtparameters->at(0);
+        std::string strobjname = vtparameters->at(0);
         ScpObject * obj=(ScpObject * )currentObjectSpace->FindObject(strobjname);
         if(obj)
         {
@@ -138,15 +138,15 @@ BOOL __stdcall Do_Clear_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     return TRUE;
 }
 /*
-¡°¹Ø±Õ¡±ÃüÁî
-²Ù×÷¶ÔÏó£º¼ÆËã»ú¡¢½ø³Ì¡¢Ïß³Ì¡¢ÍøÂçÁ¬½Ó
+â€œå…³é—­â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šè®¡ç®—æœºã€è¿›ç¨‹ã€çº¿ç¨‹ã€ç½‘ç»œè¿žæŽ¥
 */
 BOOL __stdcall Do_Shutdown_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==1)
     {
-        std::wstring text = vtparameters->at(0);
+        std::string text = vtparameters->at(0);
         {
             ScpObject *obj=(ScpObject *)currentObjectSpace->FindObject(text);
             if(obj)
@@ -169,8 +169,8 @@ BOOL __stdcall Do_Shutdown_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     return TRUE;
 }
 /*
-¡°µ¯³ö¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÏûÏ¢¿ò
+â€œå¼¹å‡ºâ€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ¶ˆæ¯æ¡†
 */
 BOOL __stdcall Do_Popup_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
@@ -178,9 +178,9 @@ BOOL __stdcall Do_Popup_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     int paramcount = vtparameters->size();
     if(paramcount == 2 || paramcount == 3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring text = vtparameters->at(1);
-        std::wstring caption;
+        std::string strobj = vtparameters->at(0);
+        std::string text = vtparameters->at(1);
+        std::string caption;
         if(vtparameters->size()==3)
             caption= vtparameters->at(2);
         ScpObjectType type =ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
@@ -201,21 +201,21 @@ BOOL __stdcall Do_Popup_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
                 caption=ScpObjectNames::GetSingleInsatnce()->strScpMessageCaption;
             }
 #ifdef _WIN32
-            typedef int (WINAPI *Func_MessageBoxW)(
+            typedef int (WINAPI *Func_MessageBoxA)(
                  HWND hWnd,
-                 LPCWSTR lpText,
-                 LPCWSTR lpCaption,
+                 LPCSTR lpText,
+                 LPCSTR lpCaption,
                  UINT uType);
-            static Func_MessageBoxW WinMessageBox = (Func_MessageBoxW)GetProcAddress(GetModuleHandleW(L"user32.dll"), "MessageBoxW");
+            static Func_MessageBoxA WinMessageBox = (Func_MessageBoxA)GetProcAddress(GetModuleHandleW(L"user32.dll"), "MessageBoxA");
             if (WinMessageBox)
             {
-                WinMessageBox(NULL, text.c_str(), caption.c_str(), MB_OK | MB_ICONINFORMATION);
+                WinMessageBox(NULL, STDSTRINGEXT::UToA(text).c_str(), STDSTRINGEXT::UToA(caption).c_str(), MB_OK | MB_ICONINFORMATION);
             }
 
 #else
-            std::wstring message;
-            message=STDSTRINGEXT::Format(L"\"zenity --info --title'%s' --text'%s'\"",caption.c_str(),text.c_str());
-            system(STDSTRINGEXT::WToA(message).c_str());
+            std::string message;
+            message=STDSTRINGEXT::Format("\"zenity --info --title'%s' --text'%s'\"",caption.c_str(),text.c_str());
+            system(message.c_str());
 #endif
         }
         else
@@ -230,8 +230,8 @@ BOOL __stdcall Do_Popup_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     return TRUE;
 }
 /*
-¡°ÔËÐÐ¡±ÃüÁî
-²Ù×÷¶ÔÏó£º½ø³Ì¡¢Ïß³Ì
+â€œè¿è¡Œâ€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šè¿›ç¨‹ã€çº¿ç¨‹
 */
 BOOL __stdcall Do_Run_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
@@ -240,15 +240,15 @@ BOOL __stdcall Do_Run_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine
     return TRUE;
 }
 /*
-¡°ÏÔÊ¾¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºµ±Ç°Ê±¼ä¡¢¾²Ì¬×Ö·û´®¡¢ÈÎÒâ¶ÔÏó
+â€œæ˜¾ç¤ºâ€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå½“å‰æ—¶é—´ã€é™æ€å­—ç¬¦ä¸²ã€ä»»æ„å¯¹è±¡
 */
 BOOL __stdcall Do_Show_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==1)
     {
-        std::wstring text = vtparameters->at(0);
+        std::string text = vtparameters->at(0);
         if(text==ScpObjectNames::GetSingleInsatnce()->scpErrorLastErrorString)
         {
             engine->PrintError(engine->GetLastErrorString());
@@ -263,14 +263,14 @@ BOOL __stdcall Do_Show_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
             else if(ScpObjectNames::GetSingleInsatnce()->strObjCallStack==text)
             {
                 ScpObjectSpace * pcurrentObjectSpace = currentObjectSpace;
-                std::wstring Tab;
+                std::string Tab;
                 while(pcurrentObjectSpace)
                 {
                     if(pcurrentObjectSpace->ObjectSpaceType==Space_Function)
                     {
                         engine->PrintError(Tab+pcurrentObjectSpace->spacename);
                         pcurrentObjectSpace=pcurrentObjectSpace->parentspace;
-                        Tab+=L"\t";
+                        Tab+="\t";
                     }
                     else if(pcurrentObjectSpace->ObjectSpaceType==Space_Global)
                     {
@@ -288,7 +288,7 @@ BOOL __stdcall Do_Show_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
                 else
                 {
                     ScpObject * tempobj = NULL;
-                    std::wstring Expression = text;
+                    std::string Expression = text;
                     ScpExpressionAnalyser ana;
                     ana.Attach(engine);
                     ScpExpressionTreeNode *root = ana.BuildExressionTreeEx(Expression);
@@ -318,8 +318,8 @@ BOOL __stdcall Do_Show_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     }
     if(vtparameters->size()==2)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring pathname = vtparameters->at(1);
+        std::string strobj = vtparameters->at(0);
+        std::string pathname = vtparameters->at(1);
         ScpObject *obj=currentObjectSpace->FindObject(strobj);
         if(obj)
         {
@@ -343,7 +343,7 @@ BOOL __stdcall Do_Show_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     {
         for(unsigned int i=0; i<vtparameters->size(); i++)
         {
-            std::wstring temp = vtparameters->at(i);
+            std::string temp = vtparameters->at(i);
             ScpObject *obj=currentObjectSpace->FindObject(temp);
             if(obj)
             {
@@ -358,16 +358,16 @@ BOOL __stdcall Do_Show_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     return TRUE;
 }
 /*
-¡°É¾³ý¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÎÄ¼þ¡¢×¢²á±í¡¢Ä¿Â¼
+â€œåˆ é™¤â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶ã€æ³¨å†Œè¡¨ã€ç›®å½•
 */
 BOOL __stdcall Do_Delete_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring pathname = vtparameters->at(1);
+        std::string strobj = vtparameters->at(0);
+        std::string pathname = vtparameters->at(1);
         StringStripQuote(pathname);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
         if(ObjFile==type)
@@ -406,7 +406,7 @@ BOOL __stdcall Do_Delete_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
     }
     else if(vtparameters->size()==1)
     {
-        std::wstring pathname = vtparameters->at(0);
+        std::string pathname = vtparameters->at(0);
         ScpObject * obj = currentObjectSpace->FindObject(pathname);
         if(obj)
         {
@@ -421,7 +421,7 @@ BOOL __stdcall Do_Delete_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
             }
             else if(ObjString ==type)
             {
-                std::wstring fileorpath= ((ScpStringObject*)obj)->content;
+                std::string fileorpath= ((ScpStringObject*)obj)->content;
                 if (ScpDirectoryObject::IsDir(fileorpath))
                 {
                     ScpDirectoryObject::Delete(fileorpath);
@@ -440,17 +440,17 @@ BOOL __stdcall Do_Delete_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
     return TRUE;
 }
 /*
-¡°´ò¿ª¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÎÄ¼þ¡¢Ä¿Â¼¡¢¹ÜµÀ¡¢×¢²á±íÏî
+â€œæ‰“å¼€â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶ã€ç›®å½•ã€ç®¡é“ã€æ³¨å†Œè¡¨é¡¹
 */
 BOOL __stdcall Do_Open_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring userobjname = vtparameters->at(1);
-        ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
+        std::string strobj = vtparameters->at(0);
+        std::string userobjname = vtparameters->at(1);
+        //ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
         {
             ScpObject * obj = currentObjectSpace->FindObject(strobj);
             ScpObject * userobj = currentObjectSpace->FindObject(userobjname);
@@ -473,15 +473,15 @@ BOOL __stdcall Do_Open_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
             }
             else if(obj && obj->GetType()==ObjFile)
             {
-                ((ScpFileObject * )obj)->Open(userobjname,L"");
+                ((ScpFileObject * )obj)->Open(userobjname,"");
             }
         }
     }
     if(vtparameters->size()==3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring userobjname = vtparameters->at(1);
-        std::wstring pathname = vtparameters->at(2);
+        std::string strobj = vtparameters->at(0);
+        std::string userobjname = vtparameters->at(1);
+        std::string pathname = vtparameters->at(2);
         ScpObject * userobj = currentObjectSpace->FindObject(pathname);
         if(userobj)
         {
@@ -545,17 +545,17 @@ BOOL __stdcall Do_Open_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
 }
 
 /*
-¡°¶¨Î»¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÎÄ¼þ
+â€œå®šä½â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶
 */
 BOOL __stdcall Do_Seek_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring userobjname = vtparameters->at(1);
-        std::wstring pos = vtparameters->at(2);
+        std::string strobj = vtparameters->at(0);
+        std::string userobjname = vtparameters->at(1);
+        std::string pos = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
         if(ObjFile==type)
         {
@@ -582,8 +582,8 @@ BOOL __stdcall Do_Seek_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     }
     else if(vtparameters->size()==2)
     {
-        std::wstring userobjname = vtparameters->at(0);
-        std::wstring pos = vtparameters->at(1);
+        std::string userobjname = vtparameters->at(0);
+        std::string pos = vtparameters->at(1);
         ScpObject* fileobj =currentObjectSpace->FindObject(userobjname);
         if(fileobj)
         {
@@ -608,16 +608,16 @@ BOOL __stdcall Do_Seek_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     return TRUE;
 }
 /*
-¡°¸´ÖÆ¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÎÄ¼þ¡¢×Ö·û´®¡¢ÄÚ´æ¡¢Ä¿Â¼
+â€œå¤åˆ¶â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶ã€å­—ç¬¦ä¸²ã€å†…å­˜ã€ç›®å½•
 */
 BOOL __stdcall Do_Copy_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring name1 = vtparameters->at(0);
-        std::wstring name2 = vtparameters->at(1);
+        std::string name1 = vtparameters->at(0);
+        std::string name2 = vtparameters->at(1);
         StringStripQuote(name1);
         StringStripQuote(name2);
         ScpObject *obj1=currentObjectSpace->FindObject(name1);
@@ -668,9 +668,9 @@ BOOL __stdcall Do_Copy_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     }
     else if(vtparameters->size()==3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring name1 = vtparameters->at(1);
-        std::wstring name2 = vtparameters->at(2);
+        std::string strobj = vtparameters->at(0);
+        std::string name1 = vtparameters->at(1);
+        std::string name2 = vtparameters->at(2);
         StringStripQuote(name1);
         StringStripQuote(name2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
@@ -739,22 +739,22 @@ BOOL __stdcall Do_Copy_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
 }
 
 /*
-¡°Á¬½Ó¡±ÃüÁî
-²Ù×÷¶ÔÏó£º×Ö·û´®£¬ÍøÂçÁ¬½Ó
+â€œè¿žæŽ¥â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸²ï¼Œç½‘ç»œè¿žæŽ¥
 */
 BOOL __stdcall Do_Connect_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     /*
-    "Á¬½Ó"Ö¸Áî
-    Á¬½ÓÁ½¸ö×Ö·û´®
-    »òÍ¨¹ý"ÍøÂçÁ¬½Ó"¶ÔÏó£¬Á¬½Óµ½Ä³¸öIPµØÖ·
+    "è¿žæŽ¥"æŒ‡ä»¤
+    è¿žæŽ¥ä¸¤ä¸ªå­—ç¬¦ä¸²
+    æˆ–é€šè¿‡"ç½‘ç»œè¿žæŽ¥"å¯¹è±¡ï¼Œè¿žæŽ¥åˆ°æŸä¸ªIPåœ°å€
     */
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring strobjtype = vtparameters->at(0);
-        std::wstring str1 = vtparameters->at(1);
-        std::wstring str2 = vtparameters->at(2);
+        std::string strobjtype = vtparameters->at(0);
+        std::string str1 = vtparameters->at(1);
+        std::string str2 = vtparameters->at(2);
         StringStripQuote(str2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobjtype.c_str());
         if(ObjString==type)
@@ -785,8 +785,8 @@ BOOL __stdcall Do_Connect_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     }
     else if (vtparameters->size()==2)
     {
-        std::wstring strobj1 = vtparameters->at(0);
-        std::wstring strobj2 = vtparameters->at(1);
+        std::string strobj1 = vtparameters->at(0);
+        std::string strobj2 = vtparameters->at(1);
         ScpObject *obj1=currentObjectSpace->FindObject(strobj1);
         if(obj1)
         {
@@ -815,7 +815,7 @@ BOOL __stdcall Do_Connect_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     return TRUE;
 }
 /*
-¡°²¶»ñ¡±ÃüÁî
+â€œæ•èŽ·â€å‘½ä»¤
 */
 BOOL __stdcall Do_Capture_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
@@ -823,17 +823,17 @@ BOOL __stdcall Do_Capture_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     return TRUE;
 }
 /*
-¡°±È½Ï¡±ÃüÁî
-²Ù×÷¶ÔÏó£º×Ö·û´®¡¢ÄÚ´æ¡¢ÎÄ¼þ
+â€œæ¯”è¾ƒâ€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸²ã€å†…å­˜ã€æ–‡ä»¶
 */
 BOOL __stdcall Do_Compare_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring strobjtype = vtparameters->at(0);
-        std::wstring str1 = vtparameters->at(1);
-        std::wstring str2 = vtparameters->at(2);
+        std::string strobjtype = vtparameters->at(0);
+        std::string str1 = vtparameters->at(1);
+        std::string str2 = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobjtype.c_str());
         ScpIntObject * compare_ret = new ScpIntObject;
         compare_ret->value = 0;
@@ -899,8 +899,8 @@ BOOL __stdcall Do_Compare_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
 }
 
 /*
-¡°ÉêÇë¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÄÚ´æ
+â€œç”³è¯·â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå†…å­˜
 */
 BOOL  __stdcall Do_Acquire_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
@@ -908,9 +908,9 @@ BOOL  __stdcall Do_Acquire_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     if(vtparameters->size()==3)
     {
         int size = 0;
-        std::wstring memobj = vtparameters->at(0);
-        std::wstring memname = vtparameters->at(1);
-        std::wstring memsize = vtparameters->at(2);
+        std::string memobj = vtparameters->at(0);
+        std::string memname = vtparameters->at(1);
+        std::string memsize = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
         if(ObjMemory==type)
         {
@@ -943,16 +943,16 @@ BOOL  __stdcall Do_Acquire_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     return TRUE;
 }
 /*
-¡°ÊÍ·Å¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÄÚ´æ
+â€œé‡Šæ”¾â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå†…å­˜
 */
 BOOL  __stdcall Do_Release_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring memobj = vtparameters->at(0);
-        std::wstring memname = vtparameters->at(1);
+        std::string memobj = vtparameters->at(0);
+        std::string memname = vtparameters->at(1);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
         if(ObjMemory==type)
         {
@@ -972,7 +972,7 @@ BOOL  __stdcall Do_Release_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     }
     else if(vtparameters->size()==1)
     {
-        std::wstring memname = vtparameters->at(0);
+        std::string memname = vtparameters->at(0);
         ScpMemoryObject * mem=(ScpMemoryObject*)currentObjectSpace->FindObject(memname);
         if(mem)
         {
@@ -989,17 +989,17 @@ BOOL  __stdcall Do_Release_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     return  TRUE;
 }
 /*
-¡°Ð´Èë¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÄÚ´æ¡¢ÎÄ¼þ¡¢×¢²á±í¡¢¹ÜµÀ
+â€œå†™å…¥â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå†…å­˜ã€æ–‡ä»¶ã€æ³¨å†Œè¡¨ã€ç®¡é“
 */
 BOOL __stdcall Do_Write_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring memobj = vtparameters->at(0);
-        std::wstring name = vtparameters->at(1);
-        std::wstring objname = vtparameters->at(2);
+        std::string memobj = vtparameters->at(0);
+        std::string name = vtparameters->at(1);
+        std::string objname = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(memobj.c_str());
         if(ObjMemory==type)
         {
@@ -1043,8 +1043,8 @@ BOOL __stdcall Do_Write_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     }
     else if(vtparameters->size()==2)
     {
-        std::wstring name = vtparameters->at(0);
-        std::wstring objname = vtparameters->at(1);
+        std::string name = vtparameters->at(0);
+        std::string objname = vtparameters->at(1);
         ScpObject * obj = currentObjectSpace->FindObject(name);
         if(obj)
         {
@@ -1097,16 +1097,16 @@ BOOL __stdcall Do_Write_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     return TRUE;
 }
 /*
-¡°¶ÁÈ¡¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºµ±Ç°Ê±¼ä¡¢ÄÚ´æ¡¢ÎÄ¼þ¡¢¹ÜµÀ
+â€œè¯»å–â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå½“å‰æ—¶é—´ã€å†…å­˜ã€æ–‡ä»¶ã€ç®¡é“
 */
 BOOL __stdcall Do_Read_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring strtimeobj = vtparameters->at(0);
-        std::wstring timename = vtparameters->at(1);
+        std::string strtimeobj = vtparameters->at(0);
+        std::string timename = vtparameters->at(1);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strtimeobj.c_str());
         if(ObjCurrentTime==type)
         {
@@ -1119,8 +1119,8 @@ BOOL __stdcall Do_Read_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
         }
         else
         {
-            std::wstring name = vtparameters->at(0);
-            std::wstring objname = vtparameters->at(1);
+            std::string name = vtparameters->at(0);
+            std::string objname = vtparameters->at(1);
             ScpObject * obj = currentObjectSpace->FindObject(name);
             if(obj)
             {
@@ -1164,9 +1164,9 @@ BOOL __stdcall Do_Read_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     }
     else if(vtparameters->size()==3)
     {
-        std::wstring memobj = vtparameters->at(0);
-        std::wstring memname = vtparameters->at(1);
-        std::wstring objname = vtparameters->at(2);
+        std::string memobj = vtparameters->at(0);
+        std::string memname = vtparameters->at(1);
+        std::string objname = vtparameters->at(2);
         if (memobj == ScpObjectNames::GetSingleInsatnce()->strObjFileLine)
         {
             ScpFileObject *file = (ScpFileObject*)currentObjectSpace->FindObject(memname);
@@ -1226,8 +1226,8 @@ BOOL __stdcall Do_Read_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     return TRUE;
 }
 /*
-¡°¿ªÊ¼¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºº¯Êý¡¢Àà
+â€œå¼€å§‹â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå‡½æ•°ã€ç±»
 */
 BOOL __stdcall Do_Start_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
@@ -1235,18 +1235,18 @@ BOOL __stdcall Do_Start_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     return TRUE;
 }
 /*
-¡°È¡×Ó´®¡±ÃüÁî
-²Ù×÷¶ÔÏó£º×Ö·û´®
+â€œå–å­ä¸²â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸²
 */
 BOOL __stdcall Do_Getsubstring_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==4)
     {
-        std::wstring substrname= vtparameters->at(0);
-        std::wstring strobjname = vtparameters->at(1);
-        std::wstring strstart= vtparameters->at(2);
-        std::wstring strlength = vtparameters->at(3);
+        std::string substrname= vtparameters->at(0);
+        std::string strobjname = vtparameters->at(1);
+        std::string strstart= vtparameters->at(2);
+        std::string strlength = vtparameters->at(3);
         ScpStringObject *substrobj = (ScpStringObject *)currentObjectSpace->FindObject(substrname);
         if(!substrobj)
         {
@@ -1295,16 +1295,16 @@ BOOL __stdcall Do_Getsubstring_Command(VTPARAMETERS * vtparameters,CScriptEngine
 
 }
 /*
-¡°²åÈë¡±ÃüÁî
-²Ù×÷¶ÔÏó£º±í¶ÔÏó¡¢×Ö·û´®
+â€œæ’å…¥â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šè¡¨å¯¹è±¡ã€å­—ç¬¦ä¸²
 */
 BOOL __stdcall Do_Insert_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring name= vtparameters->at(0);
-        std::wstring elementname = vtparameters->at(1);
+        std::string name= vtparameters->at(0);
+        std::string elementname = vtparameters->at(1);
         ScpObject * obj = (ScpObject * )currentObjectSpace->FindObject(name);
         if(obj)
         {
@@ -1316,12 +1316,12 @@ BOOL __stdcall Do_Insert_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
     }
     else if(vtparameters->size()==3)
     {
-        std::wstring objname= vtparameters->at(0);
+        std::string objname= vtparameters->at(0);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objname.c_str());
         if(ObjTable==type)
         {
-            std::wstring name = vtparameters->at(1);
-            std::wstring elementname = vtparameters->at(2);
+            std::string name = vtparameters->at(1);
+            std::string elementname = vtparameters->at(2);
             ScpTableObject * tableobj = (ScpTableObject * )currentObjectSpace->FindObject(name);
             if(tableobj)
             {
@@ -1333,9 +1333,9 @@ BOOL __stdcall Do_Insert_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
         }
         else
         {
-            std::wstring name = vtparameters->at(0);
-            std::wstring substrname = vtparameters->at(1);
-            std::wstring posname = vtparameters->at(2);
+            std::string name = vtparameters->at(0);
+            std::string substrname = vtparameters->at(1);
+            std::string posname = vtparameters->at(2);
             ScpStringObject * strobj = (ScpStringObject * )currentObjectSpace->FindObject(name);
             if(strobj)
             {
@@ -1361,10 +1361,10 @@ BOOL __stdcall Do_Insert_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
     }
     else if (vtparameters->size()==4)
     {
-        std::wstring objname= vtparameters->at(0);
-        std::wstring name = vtparameters->at(1);
-        std::wstring substrname = vtparameters->at(2);
-        std::wstring posname = vtparameters->at(3);
+        std::string objname= vtparameters->at(0);
+        std::string name = vtparameters->at(1);
+        std::string substrname = vtparameters->at(2);
+        std::string posname = vtparameters->at(3);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objname.c_str());
         if(ObjString==type)
         {
@@ -1393,18 +1393,18 @@ BOOL __stdcall Do_Insert_Command(VTPARAMETERS * vtparameters,CScriptEngine * eng
     return TRUE;
 }
 /*
-¡°Æ¥Åä¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÕýÔò±í´ïÊ½¶ÔÏó
+â€œåŒ¹é…â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ­£åˆ™è¡¨è¾¾å¼å¯¹è±¡
 */
 BOOL __stdcall Do_Match_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()>=3)
     {
-        std::wstring objname= vtparameters->at(0);
-        std::wstring name = vtparameters->at(1);
-        std::wstring text = vtparameters->at(2);
-        std::wstring posname ;
+        std::string objname= vtparameters->at(0);
+        std::string name = vtparameters->at(1);
+        std::string text = vtparameters->at(2);
+        std::string posname ;
         ScpIntObject* intobj = NULL;
         if(vtparameters->size()==4)
         {
@@ -1449,17 +1449,17 @@ BOOL __stdcall Do_Match_Command(VTPARAMETERS * vtparameters,CScriptEngine * engi
     return TRUE;
 }
 /*
-¡°²éÕÒ¡±ÃüÁî
-²Ù×÷¶ÔÏó£º×Ö·û´® Ä¿Â¼
+â€œæŸ¥æ‰¾â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸² ç›®å½•
 */
 BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring objname = vtparameters->at(0);
-        std::wstring strobjname = vtparameters->at(1);
-        std::wstring substrname= vtparameters->at(2);
+        std::string objname = vtparameters->at(0);
+        std::string strobjname = vtparameters->at(1);
+        std::string substrname= vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objname.c_str());
         if(ObjString==type)
         {
@@ -1471,7 +1471,7 @@ BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
                     ScpStringObject *subobj=(ScpStringObject *)currentObjectSpace->FindObject(substrname);
                     ScpIntObject * findret = new ScpIntObject;
 
-                    if(obj->content.find(subobj->content)!=std::wstring::npos)
+                    if(obj->content.find(subobj->content)!=std::string::npos)
                     {
                         findret->value = 1;
                     }
@@ -1485,10 +1485,10 @@ BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     }
     else if(vtparameters->size()==4)
     {
-        std::wstring objname = vtparameters->at(0);
-        std::wstring strobjname = vtparameters->at(1);
-        std::wstring substrname= vtparameters->at(2);
-        std::wstring posname = vtparameters->at(3);
+        std::string objname = vtparameters->at(0);
+        std::string strobjname = vtparameters->at(1);
+        std::string substrname= vtparameters->at(2);
+        std::string posname = vtparameters->at(3);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objname.c_str());
         if(ObjString==type)
         {
@@ -1502,7 +1502,7 @@ BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
                     {
                         ScpIntObject *intobj=(ScpIntObject *)currentObjectSpace->FindObject(posname);
                         size_t pos =obj->content.find(subobj->content);
-                        if(pos!=std::wstring::npos)
+                        if(pos!=std::string::npos)
                         {
                             intobj->value=pos;
                         }
@@ -1549,18 +1549,18 @@ BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     return TRUE;
 }
 /*
-¡°Ìæ»»¡±ÃüÁî
-²Ù×÷¶ÔÏó£º×Ö·û´®
+â€œæ›¿æ¢â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸²
 */
 BOOL __stdcall Do_Replace_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==4)
     {
-        std::wstring objname = vtparameters->at(0);
-        std::wstring strobjname = vtparameters->at(1);
-        std::wstring substrname= vtparameters->at(2);
-        std::wstring substrname2= vtparameters->at(3);
+        std::string objname = vtparameters->at(0);
+        std::string strobjname = vtparameters->at(1);
+        std::string substrname= vtparameters->at(2);
+        std::string substrname2= vtparameters->at(3);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objname.c_str());
         if(ObjString==type)
         {
@@ -1577,7 +1577,7 @@ BOOL __stdcall Do_Replace_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
                     ScpIntObject * replaceret = new ScpIntObject;
 
                     size_t pos =obj->content.find(subobj->content);
-                    if(pos!=std::wstring::npos)
+                    if(pos!=std::string::npos)
                     {
                         obj->content.replace(pos,substrname2.length(),substrname2);
                         replaceret->value= 1;
@@ -1593,8 +1593,8 @@ BOOL __stdcall Do_Replace_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     return TRUE;
 }
 /*
-¡°ÒÆ¶¯¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÎÄ¼þ¡¢Ä¿Â¼¡¢×Ö·û´®
+â€œç§»åŠ¨â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶ã€ç›®å½•ã€å­—ç¬¦ä¸²
 */
 BOOL __stdcall Do_Move_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
@@ -1602,9 +1602,9 @@ BOOL __stdcall Do_Move_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring name1 = vtparameters->at(1);
-        std::wstring name2 = vtparameters->at(2);
+        std::string strobj = vtparameters->at(0);
+        std::string name1 = vtparameters->at(1);
+        std::string name2 = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
         if(ObjFile==type)
         {
@@ -1641,17 +1641,17 @@ BOOL __stdcall Do_Move_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     return bRet;
 }
 /*
-¡°È¡´óÐ¡¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÎÄ¼þ¡¢×Ö·û´®¡¢±í¶ÔÏó¡¢ÄÚ´æ
+â€œå–å¤§å°â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶ã€å­—ç¬¦ä¸²ã€è¡¨å¯¹è±¡ã€å†…å­˜
 */
 BOOL __stdcall Do_Getsize_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring name1 = vtparameters->at(1);
-        std::wstring name2 = vtparameters->at(2);
+        std::string strobj = vtparameters->at(0);
+        std::string name1 = vtparameters->at(1);
+        std::string name2 = vtparameters->at(2);
         StringStripQuote(name1);
         StringStripQuote(name2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
@@ -1730,8 +1730,8 @@ BOOL __stdcall Do_Getsize_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     }
     else if(vtparameters->size()==2)
     {
-        std::wstring name1 = vtparameters->at(0);
-        std::wstring name2 = vtparameters->at(1);
+        std::string name1 = vtparameters->at(0);
+        std::string name2 = vtparameters->at(1);
         ScpObject * obj=(ScpObject*)currentObjectSpace->FindObject(name1);
         ScpIntObject * intobj =(ScpIntObject *)currentObjectSpace->FindObject(name2);
         if(obj && intobj)
@@ -1776,16 +1776,16 @@ BOOL __stdcall Do_Getsize_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     return TRUE;
 }
 /*
-¡°Ã¶¾Ù¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºÄ¿Â¼¡¢½ø³Ì
+â€œæžšä¸¾â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šç›®å½•ã€è¿›ç¨‹
 */
 BOOL __stdcall Do_Enum_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring name1 = vtparameters->at(1);
+        std::string strobj = vtparameters->at(0);
+        std::string name1 = vtparameters->at(1);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
         if(ObjFile==type)
         {
@@ -1806,9 +1806,9 @@ BOOL __stdcall Do_Enum_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     }
     else if(vtparameters->size()==3)
     {
-        std::wstring strobj = vtparameters->at(0);
-        std::wstring name1 = vtparameters->at(1);
-        std::wstring name2 = vtparameters->at(2);
+        std::string strobj = vtparameters->at(0);
+        std::string name1 = vtparameters->at(1);
+        std::string name2 = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
         if(ObjFile==type)
         {
@@ -1840,16 +1840,16 @@ BOOL __stdcall Do_Enum_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
     return TRUE;
 }
 /*
-¡°Éú³É¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºËæ»úÊý
+â€œç”Ÿæˆâ€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šéšæœºæ•°
 */
 BOOL __stdcall Do_Generate_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring randobj = vtparameters->at(0);
-        std::wstring name1 = vtparameters->at(1);
+        std::string randobj = vtparameters->at(0);
+        std::string name1 = vtparameters->at(1);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(randobj.c_str());
         if(ObjRandomNumber==type)
         {
@@ -1865,9 +1865,9 @@ BOOL __stdcall Do_Generate_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     }
     else if(vtparameters->size()==3)
     {
-        std::wstring randobj = vtparameters->at(0);
-        std::wstring tableobjname = vtparameters->at(1);
-        std::wstring randcount = vtparameters->at(2);
+        std::string randobj = vtparameters->at(0);
+        std::string tableobjname = vtparameters->at(1);
+        std::string randcount = vtparameters->at(2);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(randobj.c_str());
         if(ObjRandomNumber==type)
         {
@@ -1892,8 +1892,8 @@ BOOL __stdcall Do_Generate_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
                     ScpIntObject last;
                     for(int i=0; i<count; i++)
                     {
-                        std::wstring temp = tableobjname;
-                        temp+=STDSTRINGEXT::Format(L"%s%d",randobj.c_str(),i);
+                        std::string temp = tableobjname;
+                        temp+=STDSTRINGEXT::Format("%s%d",randobj.c_str(),i);
                         ScpRandomNumberObject * randomobj=new ScpRandomNumberObject;
                         randomobj->SetValue(randomobj->Refresh(last));
                         last=randomobj->GetValue();
@@ -1908,15 +1908,15 @@ BOOL __stdcall Do_Generate_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
     return TRUE;
 }
 /*
-¡°Ë¢ÐÂ¡±ÃüÁî
-²Ù×÷¶ÔÏó£ºËæ»úÊý
+â€œåˆ·æ–°â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šéšæœºæ•°
 */
 BOOL __stdcall Do_Refresh_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==1)
     {
-        std::wstring randomobj_name = vtparameters->at(0);
+        std::string randomobj_name = vtparameters->at(0);
         ScpRandomNumberObject * randomobj=(ScpRandomNumberObject * )currentObjectSpace->FindObject(randomobj_name);
         if(randomobj)
         {
@@ -1936,8 +1936,8 @@ BOOL __stdcall Do_Refresh_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     }
     else if(vtparameters->size()==2)
     {
-        std::wstring objtypename = vtparameters->at(0);
-        std::wstring randomobj_name = vtparameters->at(1);
+        std::string objtypename = vtparameters->at(0);
+        std::string randomobj_name = vtparameters->at(1);
         ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objtypename.c_str());
         if(ObjRandomNumber==type)
         {
@@ -1962,17 +1962,17 @@ BOOL __stdcall Do_Refresh_Command(VTPARAMETERS * vtparameters,CScriptEngine * en
     return TRUE;
 }
 /*
-¡°È¡ÔªËØ¡±ÃüÁî
-²Ù×÷¶ÔÏó£º±í¶ÔÏó
+â€œå–å…ƒç´ â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šè¡¨å¯¹è±¡
 */
 BOOL __stdcall  Do_Getelement_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==3)
     {
-        std::wstring tablename = vtparameters->at(0);
-        std::wstring element=vtparameters->at(1);
-        std::wstring indexstr=vtparameters->at(2);
+        std::string tablename = vtparameters->at(0);
+        std::string element=vtparameters->at(1);
+        std::string indexstr=vtparameters->at(2);
         int index=0;
         ScpTableObject * tableobj=(ScpTableObject*)currentObjectSpace->FindObject(tablename);
         if(tableobj)
@@ -2001,16 +2001,16 @@ BOOL __stdcall  Do_Getelement_Command(VTPARAMETERS * vtparameters,CScriptEngine 
     return TRUE;
 }
 /*
-¡°±éÀú¡±ÃüÁî
-²Ù×÷¶ÔÏó£º±í¶ÔÏó ÁÐ±í¶ÔÏó
+â€œéåŽ†â€å‘½ä»¤
+æ“ä½œå¯¹è±¡ï¼šè¡¨å¯¹è±¡ åˆ—è¡¨å¯¹è±¡
 */
 BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 {
     ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
     if(vtparameters->size()==2)
     {
-        std::wstring tablename = vtparameters->at(0);
-        std::wstring funcname=vtparameters->at(1);
+        std::string tablename = vtparameters->at(0);
+        std::string funcname=vtparameters->at(1);
         ScpObject *obj = currentObjectSpace->FindObject(tablename);
         if(obj &&obj->GetType() ==ObjTable )
         {
@@ -2019,10 +2019,10 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
             if(func && (func->FormalParameters.size()==1))
             {
                 BOOL Clone = FALSE;
-                std::wstring OldName;
+                std::string OldName;
                 if (currentObjectSpace->IsMyParentSpace(func->FunctionObjectSpace) || currentObjectSpace == func->FunctionObjectSpace)
                 {
-                    //	//ËµÃ÷ÊÇµÝ¹éµÄº¯Êýµ÷ÓÃ
+                    //	//è¯´æ˜Žæ˜¯é€’å½’çš„å‡½æ•°è°ƒç”¨
                     Clone = TRUE;
                 }
 
@@ -2034,7 +2034,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
                     if(elementobj)
                     {
 
-                        std::wstring elementname =currentObjectSpace->userobject.GetObjectName(elementobj);
+                        std::string elementname =currentObjectSpace->userobject.GetObjectName(elementobj);
                         ScpObjectSpace * OldObjectSpace = NULL;
                         VTPARAMETERS OldRealParameters;
                         if (Clone)
@@ -2075,10 +2075,10 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
             if (func && (func->FormalParameters.size() == 1))
             {
                 BOOL Clone = FALSE;
-                std::wstring OldName;
+                std::string OldName;
                 if (currentObjectSpace->IsMyParentSpace(func->FunctionObjectSpace) || currentObjectSpace == func->FunctionObjectSpace)
                 {
-                    //	//ËµÃ÷ÊÇµÝ¹éµÄº¯Êýµ÷ÓÃ
+                    //	//è¯´æ˜Žæ˜¯é€’å½’çš„å‡½æ•°è°ƒç”¨
                     Clone = TRUE;
                 }
 
@@ -2090,7 +2090,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						if (elementobj)
 						{
 
-							std::wstring elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
+							std::string elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
 							ScpObjectSpace * OldObjectSpace = NULL;
 							VTPARAMETERS OldRealParameters;
 							if (Clone)
@@ -2129,10 +2129,10 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 			if (func && (func->FormalParameters.size() == 1))
 			{
 				BOOL Clone = FALSE;
-				std::wstring OldName;
+				std::string OldName;
 				if (currentObjectSpace->IsMyParentSpace(func->FunctionObjectSpace) || currentObjectSpace == func->FunctionObjectSpace)
 				{
-					//	//ËµÃ÷ÊÇµÝ¹éµÄº¯Êýµ÷ÓÃ		
+					//	//è¯´æ˜Žæ˜¯é€’å½’çš„å‡½æ•°è°ƒç”¨		
 					Clone = TRUE;
 				}
 
@@ -2144,8 +2144,8 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 					if (elementobj)
 					{
 
-						std::wstring elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
-						elementname = L"element"+currentObjectSpace->GetNewTempObjectName();						
+						std::string elementname = currentObjectSpace->userobject.GetObjectName(elementobj);
+						elementname = "element"+currentObjectSpace->GetNewTempObjectName();						
 						currentObjectSpace->AddObject(elementname, elementobj);
 						ScpObjectSpace * OldObjectSpace = NULL;
 						VTPARAMETERS OldRealParameters;
@@ -2183,7 +2183,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return TRUE;
 	}
 	/*
-	¡°ÅÅÐò¡±ÃüÁî
+	â€œæŽ’åºâ€å‘½ä»¤
 	*/
 	BOOL  __stdcall Do_Sort_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
@@ -2191,17 +2191,17 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return TRUE;
 	}
 	/*
-	¡°¸ñÊ½»¯¡±ÃüÁî
-	²Ù×÷¶ÔÏó£º×Ö·û´®
+	â€œæ ¼å¼åŒ–â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸²
 	*/
 	BOOL  __stdcall Do_Format_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if(vtparameters->size()>=2)
 		{
-			std::wstring str = vtparameters->at(0);				
-			std::wstring name1= vtparameters->at(1);
-			std::wstring wstrForm;
+			std::string str = vtparameters->at(0);				
+			std::string name1= vtparameters->at(1);
+			std::string wstrForm;
 			if(vtparameters->size()>=3)
 			 wstrForm = vtparameters->at(2);
 			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(str.c_str());
@@ -2218,7 +2218,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 							ScpObject * obj = (ScpObject*)currentObjectSpace->FindObject(vtparameters->at(i));
 							if(obj)
 							{				
-								std::wstring temp = obj->ToString();
+								std::string temp = obj->ToString();
 								param.push_back(temp);						
 							}
 							else
@@ -2243,7 +2243,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 							ScpObject * obj = (ScpObject*)currentObjectSpace->FindObject(vtparameters->at(i));
 							if(obj)
 							{				
-								std::wstring temp = obj->ToString();
+								std::string temp = obj->ToString();
 								param.push_back(temp);						
 							}
 							else
@@ -2260,17 +2260,17 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return TRUE;
 	}
 	/*
-	¡°»ñÈ¡¡±ÃüÁî
-	²Ù×÷¶ÔÏó£º
+	â€œèŽ·å–â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼š
 	*/
 	BOOL __stdcall Do_Get_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	 	if(vtparameters->size()==3)
 		{
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
-			std::wstring objname3= vtparameters->at(2);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
+			std::string objname3= vtparameters->at(2);
 			if(objname1==ScpObjectNames::GetSingleInsatnce()->strObjType)
 			{
 				ScpStringObject * obj= (ScpStringObject*)currentObjectSpace->FindObject(objname3);
@@ -2325,9 +2325,9 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 				{		
 					char Value[2048];
 	#ifdef _WIN32	
-					GetEnvironmentVariableA(STDSTRINGEXT::WToA(objname2).c_str(),Value,2048);
+					GetEnvironmentVariableA(objname2.c_str(),Value,2048);
 	#endif
-					obj2->content=STDSTRINGEXT::AToW(Value);
+					obj2->content=Value;
 				}
 			}		
 			else 
@@ -2342,12 +2342,12 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						if(obj2 && obj2->GetType()==ObjString)
 						{	
 	
-								wchar_t Drv[MAX_PATH];
-								wchar_t Dir[MAX_PATH];
-								wchar_t Name[MAX_PATH];
-								wchar_t Ext[MAX_PATH];
+								char Drv[MAX_PATH];
+								char Dir[MAX_PATH];
+								char Name[MAX_PATH];
+								char Ext[MAX_PATH];
 	#ifdef _WIN32
-								_wsplitpath_s(fileobj->filename.c_str(),Drv,MAX_PATH,Dir,MAX_PATH,Name,MAX_PATH,Ext,MAX_PATH);
+								_splitpath_s(fileobj->filename.c_str(),Drv,MAX_PATH,Dir,MAX_PATH,Name,MAX_PATH,Ext,MAX_PATH);
 	#endif
 								if(objname2== str_CN_ObjDrive|| objname2 == str_EN_ObjDrive)
 								{
@@ -2406,12 +2406,12 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						{	
 							if(obj2->GetType()==ObjString)
 							{
-								wchar_t Drv[MAX_PATH];
-								wchar_t Dir[MAX_PATH];
-								wchar_t Name[MAX_PATH];
-								wchar_t Ext[MAX_PATH];
+								char Drv[MAX_PATH];
+								char Dir[MAX_PATH];
+								char Name[MAX_PATH];
+								char Ext[MAX_PATH];
 	#ifdef _WIN32
-								_wsplitpath_s(stringobj->content.c_str(),Drv,MAX_PATH,Dir,MAX_PATH,Name,MAX_PATH,Ext,MAX_PATH);
+								_splitpath_s(stringobj->content.c_str(),Drv,MAX_PATH,Dir,MAX_PATH,Name,MAX_PATH,Ext,MAX_PATH);
 	#endif
 								if(objname2== str_EN_ObjDrive|| objname2 == str_CN_ObjDrive)
 								{
@@ -2463,16 +2463,16 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		}
 		else if(vtparameters->size()==2)
 		{	
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
 			if(objname1 == ScpObjectNames::GetSingleInsatnce()->strObjCurrentDirectory)
 			{
 				ScpObject * obj= currentObjectSpace->FindObject(objname2);
 				if(obj && obj->GetType()==ObjString)
 				{
-					wchar_t CurrDir[MAX_PATH]={0};
+					char CurrDir[MAX_PATH]={0};
 	#ifdef _WIN32
-					GetCurrentDirectoryW(MAX_PATH,CurrDir);
+					GetCurrentDirectoryA(MAX_PATH,CurrDir);
 	#else
 	
 	#endif
@@ -2482,10 +2482,10 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		}
 		else if(vtparameters->size()==4)
 		{
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
-			std::wstring objname3= vtparameters->at(2);
-			std::wstring objname4= vtparameters->at(3);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
+			std::string objname3= vtparameters->at(2);
+			std::string objname4= vtparameters->at(3);
 			ScpObject * obj=(ScpObject*)currentObjectSpace->FindObject(objname1);
 			if(obj)			
 			{	
@@ -2517,8 +2517,8 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return TRUE;
 	}
 	/*
-	¡°ÉèÖÃ¡±ÃüÁî
-	²Ù×÷¶ÔÏó£º
+	â€œè®¾ç½®â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼š
 	*/
 	BOOL __stdcall Do_Set_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
@@ -2526,9 +2526,9 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		BOOL ret = FALSE;
 		if(vtparameters->size()==3)
 		{
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
-			std::wstring objname3= vtparameters->at(2);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
+			std::string objname3= vtparameters->at(2);
 			if(objname1== str_CN_ObjAttribute||
 				objname1 == str_EN_ObjAttribute)
 			{		
@@ -2553,19 +2553,19 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 				if(obj2)
 				{	
 	#ifdef _WIN32
-					SetEnvironmentVariableW(objname2.c_str(),(wchar_t *)obj2->content.c_str());
+					SetEnvironmentVariableA(objname2.c_str(),(char *)obj2->content.c_str());
 	#endif	
 				}
 			}		
 		}
 		else if(vtparameters->size()==2)
 		{	
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
 			if(objname1 == ScpObjectNames::GetSingleInsatnce()->strObjCurrentDirectory)
 			{
 				ScpObject * obj= currentObjectSpace->FindObject(objname2);
-				std::wstring curdir;
+				std::string curdir;
 				if(obj && obj->GetType()==ObjString)
 				{
 					curdir = ((ScpStringObject*)obj)->content;				
@@ -2575,7 +2575,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 					curdir = objname2;
 				}
 	#ifdef _WIN32
-				SetCurrentDirectoryW(curdir.c_str());
+				SetCurrentDirectoryA(curdir.c_str());
 	#else
 	
 	#endif
@@ -2583,10 +2583,10 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		}	
 		else if(vtparameters->size()==4)
 		{
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
-			std::wstring objname3= vtparameters->at(2);
-			std::wstring objname4= vtparameters->at(3);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
+			std::string objname3= vtparameters->at(2);
+			std::string objname4= vtparameters->at(3);
 			ScpObject * obj = (ScpObject *)currentObjectSpace->FindObject(objname1);
 			if (obj && obj->GetType()==ObjJson)
 			{
@@ -2614,16 +2614,16 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return ret;
 	}
 	/*
-	¡°×ª»»¡±ÃüÁî
-	²Ù×÷¶ÔÏó£º
+	â€œè½¬æ¢â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼š
 	*/
 	BOOL __stdcall Do_Transform_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if(vtparameters->size()==2)
 		{
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring transtype= vtparameters->at(1);
+			std::string objname1 = vtparameters->at(0);				
+			std::string transtype= vtparameters->at(1);
 			ScpObject * obj1=(ScpObject*)currentObjectSpace->FindObject(objname1);
 			if (obj1)
 			{
@@ -2666,7 +2666,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						}
 						else
 						{
-							std::wstring ErrorMessage=STDSTRINGEXT::Format(L"%s %s",((ScpStringObject*)obj2)->content.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorNotInt.c_str());
+							std::string ErrorMessage=STDSTRINGEXT::Format("%s %s",((ScpStringObject*)obj2)->content.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorNotInt);
 							engine->PrintError(ErrorMessage);
 						}
 					}				
@@ -2686,7 +2686,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						}
 						else
 						{
-							std::wstring ErrorMessage=STDSTRINGEXT::Format(L"%s %s",((ScpStringObject*)obj2)->content.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorNotNumber.c_str());
+							std::string ErrorMessage=STDSTRINGEXT::Format("%s %s",((ScpStringObject*)obj2)->content.c_str(),ScpObjectNames::GetSingleInsatnce()->scpErrorNotNumber);
 							engine->PrintError(ErrorMessage);
 						}
 					}				
@@ -2696,17 +2696,17 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return TRUE;
 	}
 	/*
-	¡°·Ö¸î¡±ÃüÁî
-	²Ù×÷¶ÔÏó£º×Ö·û´®
+	â€œåˆ†å‰²â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼šå­—ç¬¦ä¸²
 	*/
 	BOOL __stdcall Do_Split_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if(vtparameters->size()==3)
 		{
-			std::wstring objname1 = vtparameters->at(0);				
-			std::wstring objname2= vtparameters->at(1);
-			std::wstring objname3= vtparameters->at(2);
+			std::string objname1 = vtparameters->at(0);				
+			std::string objname2= vtparameters->at(1);
+			std::string objname3= vtparameters->at(2);
 			ScpStringObject * strobj1=(ScpStringObject*)currentObjectSpace->FindObject(objname1);
 			if (strobj1)
 			{
@@ -2721,9 +2721,9 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 					{
 						tableobj = new ScpTableObject;
 						size_t pos = objname1.find(objname2);
-						while(pos!=std::wstring::npos)
+						while(pos!=std::string::npos)
 						{
-							std::wstring temp = objname1.substr(0,pos);
+							std::string temp = objname1.substr(0,pos);
 							ScpStringObject *  tempstrobj = new ScpStringObject;
 							tempstrobj->content = temp;
 							currentObjectSpace->AddObject(temp,tempstrobj);
@@ -2733,7 +2733,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						}
 						if(!objname1.empty())
 						{
-							std::wstring temp = objname1;
+							std::string temp = objname1;
 							ScpStringObject *  tempstrobj = new ScpStringObject;
 							tempstrobj->content = temp;
 							currentObjectSpace->AddObject(temp,tempstrobj);
@@ -2746,10 +2746,10 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		}
 		else if(vtparameters->size()==4)
 		{
-			std::wstring objnametype = vtparameters->at(0);				
-			std::wstring objname1= vtparameters->at(1);
-			std::wstring objname2= vtparameters->at(2);
-			std::wstring objname3= vtparameters->at(3);
+			std::string objnametype = vtparameters->at(0);				
+			std::string objname1= vtparameters->at(1);
+			std::string objname2= vtparameters->at(2);
+			std::string objname3= vtparameters->at(3);
 			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objnametype.c_str());
 			if (ObjString == type)
 			{
@@ -2767,9 +2767,9 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 						{
 							tableobj = new ScpTableObject;
 							size_t pos = objname1.find(objname2);
-							while(pos!=std::wstring::npos)
+							while(pos!=std::string::npos)
 							{
-								std::wstring temp = objname1.substr(0,pos);
+								std::string temp = objname1.substr(0,pos);
 								ScpStringObject *  tempstrobj = new ScpStringObject;
 								tempstrobj->content = temp;
 								currentObjectSpace->AddObject(temp,tempstrobj);
@@ -2779,7 +2779,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 							}
 							if(!objname1.empty())
 							{
-								std::wstring temp = objname1;
+								std::string temp = objname1;
 								ScpStringObject *  tempstrobj = new ScpStringObject;
 								tempstrobj->content = temp;
 								currentObjectSpace->AddObject(temp,tempstrobj);
@@ -2794,23 +2794,23 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		return TRUE;
 	}
 	/*
-	¡°Ñ¹Èë¡±ÃüÁî
-	²Ù×÷¶ÔÏó£º
+	â€œåŽ‹å…¥â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼š
 	*/
 	BOOL __stdcall Do_Push_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
 		return TRUE;
 	}
 	/*
-	"´òÓ¡¡±ÃüÁî
-	²Ù×÷¶ÔÏó£ºÎÄ¼þ
+	"æ‰“å°â€å‘½ä»¤
+	æ“ä½œå¯¹è±¡ï¼šæ–‡ä»¶
 	*/
 	BOOL __stdcall Do_Print_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if(vtparameters->size()==1)
 		{
-			std::wstring objname = vtparameters->at(0);
+			std::string objname = vtparameters->at(0);
 			ScpObject * obj = currentObjectSpace->FindObject(objname);
 			if(obj)
 			{
@@ -2830,9 +2830,9 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if(vtparameters->size()==2)
 		{
-			std::wstring objtype = vtparameters->at(0);
-			std::wstring objname = vtparameters->at(1);
-			std::wstring wsdir;
+			std::string objtype = vtparameters->at(0);
+			std::string objname = vtparameters->at(1);
+			std::string wsdir;
 			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(objtype.c_str());
 			if(type==ObjDirectory)
 			{		
@@ -2850,7 +2850,7 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 					wsdir = objname;
 				}
 	#ifdef _WIN32
-						bRet = CreateDirectoryW(wsdir.c_str(),NULL);
+						bRet = CreateDirectoryA(wsdir.c_str(),NULL);
 						dwError = GetLastError();
 	#else
 	
@@ -2866,17 +2866,17 @@ BOOL __stdcall Do_Traverse_Command(VTPARAMETERS * vtparameters,CScriptEngine * e
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 		if(vtparameters->size()==1)
 		{
-			std::wstring wsobjectname=vtparameters->at(0);
+			std::string wsobjectname=vtparameters->at(0);
 			ScpObject * obj = currentObjectSpace->FindObject(wsobjectname);
 			if(obj && obj->GetType()==ObjFile)
 			{
-				((ScpFileObject *)obj)->Save(L"");
+				((ScpFileObject *)obj)->Save("");
 			}
 		}
 		else if(vtparameters->size()==2)
 		{
-			std::wstring wsobjectname=vtparameters->at(0);
-			std::wstring wsobjectname1=vtparameters->at(1);
+			std::string wsobjectname=vtparameters->at(0);
+			std::string wsobjectname1=vtparameters->at(1);
 			ScpObject * obj = currentObjectSpace->FindObject(wsobjectname);
 			if(obj && obj->GetType()==ObjFile)
 			{

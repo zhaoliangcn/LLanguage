@@ -1,7 +1,7 @@
 #include "ScpLex.h"
 #include "ScpScriptLex.h"
 #include "../Common/stdstringext.hpp"
-ScpLex::ScpLex(std::wstring commandstring):startpos(0),Expression(commandstring)
+ScpLex::ScpLex(std::string commandstring):startpos(0),Expression(commandstring)
 {
 	STDSTRINGEXT::trim(Expression);
 }
@@ -10,18 +10,25 @@ ScpLex::~ScpLex(void)
 {
 
 }
-std::wstring ScpLex::GetNextToken()
+std::string ScpLex::GetNextToken()
 {
 	if(startpos>=Expression.length())
 	{
 		return scpEndofExpression;		
 	}	
-	std::wstring LeftExp=Expression.substr(startpos,1);
-	while(iswspace(*LeftExp.begin()))
+	std::string LeftExp=Expression.substr(startpos,1);
+	const char* pstr = LeftExp.data();
+	while (isspace(*pstr))
 	{
-		startpos+=1;
-		LeftExp=Expression.substr(startpos,1);
+		startpos += 1;
+		pstr += 1;		
 	}
+	LeftExp = Expression.substr(startpos, 1);
+	//while(iswspace(*LeftExp.begin()))
+	//{
+	//	startpos+=1;
+	//	LeftExp=Expression.substr(startpos,1);
+	//}
 	int pos =0;
 	if(LeftExp==scpLeftParentheses)
 	{
@@ -36,7 +43,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationAdd)
 	{		
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -50,7 +57,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationSubtraction)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -58,8 +65,8 @@ std::wstring ScpLex::GetNextToken()
 		}
 		else 
 		{
-			//Ô­À´ÊÇ¿¼ÂÇÅĞ¶ÏÊÇ·ñÊÇ¸ººÅ
-			//ÒòÎªÈç¹ûÃ»ÓĞ×ó±ßµÄ±í´ïÊ½£¬ÄÇËü¾ÍÊÇÒ»¸ö¸ºÖµ£¬¶ø²»ÊÇ½øĞĞ¼õ·¨²Ù×÷
+			//åŸæ¥æ˜¯è€ƒè™‘åˆ¤æ–­æ˜¯å¦æ˜¯è´Ÿå·
+			//å› ä¸ºå¦‚æœæ²¡æœ‰å·¦è¾¹çš„è¡¨è¾¾å¼ï¼Œé‚£å®ƒå°±æ˜¯ä¸€ä¸ªè´Ÿå€¼ï¼Œè€Œä¸æ˜¯è¿›è¡Œå‡æ³•æ“ä½œ
 			//if(objstack.size()!=0)
 				return scpOperationSubtraction;
 		}
@@ -67,7 +74,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationMultiplication)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -81,7 +88,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationDivision)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -95,7 +102,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationMod)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -109,7 +116,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationAssign)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -123,7 +130,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationLessthan)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -142,7 +149,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp==scpOperationBigthan)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -161,7 +168,7 @@ std::wstring ScpLex::GetNextToken()
 	else if (LeftExp == scpOperationNot)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationAssign)
 		{
 			startpos ++;
@@ -175,7 +182,7 @@ std::wstring ScpLex::GetNextToken()
 	else if(LeftExp ==scpOperationBitAnd)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationBitAnd)
 		{
 			startpos ++;
@@ -189,7 +196,7 @@ std::wstring ScpLex::GetNextToken()
 	else if(LeftExp ==scpOperationBitOr)
 	{
 		startpos ++;
-		std::wstring token = Expression.substr(startpos,1);
+		std::string token = Expression.substr(startpos,1);
 		if(token==scpOperationBitOr)
 		{
 			startpos ++;
@@ -215,7 +222,7 @@ std::wstring ScpLex::GetNextToken()
 		if (LeftExp==scpOperationSubtraction)
 			pos--;
 		int endpos = startpos;
-		std::wstring::iterator it = Expression.begin();
+		std::string::iterator it = Expression.begin();
 		it+=startpos;
 		while((it!=Expression.end())
 			&&(*it!=scpOperationAdd[0])
@@ -238,19 +245,19 @@ std::wstring ScpLex::GetNextToken()
 			it++;
 		}
 		startpos = endpos;
-		std::wstring temp = Expression.substr(pos,endpos-pos);
+		std::string temp = Expression.substr(pos,endpos-pos);
 		return STDSTRINGEXT::trim(temp);
 	}
 }
-std::wstring ScpLex::GetLastToken()
+std::string ScpLex::GetLastToken()
 {
 	return last;
 }
-std::wstring ScpLex::GetCurrentToken()
+std::string ScpLex::GetCurrentToken()
 {
 	return current;
 }
-BOOL ScpLex::IsUnaryOperator(std::wstring & Token)
+BOOL ScpLex::IsUnaryOperator(std::string & Token)
 {
 	if (Token==scpOperationNot || Token == scpOperationBitNot || Token == scpOperationBitXor || Token == scpOperationObjectRefrence)
 	{
@@ -258,10 +265,10 @@ BOOL ScpLex::IsUnaryOperator(std::wstring & Token)
 	}
 	return FALSE;
 }
-BOOL ScpLex::IsBinaryOperator(std::wstring & token)
+BOOL ScpLex::IsBinaryOperator(std::string & token)
 {
 	BOOL bRet=FALSE;
-	//std::wstring BinaryOperator;
+	//std::string BinaryOperator;
 	//BinaryOperator=scpOperationAdd+L"|";
 	//BinaryOperator=scpOperationSubtraction+L"|";
 	//BinaryOperator=scpOperationMultiplication+L"|";

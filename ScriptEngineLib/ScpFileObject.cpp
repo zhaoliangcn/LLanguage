@@ -121,7 +121,7 @@ int comparefile(const wchar_t *FileName1, const wchar_t *FileName2)
 	FILETIME ftCreate2, ftAccess2, ftWrite2;
 	if (!GetFileTime(hFile2, &ftCreate2, &ftAccess2, &ftWrite2))
 		return ret;
-	//±È½ÏÎÄ¼þ×îºóÐÞ¸ÄÊ±¼ä    
+	//æ¯”è¾ƒæ–‡ä»¶æœ€åŽä¿®æ”¹æ—¶é—´    
 	ret = CompareFileTime(&ftWrite1, &ftWrite2);
 	if (ret == 1)
 	{
@@ -135,7 +135,7 @@ int comparefile(const wchar_t *FileName1, const wchar_t *FileName2)
 	{
 		//printf("%sis older than %s\n", FileName1,FileName2);
 	}
-	//±È½ÏÎÄ¼þ´óÐ¡ 
+	//æ¯”è¾ƒæ–‡ä»¶å¤§å° 
 	ULARGE_INTEGER liFile1, liFile2;
 	liFile1.LowPart = GetFileSize(hFile1, &liFile1.HighPart);
 	liFile2.LowPart = GetFileSize(hFile2, &liFile2.HighPart);
@@ -237,11 +237,11 @@ SYSTEMTIME Time_tToSystemTime(time_t t)
 ScpFileObject::ScpFileObject()
 {
 	objecttype = ObjFile;
-	filename = L"";
+	filename = "";
 	currentpos = 0;
 	filesize = 0;
 	content = NULL;
-	file = 0;
+	file = NULL;
 
 	BindObjectInnerFuction(scpcommand_en_show, InnerFunction_Show);
 	BindObjectInnerFuction(scpcommand_cn_show, InnerFunction_Show);
@@ -328,15 +328,15 @@ ScpFileObject::~ScpFileObject()
 #endif
 	
 }
-ScpObject * ScpFileObject::Clone(std::wstring strObjName)
+ScpObject * ScpFileObject::Clone(std::string strObjName)
 {
 	ScpFileObject * obj = new ScpFileObject;
 	obj->filename = filename;
 	return NULL;
 }
-std::wstring ScpFileObject::ToString()
+std::string ScpFileObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp = filename;
 	return temp;
 }
@@ -344,16 +344,16 @@ void ScpFileObject::Release()
 {
 	delete this;
 }
-int  ScpFileObject::Compare(std::wstring FileName1, std::wstring FileName2)
+int  ScpFileObject::Compare(std::string FileName1, std::string FileName2)
 {
-	return comparefile(FileName1.c_str(), FileName2.c_str());
+	return comparefile(STDSTRINGEXT::UTF2W(FileName1).c_str(), STDSTRINGEXT::UTF2W(FileName2).c_str());
 }
-ScpTimeObject * ScpFileObject::GetLastAccessTime(std::wstring FileName1)
+ScpTimeObject * ScpFileObject::GetLastAccessTime(std::string FileName1)
 {
 
 #ifdef _WIN32
 	HANDLE hFile;
-	hFile = CreateFileW(FileName1.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
+	hFile = CreateFileA(FileName1.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
 		OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
@@ -371,7 +371,7 @@ ScpTimeObject * ScpFileObject::GetLastAccessTime(std::wstring FileName1)
 #else
 	ScpTimeObject * temp = NULL;
 	struct stat buf;
-	int fd = open(STDSTRINGEXT::W2UTF(FileName1).c_str(), O_RDWR);
+	int fd = open(FileName1.c_str(), O_RDWR);
 	if (fd != -1)
 	{
 		if (fstat(fd, &buf) != -1)
@@ -384,12 +384,12 @@ ScpTimeObject * ScpFileObject::GetLastAccessTime(std::wstring FileName1)
 	return temp;
 #endif
 }
-ScpTimeObject * ScpFileObject::GetCreateTime(std::wstring FileName1)
+ScpTimeObject * ScpFileObject::GetCreateTime(std::string FileName1)
 {
 
 #ifdef _WIN32
 	HANDLE hFile;
-	hFile = CreateFileW(FileName1.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
+	hFile = CreateFileA(FileName1.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
 		OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
@@ -407,7 +407,7 @@ ScpTimeObject * ScpFileObject::GetCreateTime(std::wstring FileName1)
 #else 
 	ScpTimeObject * temp = NULL;
 	struct stat buf;
-	int fd = open(STDSTRINGEXT::W2UTF(FileName1).c_str(), O_RDWR);
+	int fd = open(FileName1.c_str(), O_RDWR);
 	if (fd != -1)
 	{
 		if (fstat(fd, &buf) != -1)
@@ -420,12 +420,12 @@ ScpTimeObject * ScpFileObject::GetCreateTime(std::wstring FileName1)
 	return temp;
 #endif
 }
-ScpTimeObject * ScpFileObject::GetLastModifyTime(std::wstring FileName1)
+ScpTimeObject * ScpFileObject::GetLastModifyTime(std::string FileName1)
 {
 
 #ifdef _WIN32
 	HANDLE hFile;
-	hFile = CreateFileW(FileName1.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
+	hFile = CreateFileA(FileName1.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
 		OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
@@ -443,7 +443,7 @@ ScpTimeObject * ScpFileObject::GetLastModifyTime(std::wstring FileName1)
 #else 
 	ScpTimeObject * temp = NULL;
 	struct stat buf;
-	int fd = open(STDSTRINGEXT::W2UTF(FileName1).c_str(), O_RDWR);
+	int fd = open(FileName1.c_str(), O_RDWR);
 	if (fd != -1)
 	{
 		if (fstat(fd, &buf) != -1)
@@ -456,7 +456,7 @@ ScpTimeObject * ScpFileObject::GetLastModifyTime(std::wstring FileName1)
 	return temp;
 #endif
 }
-ScpTableObject * ScpFileObject::GetArrtibute(std::wstring FileName, ScpTableObject * tableobj)
+ScpTableObject * ScpFileObject::GetArrtibute(std::string FileName, ScpTableObject * tableobj)
 {
 	ScpTableObject * table = NULL;
 	VTPARAMETERS attrlist;
@@ -476,7 +476,7 @@ ScpTableObject * ScpFileObject::GetArrtibute(std::wstring FileName, ScpTableObje
 	}
 	return table;
 }
-BOOL ScpFileObject::ChangeAttribute(std::wstring FileName, ScpTableObject * table)
+BOOL ScpFileObject::ChangeAttribute(std::string FileName, ScpTableObject * table)
 {
 	BOOL ret = FALSE;
 
@@ -494,11 +494,11 @@ BOOL ScpFileObject::ChangeAttribute(std::wstring FileName, ScpTableObject * tabl
 
 	return ret;
 }
-BOOL ScpFileObject::GetArrtibute(std::wstring FileName, VTPARAMETERS & attrlist)
+BOOL ScpFileObject::GetArrtibute(std::string FileName, VTPARAMETERS & attrlist)
 {
 	attrlist.clear();
 #ifdef WIN32	
-	DWORD attributes = GetFileAttributes(FileName.c_str());
+	DWORD attributes = GetFileAttributesA(FileName.c_str());
 	if (ScpObjectNames::GetSingleInsatnce()->GetLanguage() == 0)
 	{
 
@@ -556,28 +556,28 @@ BOOL ScpFileObject::GetArrtibute(std::wstring FileName, VTPARAMETERS & attrlist)
 	}
 #else
 	struct stat st;
-	stat(STDSTRINGEXT::W2UTF(FileName).c_str(), &st);
+	stat(FileName.c_str(), &st);
 #endif
 	return TRUE;
 }
-std::wstring ScpFileObject::GetFileExt(std::wstring FileName)
+std::string ScpFileObject::GetFileExt(std::string FileName)
 {
-	wchar_t Ext[MAX_PATH];
+	char Ext[MAX_PATH];
 #ifdef _WIN32
-	_wsplitpath_s(FileName.c_str(), NULL, 0, NULL, 0, NULL, 0, Ext, MAX_PATH);
+	_splitpath_s(FileName.c_str(), NULL, 0, NULL, 0, NULL, 0, Ext, MAX_PATH);
 #else
 	char utfExt[MAX_PATH];
-	_splitpath(STDSTRINGEXT::W2UTF(FileName).c_str(), NULL, NULL, NULL, utfExt);
-    wcscpy(Ext, STDSTRINGEXT::UTF2W(utfExt).c_str());
+	_splitpath(FileName.c_str(), NULL, NULL, NULL, utfExt);
+    strcpy(Ext, utfExt);
 #endif
 	return Ext;
 }
-BOOL ScpFileObject::ChangeAttribute(std::wstring FileName, VTPARAMETERS & attrlist)
+BOOL ScpFileObject::ChangeAttribute(std::string FileName, VTPARAMETERS & attrlist)
 {
 #ifdef WIN32
 
 	DWORD attributes = FILE_ATTRIBUTE_NORMAL;
-	attributes = GetFileAttributes(FileName.c_str());
+	attributes = GetFileAttributesA(FileName.c_str());
 	for (VTPARAMETERS::iterator it = attrlist.begin(); it != attrlist.end(); it++)
 	{
 		if (*it == str_EN_file_attribute_readonly|| *it == str_CN_file_attribute_readonly)
@@ -605,13 +605,13 @@ BOOL ScpFileObject::ChangeAttribute(std::wstring FileName, VTPARAMETERS & attrli
 			attributes |= FILE_ATTRIBUTE_TEMPORARY;
 		}
 	}
-	return SetFileAttributes(FileName.c_str(), attributes);
+	return SetFileAttributesA(FileName.c_str(), attributes);
 #else
 	return FALSE;
 #endif 
 
 }
-BOOL ScpFileObject::Save(std::wstring newFileName)
+BOOL ScpFileObject::Save(std::string newFileName)
 {
 	BOOL ret = FALSE;
 	if (newFileName.empty())
@@ -622,11 +622,11 @@ BOOL ScpFileObject::Save(std::wstring newFileName)
 	else
 	{
 #ifdef WIN32
-		ret = CopyFileW(this->filename.c_str(), newFileName.c_str(), FALSE);
+		ret = CopyFileA(this->filename.c_str(), newFileName.c_str(), FALSE);
 		if (ret)
 			this->filename = newFileName;
 #else 
-		if(copyFile(STDSTRINGEXT::W2UTF(this->filename).c_str(), STDSTRINGEXT::W2UTF(newFileName).c_str()) ==0)
+		if(copyFile(this->filename.c_str(), newFileName.c_str()) ==0)
 		{
 			this->filename = newFileName;
 			ret = TRUE;
@@ -635,7 +635,7 @@ BOOL ScpFileObject::Save(std::wstring newFileName)
 	}
 	return ret;
 }
-BOOL ScpFileObject::Open(std::wstring FileName, std::wstring mode)
+BOOL ScpFileObject::Open(std::string FileName, std::string mode)
 {
 #ifdef _WIN32
     if (!file)
@@ -643,14 +643,14 @@ BOOL ScpFileObject::Open(std::wstring FileName, std::wstring mode)
         filename = FileName;
         openmode = mode;
         filesize = GetSize(FileName);
-        file = CreateFileW(FileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        file = CreateFileA(FileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     }
     if (file && file!=INVALID_HANDLE_VALUE)
         return TRUE;
     else
         return FALSE;
 #else
-	file = open(STDSTRINGEXT::W2UTF(FileName).c_str(), O_RDWR);
+	file = open(FileName.c_str(), O_RDWR);
 	if (file < 0) {
 		return FALSE;
 	}
@@ -659,7 +659,7 @@ BOOL ScpFileObject::Open(std::wstring FileName, std::wstring mode)
 #endif
     return FALSE;
 }
-BOOL ScpFileObject::Create(std::wstring FileName, std::wstring mode)
+BOOL ScpFileObject::Create(std::string FileName, std::string mode)
 {
 	BOOL bRet = FALSE;
 #ifdef _WIN32
@@ -668,14 +668,14 @@ BOOL ScpFileObject::Create(std::wstring FileName, std::wstring mode)
         filename = FileName;
         openmode = mode;
         filesize = GetSize(FileName);
-        file = CreateFileW(FileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        file = CreateFileA(FileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     }
 	if (file)
 		bRet = TRUE;
 	else
 		bRet = FALSE;
 #else
-	file = open(STDSTRINGEXT::W2UTF(FileName).c_str(), O_RDWR | O_CREAT, 00700);
+	file = open(FileName.c_str(), O_RDWR | O_CREAT, 00700);
 	if (file < 0) {
 		bRet = FALSE;
 	}
@@ -684,10 +684,10 @@ BOOL ScpFileObject::Create(std::wstring FileName, std::wstring mode)
 	return bRet;
     
 }
-BOOL ScpFileObject::IsDir(std::wstring FileName)
+BOOL ScpFileObject::IsDir(std::string FileName)
 {
 #ifdef _WIN32
-    DWORD dwAttr = GetFileAttributesW(FileName.c_str());
+    DWORD dwAttr = GetFileAttributesA(FileName.c_str());
     if(dwAttr!=-1)
         if ((dwAttr&FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
         {
@@ -695,7 +695,7 @@ BOOL ScpFileObject::IsDir(std::wstring FileName)
         }
 #else
 	struct stat st;
-	stat(STDSTRINGEXT::WToA(FileName).c_str(), &st);
+	stat(FileName.c_str(), &st);
 	if(st.st_mode&S_IFDIR == S_IFDIR)
 	{
 		return TRUE;
@@ -703,18 +703,18 @@ BOOL ScpFileObject::IsDir(std::wstring FileName)
 #endif
     return FALSE;
 }
-BOOL ScpFileObject::FileExist(std::wstring FileName)
+BOOL ScpFileObject::FileExist(std::string FileName)
 {
 	BOOL ret = FALSE;
 #ifdef WIN32
-	HANDLE hFile = CreateFileW(FileName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileA(FileName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		ret = TRUE;
 		CloseHandle(hFile);
 	}
 #else
-	if (access(STDSTRINGEXT::WToA(FileName).c_str(), F_OK) == 0)
+	if (access(FileName.c_str(), F_OK) == 0)
 	{
 		ret = TRUE;
 	}
@@ -752,7 +752,7 @@ BOOL ScpFileObject::read(__int64 pos, std::string &content, unsigned int length)
 	}	
 	return ret;
 }
-BOOL ScpFileObject::read(std::string &content)
+BOOL ScpFileObject::read(std::wstring &content)
 {
 	BOOL ret = FALSE;
 	DWORD size = 0;
@@ -780,7 +780,7 @@ BOOL ScpFileObject::read(std::string &content)
 			if(ret)
 			{
 				buffer[filesize] = '\0';
-				content = (char*)buffer;
+				content = STDSTRINGEXT::UTF2W((char*)buffer);
 			}
 			free(buffer);
 			ret = TRUE;
@@ -840,14 +840,14 @@ BOOL ScpFileObject::readline(std::string &line)
 BOOL ScpFileObject::readall_line(ScpTableObject * tableobj, CScriptEngine * engine)
 {
 	BOOL bRet = FALSE;
-	std::wstring line;
+	std::string line;
 	int i = 0;
 	while (readline(line))
 	{
 		ScpStringObject * obj = new ScpStringObject;
 		STDSTRINGEXT::trim(line);
 		obj->content = line;
-		std::wstring linename = STDSTRINGEXT::Format(L"line%d", i);
+		std::string linename = STDSTRINGEXT::Format("line%d", i);
 		engine->GetCurrentObjectSpace()->AddObject(linename, obj);
 		tableobj->AddElement(linename, obj);
 		i++;
@@ -857,8 +857,8 @@ BOOL ScpFileObject::readall_line(ScpTableObject * tableobj, CScriptEngine * engi
 BOOL ScpFileObject::writeall_line(ScpTableObject * tableobj, CScriptEngine * engine)
 {
 	BOOL bRet = FALSE;
-	std::wstring line;
-	std::string filenamea = STDSTRINGEXT::WToA(filename);
+	std::string line;
+	std::string filenamea =filename;
 	std::fstream infile;
 	infile.open(filenamea.c_str(), std::ios::in | std::ios::out | std::ios::app);
 	if (infile.is_open())
@@ -887,10 +887,7 @@ BOOL ScpFileObject::readline(std::wstring &line)
 	bRet = readline(aline);
 	if (bRet)
 	{
-		if (STDSTRINGEXT::IsTextUTF8((char *)aline.c_str(), aline.length()))
-			line = STDSTRINGEXT::UTF2W(aline);
-		else
-			line = STDSTRINGEXT::AToW(aline);
+		line = STDSTRINGEXT::UTF2W(aline);
 	}
 	else
 	{
@@ -898,7 +895,7 @@ BOOL ScpFileObject::readline(std::wstring &line)
 	}
 	return bRet;
 }
-BOOL ScpFileObject::read(std::wstring &content)
+BOOL ScpFileObject::read(std::string &content)
 {
 	
 	BOOL ret = FALSE;
@@ -928,7 +925,7 @@ BOOL ScpFileObject::read(std::wstring &content)
 #endif
 			buffer[size] = 0;
 			contenta = (char*)buffer;
-			content = STDSTRINGEXT::AToW(contenta);
+			content = contenta;
 			free(buffer);
 			ret = TRUE;
 		}
@@ -967,7 +964,7 @@ BOOL ScpFileObject::write(std::wstring &content)
 	BOOL ret = FALSE;
 	if (file)
 	{
-		std::string contenta = STDSTRINGEXT::WToA(content);
+		std::string contenta = STDSTRINGEXT::W2UTF(content);
 		DWORD size = contenta.length();
 		write(contenta);
 		ret = TRUE;
@@ -975,17 +972,17 @@ BOOL ScpFileObject::write(std::wstring &content)
 	return ret;
 
 }
-BOOL ScpFileObject::Clear(std::wstring filename)
+BOOL ScpFileObject::Clear(std::string filename)
 {
 	BOOL ret = FALSE;
 #ifdef WIN32
-	HANDLE handle = CreateFileW(filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, TRUNCATE_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE handle = CreateFileA(filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, TRUNCATE_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (INVALID_HANDLE_VALUE != handle)
 	{
 		ret = CloseHandle(handle);
 	}
 #else
-	int fd = open(STDSTRINGEXT::W2UTF(filename).c_str(), O_RDWR);
+	int fd = open(filename.c_str(), O_RDWR);
 	if (fd != -1)
 	{
 		if (ftruncate(fd, 0) != -1)
@@ -1001,12 +998,12 @@ BOOL ScpFileObject::Clear()
 {
 	return Clear(this->filename);
 }
-BOOL ScpFileObject::write(__int64 pos, std::wstring &content, unsigned int length)
+BOOL ScpFileObject::write(__int64 pos, std::string &content, unsigned int length)
 {
 	BOOL ret = FALSE;
 	if (file)
 	{
-		std::string contenta = STDSTRINGEXT::WToA(content);
+		std::string contenta =content;
 		char* buffer = (char*)malloc(contenta.length());
 		memset(buffer, 0, contenta.length());
 		DWORD WriteCount;
@@ -1137,9 +1134,9 @@ BOOL ScpFileObject::append(ULONG size, void * Buffer)
 	}
 	return ret;
 }
-BOOL ScpFileObject::append(std::wstring & content)
+BOOL ScpFileObject::append(std::string & content)
 {
-	std::string contenta = STDSTRINGEXT::WToA(content);
+	std::string contenta = content;
 	BOOL ret = FALSE;
 	DWORD size = contenta.length();	
 	return append(size,(void *)contenta.c_str());
@@ -1159,7 +1156,7 @@ BOOL ScpFileObject::readall()
 		file = NULL;
 	}
 	filesize = GetSize(this->filename);
-	file = CreateFileW(this->filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	file = CreateFileA(this->filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file)
 	{
 		content = (unsigned char*)malloc(filesize+1);
@@ -1185,9 +1182,9 @@ BOOL ScpFileObject::readall()
 	if (file > 0)
 	{
 		close(file);
-		file = 0;
+		file = NULL;
 		filesize = GetSize(this->filename);
-		file = open(STDSTRINGEXT::W2UTF(this->filename).c_str(), O_RDWR);
+		file = open(this->filename.c_str(), O_RDWR);
 		if (file > 0)
 		{
 			content = (unsigned char*)malloc(filesize + 1);
@@ -1205,7 +1202,7 @@ BOOL ScpFileObject::readall()
 			if (readcount > 0)
 				ret = TRUE;
 			close(file);
-			file = 0;
+			file = NULL;
 		}
 	}
 #endif	
@@ -1222,7 +1219,7 @@ BOOL ScpFileObject::readall(ScpMemoryObject * memobj)
 	}
 	return bRet;
 }
-__int64  ScpFileObject::seek(std::wstring pos)
+__int64  ScpFileObject::seek(std::string pos)
 {
 
 	if (pos == str_CN_file_pos_begin|| pos == str_EN_file_pos_begin)
@@ -1278,7 +1275,7 @@ void ScpFileObject::Show(CScriptEngine * engine)
 {
 	Print(engine);
 }
-bool ScpFileObject::IsInnerFunction(std::wstring & functionname)
+bool ScpFileObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -1286,7 +1283,7 @@ bool ScpFileObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;	
 }
-ScpObject * ScpFileObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpFileObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -1297,9 +1294,9 @@ ScpObject * ScpFileObject::CallInnerFunction(std::wstring & functionname, VTPARA
 }
 void ScpFileObject::Close()
 {
-	filename = L"";
+	filename = "";
 	currentpos = 0;
-	openmode = L"";
+	openmode = "";
 	filesize = 0;
 	if (content)
 		free(content);
@@ -1308,19 +1305,19 @@ void ScpFileObject::Close()
 	if (file)
 		CloseHandle(file);
 #else
-    remove(STDSTRINGEXT::W2UTF(filename).c_str()) ;
+    remove(filename.c_str()) ;
 #endif
-	file = 0;
+	file = NULL;
 }
-BOOL ScpFileObject::Delete(std::wstring filename)
+BOOL ScpFileObject::Delete(std::string filename)
 {
 #ifdef WIN32
-	return DeleteFileW(filename.c_str());
+	return DeleteFileA(filename.c_str());
 #else
-	return (remove(STDSTRINGEXT::W2UTF(filename).c_str()) != -1);
+	return (remove(filename.c_str()) != -1);
 #endif
 }
-BOOL ScpFileObject::Erase(std::wstring filename)
+BOOL ScpFileObject::Erase(std::string filename)
 {
 	BOOL ret = FALSE;
 	__int64 size = GetSize(filename);
@@ -1332,7 +1329,7 @@ BOOL ScpFileObject::Erase(std::wstring filename)
 			memset(mem, 0, size);
 
 #ifdef WIN32
-			HANDLE handle = CreateFileW(filename.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			HANDLE handle = CreateFileA(filename.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (INVALID_HANDLE_VALUE != handle)
 			{
 				DWORD WriteCount = 0;
@@ -1340,7 +1337,7 @@ BOOL ScpFileObject::Erase(std::wstring filename)
 				CloseHandle(handle);
 			}
 #else
-			int handle = ::open(STDSTRINGEXT::WToA(filename).c_str(), O_RDWR, 007000);
+			int handle = ::open(filename.c_str(), O_RDWR, 007000);
 			if (handle != -1)
 			{
                 lseek(handle, 0, SEEK_SET);
@@ -1357,66 +1354,66 @@ BOOL ScpFileObject::Erase(std::wstring filename)
 	}
 	return ret;
 }
-BOOL ScpFileObject::Encrypt(std::wstring filename, std::wstring password, std::wstring algorithm)
+BOOL ScpFileObject::Encrypt(std::string filename, std::string password, std::string algorithm)
 {
 	//ScpEncryptLib encryptlib;
 	//return (0 == encryptlib.scpEncryptFile(filename, password, EncryptTypeAES));
 	return FALSE;
 }
-BOOL ScpFileObject::Decrypt(std::wstring filename, std::wstring password, std::wstring algorithm)
+BOOL ScpFileObject::Decrypt(std::string filename, std::string password, std::string algorithm)
 {
 	//ScpEncryptLib encryptlib;
 	//return (0 == encryptlib.scpDecryptFile(filename, password, EncryptTypeAES));
 	return FALSE;
 }
-BOOL ScpFileObject::Move(std::wstring src, std::wstring dst)
+BOOL ScpFileObject::Move(std::string src, std::string dst)
 {
 #ifdef WIN32
-	return MoveFileW(src.c_str(), dst.c_str());
+	return MoveFileA(src.c_str(), dst.c_str());
 #else 
-	return (rename(STDSTRINGEXT::W2UTF(src).c_str(), STDSTRINGEXT::W2UTF(dst).c_str()) != -1);
+	return (rename(src.c_str(), dst.c_str()) != -1);
 #endif
 }
-BOOL ScpFileObject::Copy(std::wstring src, std::wstring dst)
+BOOL ScpFileObject::Copy(std::string src, std::string dst)
 {
 #ifdef WIN32
 	if (IsDir(dst))
 	{
 
-		if (dst.at(dst.length() - 1) != L'\\')
+		if (dst.at(dst.length() - 1) != '\\')
 		{
-			dst += L"\\";
+			dst += "\\";
 		}
 		dst += MyPathStripPath(src.c_str());
 	}
-	return CopyFileW(src.c_str(), dst.c_str(), TRUE);
+	return CopyFileA(src.c_str(), dst.c_str(), TRUE);
 #else
 	if (IsDir(dst))
 	{
 
-		if (dst.at(dst.length() - 1) != L'/')
+		if (dst.at(dst.length() - 1) != '/')
 		{
-			dst += L"/";
+			dst += "/";
 		}
 		char utfDrive[MAX_PATH];
 		char utfPath[MAX_PATH];
 		char utfName[MAX_PATH];
 		char utfExt[MAX_PATH];
-		_splitpath(STDSTRINGEXT::W2UTF(src).c_str(), utfDrive, utfPath, utfName, utfExt);
-		dst += STDSTRINGEXT::UTF2W(utfName);
-		dst += STDSTRINGEXT::UTF2W(utfExt);
+		_splitpath(src.c_str(), utfDrive, utfPath, utfName, utfExt);
+		dst += utfName;
+		dst += utfExt;
 	}
-	return copyFile(STDSTRINGEXT::W2UTF(src).c_str(), STDSTRINGEXT::W2UTF(dst).c_str());
+	return copyFile(src.c_str(), dst.c_str());
 
 #endif
 }
-__int64 ScpFileObject::GetSize(std::wstring FileName)
+__int64 ScpFileObject::GetSize(std::string FileName)
 {
 #ifdef WIN32
 
 	LARGE_INTEGER size;
 	size.QuadPart = 0;
-	HANDLE hFile = CreateFileW(FileName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileA(FileName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		GetFileSizeEx(hFile, &size);
@@ -1425,11 +1422,10 @@ __int64 ScpFileObject::GetSize(std::wstring FileName)
 	return size.QuadPart;
 #else
 	struct stat buf;
-	if (stat(STDSTRINGEXT::W2UTF(FileName).c_str(), &buf) != -1)
+	if (stat(FileName.c_str(), &buf) != -1)
 	{
 		return buf.st_size;
 	}
-	return 0;
 #endif
 
 }
@@ -1438,9 +1434,9 @@ ScpObject * __stdcall ScpFileObjectFactory(VTPARAMETERS * paramters, CScriptEngi
 {
 	if (paramters->size() >= 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
-		std::wstring content;
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
+		std::string content;
 		if (paramters->size() == 3)
 			content = paramters->at(2);
 		StringStripQuote(content);
@@ -1476,7 +1472,7 @@ ScpObject * ScpFileObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -1498,14 +1494,25 @@ ScpObject * ScpFileObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 			tname->istemp = true;
 			return tname;
 		}
+		else if (param0 == str_EN_pos ||
+			param0 == str_CN_pos)
+		{
+			ScpIntObject * ipos = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
+			if (ipos)
+			{
+				ipos->value = ((ScpFileObject*)thisObject)->currentpos;
+				ipos->istemp = true;
+			}
+			return ipos;
+		}
 		else
 		{
-			wchar_t Drv[MAX_PATH];
-			wchar_t Dir[MAX_PATH];
-			wchar_t Name[MAX_PATH];
-			wchar_t Ext[MAX_PATH];
+			char Drv[MAX_PATH];
+			char Dir[MAX_PATH];
+			char Name[MAX_PATH];
+			char Ext[MAX_PATH];
 #ifdef _WIN32
-			_wsplitpath_s(((ScpFileObject*)thisObject)->filename.c_str(), Drv, MAX_PATH, Dir, MAX_PATH, Name, MAX_PATH, Ext, MAX_PATH);
+			_splitpath_s(((ScpFileObject*)thisObject)->filename.c_str(), Drv, MAX_PATH, Dir, MAX_PATH, Name, MAX_PATH, Ext, MAX_PATH);
 #endif
 			if (param0 == str_EN_ObjDrive ||
 				param0 == str_CN_ObjDrive)
@@ -1594,7 +1601,7 @@ ScpObject * ScpFileObject::InnerFunction_open(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsfilename = parameters->at(0);
+		std::string wsfilename = parameters->at(0);
 		StringStripQuote(wsfilename);
 		ScpStringObject * obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(wsfilename);
 		if (obj && obj->GetType() == ObjString)
@@ -1605,7 +1612,7 @@ ScpObject * ScpFileObject::InnerFunction_open(ScpObject * thisObject, VTPARAMETE
 		ScpIntObject * iexist = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		if (iexist)
 		{
-			iexist->value = ((ScpFileObject*)thisObject)->Open(wsfilename, L"");
+			iexist->value = ((ScpFileObject*)thisObject)->Open(wsfilename, "");
 			iexist->istemp = true;
 		}
 		return iexist;
@@ -1615,7 +1622,7 @@ ScpObject * ScpFileObject::InnerFunction_open(ScpObject * thisObject, VTPARAMETE
 		ScpIntObject * iexist = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		if (iexist)
 		{
-			iexist->value = ((ScpFileObject*)thisObject)->Open(((ScpFileObject*)thisObject)->filename, L"");
+			iexist->value = ((ScpFileObject*)thisObject)->Open(((ScpFileObject*)thisObject)->filename, "");
 			iexist->istemp = true;
 		}
 		return iexist;
@@ -1627,7 +1634,7 @@ ScpObject * ScpFileObject::InnerFunction_create(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsfilename = parameters->at(0);
+		std::string wsfilename = parameters->at(0);
 		StringStripQuote(wsfilename);
 		ScpStringObject * obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(wsfilename);
 		if (obj && obj->GetType() == ObjString)
@@ -1638,7 +1645,7 @@ ScpObject * ScpFileObject::InnerFunction_create(ScpObject * thisObject, VTPARAME
 		ScpIntObject * iexist = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		if (iexist)
 		{
-			iexist->value = ((ScpFileObject*)thisObject)->Create(wsfilename, L"");
+			iexist->value = ((ScpFileObject*)thisObject)->Create(wsfilename, "");
 			iexist->istemp = true;
 		}
 
@@ -1649,7 +1656,7 @@ ScpObject * ScpFileObject::InnerFunction_create(ScpObject * thisObject, VTPARAME
 		ScpIntObject * iexist = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		if (iexist)
 		{
-			iexist->value = ((ScpFileObject*)thisObject)->Create(((ScpFileObject*)thisObject)->filename, L"");
+			iexist->value = ((ScpFileObject*)thisObject)->Create(((ScpFileObject*)thisObject)->filename, "");
 			iexist->istemp = true;
 		}
 		return iexist;
@@ -1661,11 +1668,11 @@ ScpObject * ScpFileObject::InnerFunction_save(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 0)
 	{
-		((ScpFileObject*)thisObject)->Save(L"");
+		((ScpFileObject*)thisObject)->Save("");
 	}
 	else if (parameters->size() == 1)
 	{
-		std::wstring wsobjectname1 = parameters->at(0);
+		std::string wsobjectname1 = parameters->at(0);
 		StringStripQuote(wsobjectname1);
 		ScpObject * obj1 = engine->GetCurrentObjectSpace()->FindObject(wsobjectname1);
 		if (obj1 && obj1->GetType() == ObjString)
@@ -1702,7 +1709,7 @@ ScpObject * ScpFileObject::InnerFunction_move(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring wsdestname = parameters->at(1);
+		std::string wsdestname = parameters->at(1);
 		StringStripQuote(wsdestname);
 		ScpObject * obj1 = engine->GetCurrentObjectSpace()->FindObject(wsdestname);
 		if (obj1 && obj1->GetType() == ObjString)
@@ -1731,7 +1738,7 @@ ScpObject * ScpFileObject::InnerFunction_compare(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring str1 = parameters->at(0);
+		std::string str1 = parameters->at(0);
 		StringStripQuote(str1);
 		ScpIntObject * compare_ret = new ScpIntObject;
 		compare_ret->istemp = true;
@@ -1767,17 +1774,56 @@ ScpObject * ScpFileObject::InnerFunction_seek(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring pos = parameters->at(0);
+		std::string pos = parameters->at(0);
 		StringStripQuote(pos);
 		ScpObject* posobj = engine->GetCurrentObjectSpace()->FindObject(pos);
 		if (posobj && posobj->GetType() == ObjInt)
 		{
 			((ScpFileObject*)thisObject)->seek(((ScpIntObject*)posobj)->value);
 		}
+		else if (posobj && posobj->GetType() == ObjString)
+		{
+			pos = ((ScpStringObject*)posobj)->content;
+			if (pos == str_EN_curpos ||
+				pos == str_CN_curpos)
+			{
+
+			}
+			else if (pos == str_CN_file_pos_begin || pos == str_EN_file_pos_begin)
+			{
+				((ScpFileObject*)thisObject)->currentpos = 0;
+			}
+			else if (pos == str_CN_file_pos_end || pos == str_EN_file_pos_end)
+			{
+				((ScpFileObject*)thisObject)->currentpos = ((ScpFileObject*)thisObject)->filesize;
+			}
+			else
+			{
+				return nullptr;
+			}
+			ScpIntObject * ipos = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
+			if (ipos)
+			{
+				ipos->value = ((ScpFileObject*)thisObject)->currentpos;
+				ipos->istemp = true;
+			}
+			return ipos;
+		}
 		else
 		{
 			if (IsStaticNumber(pos))
 				((ScpFileObject*)thisObject)->seek(StringToInt64(pos.c_str()));
+			else if (pos == str_EN_curpos ||
+				pos == str_CN_curpos)
+			{
+				ScpIntObject * ipos = (ScpIntObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
+				if (ipos)
+				{
+					ipos->value = ((ScpFileObject*)thisObject)->currentpos;
+					ipos->istemp = true;
+				}
+				return ipos;
+			}
 			else
 				((ScpFileObject*)thisObject)->seek(pos);
 		}
@@ -1789,7 +1835,7 @@ ScpObject * ScpFileObject::InnerFunction_readall(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring memobjname = parameters->at(0);
+		std::string memobjname = parameters->at(0);
 		StringStripQuote(memobjname);
 		ScpMemoryObject * obj = (ScpMemoryObject*)engine->GetCurrentObjectSpace()->FindObject(memobjname);
 		if (obj)
@@ -1805,7 +1851,7 @@ ScpObject * ScpFileObject::InnerFunction_readall_line(ScpObject * thisObject, VT
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring tableobjname = parameters->at(0);
+		std::string tableobjname = parameters->at(0);
 		StringStripQuote(tableobjname);
 		ScpTableObject * obj = (ScpTableObject*)engine->GetCurrentObjectSpace()->FindObject(tableobjname);
 		if (obj)
@@ -1828,37 +1874,54 @@ ScpObject * ScpFileObject::InnerFunction_read(ScpObject * thisObject, VTPARAMETE
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpObject *obj1 = currentObjectSpace->FindObject(objname);
 		if (obj1)
 		{
+			ScpObject  * readcount = currentObjectSpace->AcquireTempObject(ObjInt);
 			if (obj1->GetType() == ObjString)
-				((ScpFileObject*)thisObject)->read(((ScpStringObject *)obj1)->content);
+			{
+				if (((ScpFileObject*)thisObject)->read(((ScpStringObject *)obj1)->content))
+				{
+					((ScpIntObject*)readcount)->value = ((ScpStringObject *)obj1)->content.size();
+				}
+			}				
 			else if (obj1->GetType() == ObjMemory)
-				((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), ((ScpMemoryObject*)obj1)->Size, &((ScpMemoryObject*)obj1)->Address);
+			{
+				if (((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), ((ScpMemoryObject*)obj1)->Size, &((ScpMemoryObject*)obj1)->Address))
+				{
+					((ScpIntObject*)readcount)->value = ((ScpMemoryObject *)obj1)->GetSize();
+				}
+			}
 			else if (obj1->GetType() == ObjInt)
 			{
 				//void * pint = (void *)&((ScpIntObject*)obj1)->value;
 				int value = 0;
 				ULONG size = sizeof(value);
 				void* pint = (void*)&value;
-				((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), size, &pint);
-				((ScpIntObject*)obj1)->value = value;
+				if (((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), size, &pint))
+				{
+					((ScpIntObject*)obj1)->value = value;
+					((ScpIntObject*)readcount)->value = size;
+				}
 			}
 			else if (obj1->GetType() == ObjBigInt)
 			{
 				void * pint = (void *)&((ScpBigIntObject*)obj1)->value;
 				ULONG size = sizeof(__int64);
-				((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), size, &pint);
+				if (((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), size, &pint))
+				{
+					((ScpIntObject*)readcount)->value = size;
+				}
 			}
 		}
-
 	}
 	else if (parameters->size() == 2)
 	{
-		std::wstring &param0 = parameters->at(0);
-		std::wstring &objname = parameters->at(1);
+		ScpObject  * readcount = currentObjectSpace->AcquireTempObject(ObjInt);
+		std::string &param0 = parameters->at(0);
+		std::string &objname = parameters->at(1);
 		StringStripQuote(param0);
 		StringStripQuote(objname);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
@@ -1872,7 +1935,33 @@ ScpObject * ScpFileObject::InnerFunction_read(ScpObject * thisObject, VTPARAMETE
 			if (obj1)
 			{
 				if (obj1->GetType() == ObjString)
-					((ScpFileObject*)thisObject)->readline(((ScpStringObject *)obj1)->content);
+				{
+					if (((ScpFileObject*)thisObject)->readline(((ScpStringObject *)obj1)->content))
+					{
+						((ScpIntObject*)readcount)->value = ((ScpStringObject *)obj1)->content.size();
+					}
+					return readcount;
+				}
+			}
+		}
+		if (objparam0 && objparam0->GetType() == ObjMemory)
+		{
+			ULONG size = 0;
+			ScpObject *obj1 = currentObjectSpace->FindObject(objname);
+			if (obj1)
+			{
+				if (obj1->GetType() == ObjInt)
+				{
+					size = ((ScpIntObject*)obj1)->value;
+					if (size <= ((ScpMemoryObject*)objparam0)->Size)
+					{
+						if (((ScpFileObject*)thisObject)->read(((ScpFileObject*)thisObject)->GetCurrentPos(), size, &((ScpMemoryObject*)objparam0)->Address))
+						{
+							((ScpIntObject*)readcount)->value = size;
+						}
+						return readcount;
+					}
+				}
 			}
 		}
 	}
@@ -1884,7 +1973,7 @@ ScpObject * ScpFileObject::InnerFunction_write(ScpObject * thisObject, VTPARAMET
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (parameters->size() == 1)
 	{
-		std::wstring objname = parameters->at(0);
+		std::string objname = parameters->at(0);
 		StringStripQuote(objname);
 		ScpObject *obj1 = currentObjectSpace->FindObject(objname);
 		if (obj1)
@@ -1922,7 +2011,7 @@ ScpObject * ScpFileObject::InnerFunction_copy(ScpObject * thisObject, VTPARAMETE
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
-		std::wstring destname = parameters->at(0);
+		std::string destname = parameters->at(0);
 		StringStripQuote(destname);
 		ScpObject *obj1 = currentObjectSpace->FindObject(destname);
 		if (obj1)
@@ -1939,7 +2028,7 @@ ScpObject * ScpFileObject::InnerFunction_copy(ScpObject * thisObject, VTPARAMETE
 
 ScpObject * ScpFileObject::InnerFunction_select_open(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
-	//È¥µô¶Ôc:\windows\system32\COMDLG32.DLLµÄÒÀÀµ
+	//åŽ»æŽ‰å¯¹c:\windows\system32\COMDLG32.DLLçš„ä¾èµ–
 //#ifdef WIN32
 //		OPENFILENAME ofn;
 //		wchar_t szFile[MAX_PATH];
@@ -1956,7 +2045,7 @@ ScpObject * ScpFileObject::InnerFunction_select_open(ScpObject * thisObject, VTP
 //		ofn.nMaxFileTitle = 0;
 //		ofn.lpstrInitialDir = NULL;
 //		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-//		ofn.lpstrTitle = _T("´ò¿ª");
+//		ofn.lpstrTitle = _T("æ‰“å¼€");
 //		if (GetOpenFileName(&ofn))
 //		{
 //			ScpStringObject * tname = new ScpStringObject;
@@ -1987,7 +2076,7 @@ ScpObject * ScpFileObject::InnerFunction_select_save(ScpObject * thisObject, VTP
 //		ofn.nMaxFileTitle = 0;
 //		ofn.lpstrInitialDir = NULL;
 //		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-//		ofn.lpstrTitle = _T("±£´æ");
+//		ofn.lpstrTitle = _T("ä¿å­˜");
 //		if (GetSaveFileName(&ofn))
 //		{
 //			ScpStringObject * tname = new ScpStringObject;
@@ -2004,7 +2093,7 @@ ScpObject * ScpFileObject::InnerFunction_append(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring content = parameters->at(0);
+		std::string content = parameters->at(0);
 		StringStripQuote(content);
 		ScpObject * obj1 = engine->GetCurrentObjectSpace()->FindObject(content);
 		if (obj1)

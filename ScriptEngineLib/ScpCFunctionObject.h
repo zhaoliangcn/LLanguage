@@ -2,97 +2,81 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//CÓïÑÔº¯Êý¶ÔÏó
-//ÓÃÓÚÊµÏÖ¶ÔCº¯ÊýµÄµ÷ÓÃºÍ°ó¶¨µ½L½Å±¾ÓïÑÔµÄº¯Êý
+//Cè¯­è¨€å‡½æ•°å¯¹è±¡
+//ç”¨äºŽå®žçŽ°å¯¹Cå‡½æ•°çš„è°ƒç”¨å’Œç»‘å®šåˆ°Lè„šæœ¬è¯­è¨€çš„å‡½æ•°
 */
 #ifndef _H_SCPCFUNCTION
 #define _H_SCPCFUNCTION
 #include "ScpObject.h"
 #include "ScpObjectSpace.h"
 #include "ScpCObject.h"
+#include "ffi.h"
+#ifdef _WIN32
+
+#else
+#include <sys/types.h>
+#include <stdint.h>
+#endif
 class CScriptEngine;
 
 class ScpCFunctionObject:public ScpObject
 {
 public:
-#ifdef _M_AMD64
-	typedef unsigned __int64 QWORD;
-	typedef QWORD (__stdcall *STDAPICAll0)();
-	typedef QWORD (__stdcall *STDAPICAll1)(QWORD);
-	typedef QWORD (__stdcall *STDAPICAll2)(QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll3)(QWORD, QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll4)(QWORD, QWORD, QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll5)(QWORD, QWORD, QWORD, QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll6)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
 
 
-	typedef void (__stdcall *STDAPICALL0_NORET)();
-	typedef void (__stdcall *STDAPICALL1_NORET)(QWORD);
-	typedef void (__stdcall *STDAPICALL2_NORET)(QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll3_NORET)(QWORD, QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll4_NORET)(QWORD, QWORD, QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll5_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll6_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
-#else
-#ifdef Linux64
-	typedef unsigned long long QWORD;
-	typedef QWORD (__stdcall *STDAPICAll0)();
-	typedef QWORD (__stdcall *STDAPICAll1)(QWORD);
-	typedef QWORD (__stdcall *STDAPICAll2)(QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll3)(QWORD, QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll4)(QWORD, QWORD, QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll5)(QWORD, QWORD, QWORD, QWORD, QWORD);
-	typedef QWORD (__stdcall *STDAPICAll6)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
 
 
-	typedef void (__stdcall *STDAPICALL0_NORET)();
-	typedef void (__stdcall *STDAPICALL1_NORET)(QWORD);
-	typedef void (__stdcall *STDAPICALL2_NORET)(QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll3_NORET)(QWORD, QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll4_NORET)(QWORD, QWORD, QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll5_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD);
-	typedef void (__stdcall *STDAPICAll6_NORET)(QWORD, QWORD, QWORD, QWORD, QWORD, QWORD);
-#else
-	typedef DWORD(__stdcall *STDAPICAll0)();
-	typedef DWORD(__stdcall *STDAPICAll1)(DWORD);
-	typedef DWORD(__stdcall *STDAPICAll2)(DWORD, DWORD);
-	typedef DWORD(__stdcall *STDAPICAll3)(DWORD, DWORD, DWORD);
-	typedef DWORD(__stdcall *STDAPICAll4)(DWORD, DWORD, DWORD, DWORD);
-	typedef DWORD(__stdcall *STDAPICAll5)(DWORD, DWORD, DWORD, DWORD, DWORD);
-	typedef DWORD(__stdcall *STDAPICAll6)(DWORD, DWORD, DWORD, DWORD, DWORD, DWORD);
-
-
-	typedef void(__stdcall *STDAPICALL0_NORET)();
-	typedef void(__stdcall *STDAPICALL1_NORET)(DWORD);
-	typedef void(__stdcall *STDAPICALL2_NORET)(DWORD, DWORD);
-	typedef void(__stdcall *STDAPICAll3_NORET)(DWORD, DWORD, DWORD);
-	typedef void(__stdcall *STDAPICAll4_NORET)(DWORD, DWORD, DWORD, DWORD);
-	typedef void(__stdcall *STDAPICAll5_NORET)(DWORD, DWORD, DWORD, DWORD, DWORD);
-	typedef void(__stdcall *STDAPICAll6_NORET)(DWORD, DWORD, DWORD, DWORD, DWORD, DWORD);
-#endif
-#endif
 	ScpCFunctionObject();
 	~ScpCFunctionObject();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
-	void * GetApiAddress(std::wstring CDLLName,std::wstring CFunctionName);
-	BOOL MakeCFunctionInterface(std::wstring myFunctionName,std::wstring DllName,std::wstring myCFunctionName,std::wstring ReturnType,VTPARAMETERS Parameters);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	void * GetApiAddress(std::string CDLLName,std::string CFunctionName);
+	BOOL MakeCFunctionInterface(std::string myFunctionName,std::string DllName,std::string myCFunctionName,std::string ReturnType,VTPARAMETERS Parameters);
 	ScpCObject * MakeParamObject(VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace,int paramindex);
 	BOOL CopyBackParamObject(VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace,ScpCObject * param,int paramindex);
-	ScpCObject * MakeRetValueObject(std::wstring retvalue,ScpObjectSpace * objectSpace);
-	BOOL CopyBackRetValueObject(std::wstring retvalue,ScpObjectSpace * objectSpace,ScpCObject *retValueObj);
-	BOOL Call(std::wstring retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace);
-	BOOL AsmCall(std::wstring retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace);
+	ScpCObject * MakeRetValueObject(std::string retvalue,ScpObjectSpace * objectSpace);
+	BOOL CopyBackRetValueObject(std::string retvalue,ScpObjectSpace * objectSpace,ScpCObject *retValueObj);
+	BOOL Call(std::string retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace);
+	BOOL AsmCall(std::string retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace);
 
 
 	VTPARAMETERS FormalParameters;	
-	std::wstring FunctionName;
-	std::wstring CFunctionName;
-	std::wstring CDllName;
-	std::wstring CReturnType;
+	std::string FunctionName;
+	std::string CFunctionName;
+	std::string CDllName;
+	std::string CReturnType;
+
+
+typedef	ffi_status (*func_ffi_prep_cif)(ffi_cif* cif,
+		ffi_abi abi,
+		unsigned int nargs,
+		ffi_type* rtype,
+		ffi_type** atypes);
+func_ffi_prep_cif pffi_prep_cif;
+typedef	void (*func_ffi_call)(ffi_cif* cif,
+		void (*fn)(void),
+		void* rvalue,
+		void** avalue);
+func_ffi_call pffi_call;
+	ffi_type* pffi_type_void;
+	ffi_type* pffi_type_uint8;
+	ffi_type* pffi_type_sint8;
+	ffi_type* pffi_type_uint16;
+	ffi_type* pffi_type_sint16;
+	ffi_type* pffi_type_uint32;
+	ffi_type* pffi_type_sint32;
+	ffi_type* pffi_type_uint64;
+	ffi_type* pffi_type_sint64;
+	ffi_type* pffi_type_float;
+	ffi_type* pffi_type_double;
+	ffi_type* pffi_type_pointer;
+
+	
+	int ffi;
+
 };
 #endif //_H_SCPCFUNCTION

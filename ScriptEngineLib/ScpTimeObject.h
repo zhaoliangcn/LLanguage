@@ -11,19 +11,19 @@
 #include "ScpIntObject.h"
 
 
-const static wchar_t *str_CN_year = L"年";
-const static wchar_t *str_CN_month = L"月";
-const static wchar_t *str_CN_day = L"日";
-const static wchar_t *str_CN_hour= L"时";
-const static wchar_t *str_CN_minute = L"分";
-const static wchar_t *str_CN_second = L"秒";
+const static char  *str_CN_year = "年";
+const static char  *str_CN_month = "月";
+const static char  *str_CN_day = "日";
+const static char  *str_CN_hour= "时";
+const static char  *str_CN_minute = "分";
+const static char  *str_CN_second = "秒";
 
-const static wchar_t * str_EN_year = L"year";
-const static wchar_t *str_EN_month = L"month";
-const static wchar_t *str_EN_day = L"day";
-const static wchar_t *str_EN_hour = L"hour";
-const static wchar_t *str_EN_minute = L"minute";
-const static wchar_t *str_EN_second = L"second";
+const static char  * str_EN_year = "year";
+const static char  *str_EN_month = "month";
+const static char  *str_EN_day = "day";
+const static char  *str_EN_hour = "hour";
+const static char  *str_EN_minute = "minute";
+const static char  *str_EN_second = "second";
 
 class ScpTimeObject :public ScpObject
 {
@@ -32,11 +32,11 @@ public:
 	~ScpTimeObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters,CScriptEngine * engine);
 	static int Compare(ScpTimeObject* time1,ScpTimeObject* time2);
 	static ScpIntObject LessThan(ScpTimeObject* time1,ScpTimeObject* time2);
 	static ScpIntObject BigThan(ScpTimeObject* time1,ScpTimeObject* time2);
@@ -44,7 +44,7 @@ public:
 	static ScpIntObject LessOrEqul(ScpTimeObject* time1,ScpTimeObject* time2);
 	static ScpIntObject Equl(ScpTimeObject* time1,ScpTimeObject* time2);
 	static void ShowNow(CScriptEngine * engine);
-	static std::wstring Now();
+	static std::string Now();
 	static time_t GetNow();
 	int GetYear();
 	int GetMonth();
@@ -53,7 +53,7 @@ public:
 	int GetMinute();
 	int GetSecond();
 	time_t value;
-	std::wstring name;
+	std::string name;
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_Get(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

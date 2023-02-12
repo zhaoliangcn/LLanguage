@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//JSON¶ÔÏó
+//JSONå¯¹è±¡
 */
 #ifndef _H_SCPJSONOBJECT
 #define _H_SCPJSONOBJECT
@@ -21,21 +21,21 @@ public:
 	~ScpJsonObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
-	BOOL Load(std::wstring jsonstring);
-	BOOL Save(std::wstring name=L"");
-	BOOL Open(std::wstring name);
+	BOOL Load(std::string jsonstring);
+	BOOL Save(std::string name="");
+	BOOL Open(std::string name);
 	BOOL Close();	
-	BOOL GetValue(std::wstring tag,std::wstring& value);
-	BOOL GetValue(std::wstring tag,int & value);
-	BOOL SetValue(std::wstring tag,std::wstring value);	
-	BOOL SetValue(std::wstring tag,int value);
-	std::wstring jsonfileName;	
+	BOOL GetValue(std::string tag,std::string& value);
+	BOOL GetValue(std::string tag,int & value);
+	BOOL SetValue(std::string tag,std::string value);	
+	BOOL SetValue(std::string tag,int value);
+	std::string jsonfileName;	
 	CppEasyJson ejson;
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

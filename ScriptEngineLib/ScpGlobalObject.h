@@ -17,11 +17,11 @@ public:
 		return &singleton;
 	}	
 	~ScpGlobalObject(void);	
-	ScpObjectType GetType(const wchar_t * strObj);
+	ScpObjectType GetType(const char * strObj);
 	void Show(CScriptEngine *engine);
-	std::wstring GetTypeName(ScpObjectType type);	
+	std::string GetTypeName(ScpObjectType type);	
 	void SelectLanguage(int lang);
-	BOOL Register(const wchar_t * objname_cn,const wchar_t * objname_en,ULONG TypeID);
+	BOOL Register(const char * objname_cn,const char * objname_en,ULONG TypeID);
 private:
 	void Init();
 	ScpGlobalObject(void);	

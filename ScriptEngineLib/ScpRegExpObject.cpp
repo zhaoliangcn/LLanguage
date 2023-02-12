@@ -34,7 +34,7 @@ ScpRegExpObject::~ScpRegExpObject()
 {
 
 }
-ScpObject * ScpRegExpObject::Clone(std::wstring strObjName)
+ScpObject * ScpRegExpObject::Clone(std::string strObjName)
 {
 	ScpRegExpObject *obj = new ScpRegExpObject;
 	if (obj)
@@ -45,9 +45,9 @@ ScpObject * ScpRegExpObject::Clone(std::wstring strObjName)
 
 	return NULL;
 }	
-std::wstring ScpRegExpObject::ToString()
+std::string ScpRegExpObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp+=wstrregexp;
 	return temp;
 }
@@ -55,14 +55,14 @@ void ScpRegExpObject::Release()
 {
 	delete this;
 }
-bool ScpRegExpObject::Compile(std::wstring regexp)
+bool ScpRegExpObject::Compile(std::string regexp)
 {
 	bool ret = true;
 #ifdef _WIN32
 	wstrregexp=regexp;
 	try
 	{
-		wrgx = regexp;
+		rgx = regexp;
 	}
 	catch(...)
 	{
@@ -71,13 +71,13 @@ bool ScpRegExpObject::Compile(std::wstring regexp)
 #endif
 	return ret;
 }
-bool  ScpRegExpObject::Find(std::wstring Text)
+bool  ScpRegExpObject::Find(std::string Text)
 {
 	bool ret = false;
 #ifdef _WIN32
 	try
 	{
-		ret = regex_search(Text,wrgx);
+		ret = regex_search(Text,rgx);
 	}
 	catch(...)
 	{
@@ -86,11 +86,11 @@ bool  ScpRegExpObject::Find(std::wstring Text)
 #endif
 	return ret;
 }
-bool ScpRegExpObject::Match(std::wstring Text)
+bool ScpRegExpObject::Match(std::string Text)
 {
 	return false;
 }
-bool ScpRegExpObject::Replace(std::wstring Text,std::wstring Text2)
+bool ScpRegExpObject::Replace(std::string Text,std::string Text2)
 {
 	return false;
 }
@@ -103,7 +103,7 @@ ScpObject * ScpRegExpObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -131,7 +131,7 @@ ScpObject * ScpRegExpObject::InnerFunction_match(ScpObject * thisObject, VTPARAM
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring text = parameters->at(0);
+		std::string text = parameters->at(0);
 		StringStripQuote(text);
 		ScpIntObject* intobj = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
 		ScpStringObject *obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(text);
@@ -158,7 +158,7 @@ ScpObject * ScpRegExpObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 	{
 		bool bfind = false;
 		int count = 0;
-		std::wstring text = parameters->at(0);
+		std::string text = parameters->at(0);
 		StringStripQuote(text);
 		ScpTableObject* tableobj = (ScpTableObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjTable);
 		ScpStringObject *obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(text);
@@ -167,15 +167,15 @@ ScpObject * ScpRegExpObject::InnerFunction_find(ScpObject * thisObject, VTPARAME
 			if (obj->GetType() == ObjString)
 				text = obj->content;
 		}
-		wrgxiter first(text.begin(), text.end(), ((ScpRegExpObject*)thisObject)->wrgx);
-		wrgxiter last;
+		rgxiter first(text.begin(), text.end(), ((ScpRegExpObject*)thisObject)->rgx);
+		rgxiter last;
 		while (first != last)
 		{
 			bfind = true;
 			count++;
 			ScpStringObject *obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
 			obj->content = first->str();
-			tableobj->AddElement(first->str() + IntToWString(count), obj);
+			tableobj->AddElement(first->str() + IntToString(count), obj);
 			first++;
 		}
 		if (bfind)
@@ -192,8 +192,8 @@ ScpObject * ScpRegExpObject::InnerFunction_replace(ScpObject * thisObject, VTPAR
 	{
 		bool bfind = false;
 		int count = 0;
-		std::wstring text = parameters->at(0);
-		std::wstring reptext = parameters->at(1);
+		std::string text = parameters->at(0);
+		std::string reptext = parameters->at(1);
 		StringStripQuote(reptext);
 		StringStripQuote(text);
 		ScpStringObject *obj = (ScpStringObject *)engine->GetCurrentObjectSpace()->FindObject(text);
@@ -209,7 +209,7 @@ ScpObject * ScpRegExpObject::InnerFunction_replace(ScpObject * thisObject, VTPAR
 				reptext = obj1->content;
 		}
 		ScpStringObject *objret = (ScpStringObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjString);
-		objret->content = std::regex_replace(text, ((ScpRegExpObject*)thisObject)->wrgx, reptext);
+		objret->content = std::regex_replace(text, ((ScpRegExpObject*)thisObject)->rgx, reptext);
 		return objret;
 	}
 	return nullptr;
@@ -218,7 +218,7 @@ void ScpRegExpObject::Show(CScriptEngine * engine)
 {
 	engine->PrintError(wstrregexp);
 }
-bool ScpRegExpObject::IsInnerFunction(std::wstring & functionname)
+bool ScpRegExpObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -226,7 +226,7 @@ bool ScpRegExpObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpRegExpObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpRegExpObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -240,9 +240,9 @@ ScpObject * __stdcall ScpRegExpObjectFactory(VTPARAMETERS * paramters, CScriptEn
 {
 	if (paramters->size() >= 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
-		std::wstring content;
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
+		std::string content;
 		if (paramters->size() == 3)
 			content = paramters->at(2);
 		ScpRegExpObject * regexpobj = new ScpRegExpObject;

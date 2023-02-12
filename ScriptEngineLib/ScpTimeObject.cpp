@@ -78,7 +78,7 @@ void ScpTimeObject::Show(CScriptEngine * engine)
 	engine->PrintError(STDSTRINGEXT::AToW(strTime));
 	}
 }
-ScpObject * ScpTimeObject::Clone(std::wstring strObjName)
+ScpObject * ScpTimeObject::Clone(std::string strObjName)
 {
 	ScpTimeObject * obj = new ScpTimeObject;
 	if (obj)
@@ -89,9 +89,9 @@ ScpObject * ScpTimeObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpTimeObject::ToString()
+std::string ScpTimeObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp = Now();
 	return temp;
 }
@@ -99,7 +99,7 @@ void ScpTimeObject::Release()
 {
 	delete this;
 }
-bool ScpTimeObject::IsInnerFunction(std::wstring & functionname)
+bool ScpTimeObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -107,7 +107,7 @@ bool ScpTimeObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpTimeObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpTimeObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -154,7 +154,7 @@ void ScpTimeObject::ShowNow(CScriptEngine * engine)
 {
 	engine->PrintError(Now());
 }
-std::wstring ScpTimeObject::Now()
+std::string ScpTimeObject::Now()
 {
 	time_t rawtime; 
 	struct tm  timeinfo; 
@@ -170,7 +170,7 @@ std::wstring ScpTimeObject::Now()
 #else
     asctime_r(&timeinfo,strTime);
 #endif
-	return STDSTRINGEXT::AToW(strTime);
+	return strTime;
 }
 time_t ScpTimeObject::GetNow()
 {
@@ -255,7 +255,7 @@ int ScpTimeObject::GetDay()
 	{
 		if (parameters->size() == 1)
 		{
-			std::wstring param0 = parameters->at(0);
+			std::string param0 = parameters->at(0);
 			StringStripQuote(param0);
 			ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 			if (objparam0 && objparam0->GetType() == ObjString)
@@ -267,6 +267,16 @@ int ScpTimeObject::GetDay()
 					tname->content = ScpGlobalObject::GetInstance()->GetTypeName(thisObject->GetType());
 					tname->istemp = true;
 					return tname;
+				}
+				else if (((ScpStringObject*)objparam0)->content == str_EN_ObjCurrentTime ||
+					((ScpStringObject*)objparam0)->content == str_CN_ObjCurrentTime)
+				{
+					ScpTimeObject* timeobj = (ScpTimeObject*)thisObject;
+					if (timeobj)
+					{
+						timeobj->value = ScpTimeObject::GetNow();
+					}
+					return thisObject;
 				}
 			}
 			if (parameters->at(0) == str_EN_ObjType || parameters->at(0) == str_CN_ObjType)
@@ -284,14 +294,14 @@ int ScpTimeObject::GetDay()
 	{
 		if (parameters->size() == 1)
 		{
-			std::wstring formattype = parameters->at(0);
+			std::string formattype = parameters->at(0);
 			StringStripQuote(formattype);
 			ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(formattype);
 			if (objparam0 && objparam0->GetType() == ObjString)
 			{
 				formattype = ((ScpStringObject *)objparam0)->content;
 			}
-			if (formattype == L"GMT")
+			if (formattype == "GMT")
 			{
 				time_t rawTime =((ScpTimeObject*) thisObject)->value;
 				struct tm* timeInfo;
@@ -300,7 +310,7 @@ int ScpTimeObject::GetDay()
 				timeInfo = gmtime(&rawTime);
 				strftime(szTemp, sizeof(szTemp), "%a, %d %b %Y %H:%M:%S GMT", timeInfo);
 				ScpStringObject * tname = new ScpStringObject;
-				tname->content = STDSTRINGEXT::AToW(szTemp);
+				tname->content = szTemp;
 				tname->istemp = true;
 				return tname;
 			}

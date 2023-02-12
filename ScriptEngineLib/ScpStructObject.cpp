@@ -36,13 +36,13 @@ ScpStructObject::~ScpStructObject(void)
 	FreeStructMemory();
 }
 
-ScpObject * ScpStructObject::Clone(std::wstring strObjName)
+ScpObject * ScpStructObject::Clone(std::string strObjName)
 {
 	return NULL;
 }
-std::wstring ScpStructObject::ToString()
+std::string ScpStructObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpStructObject::Show(CScriptEngine * engine)
@@ -52,7 +52,7 @@ void ScpStructObject::Show(CScriptEngine * engine)
 		engine->PrintError(Boday.at(i));
 	}
 }
-bool ScpStructObject::IsInnerFunction(std::wstring & functionname)
+bool ScpStructObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -60,7 +60,7 @@ bool ScpStructObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpStructObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpStructObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -246,7 +246,7 @@ ScpObject * ScpStructObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)

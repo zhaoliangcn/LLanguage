@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//¶ÔÏóÃûºÍ¶ÔÏóÊµÀıµÄÓ³Éä
+//å¯¹è±¡åå’Œå¯¹è±¡å®ä¾‹çš„æ˜ å°„
 */
 #include "ScpUserObject.h"
 #include "ScriptEngine.h"
@@ -50,7 +50,7 @@ ULONG ScpUserObject::GetSize()
 {
 	return userobjmap.size();
 }
-int ScpUserObject::IsInMap(const std::wstring &strObjname)
+int ScpUserObject::IsInMap(const std::string &strObjname)
 {
 	int ret = 0;
 	ITUSEROBJMAP it ;
@@ -63,7 +63,7 @@ int ScpUserObject::IsInMap(const std::wstring &strObjname)
 	UnLock();
 	return ret;
 }
-ScpObjectType ScpUserObject::GetType(const std::wstring& strObjname)
+ScpObjectType ScpUserObject::GetType(const std::string& strObjname)
 {
 	ScpObject *  obj=NULL;
 	Lock();
@@ -77,7 +77,7 @@ ScpObjectType ScpUserObject::GetType(const std::wstring& strObjname)
 	UnLock();
 	return type;
 }
-BOOL ScpUserObject::MapObject(const std::wstring& strObjname,ScpObject *obj,std::wstring scope)
+BOOL ScpUserObject::MapObject(const std::string& strObjname,ScpObject *obj,std::string scope)
 {
 	BOOL ret = FALSE ;	
 	if(IsInMap(strObjname)==1)
@@ -98,7 +98,7 @@ BOOL ScpUserObject::MapObject(const std::wstring& strObjname,ScpObject *obj,std:
 	}	
 	return ret;
 }
-ScpObject * ScpUserObject::GetObject(const std::wstring& strObjname)
+ScpObject * ScpUserObject::GetObject(const std::string& strObjname)
 {
 	ScpObject * temp = NULL;
 	Lock();
@@ -127,7 +127,7 @@ ScpObject * ScpUserObject::GetObject(unsigned long objindex)
 	UnLock();
 	return obj;
 }
-void ScpUserObject::UnMapObject(const std::wstring& strObjname)
+void ScpUserObject::UnMapObject(const std::string& strObjname)
 {
 	ScpObject *  obj=NULL;
 	Lock();
@@ -164,9 +164,9 @@ void ScpUserObject::UnMapObject(unsigned long objindex)
 	}
 	UnLock();
 }
-std::wstring  ScpUserObject::GetObjectName(ScpObject *obj)
+std::string  ScpUserObject::GetObjectName(ScpObject *obj)
 {
-	std::wstring name;
+	std::string name;
 	Lock();
 	name = FindKeyByValue(userobjmap,obj,name);
 	UnLock();
@@ -184,7 +184,7 @@ void ScpUserObject::Destroy()
 		//{
 		//	printf("destroy refcount  %d type %d %s %0x\n", temp->RefCount, temp->GetType(),STDSTRINGEXT::WToA(it->first).c_str(),temp);
 		//}
-		//googlehashmapÓëstlµÄhashmap²»Ò»Ñùerase²»·µ»ØÏÂÒ»¸öµü´ú£¬ĞèÒªÓÃ»§µ÷ÓÃ×ÔÔö²Ù×÷
+		//googlehashmapä¸stlçš„hashmapä¸ä¸€æ ·eraseä¸è¿”å›ä¸‹ä¸€ä¸ªè¿­ä»£ï¼Œéœ€è¦ç”¨æˆ·è°ƒç”¨è‡ªå¢æ“ä½œ
 		
 #ifdef USE_GOOGLE_HASHMAP
 		userobjmap.erase(it);
@@ -197,10 +197,10 @@ void ScpUserObject::Destroy()
 		it++;
 #endif
 #endif
-		//´¦ÀíÒ»¸ö¶ÔÏóÓĞ¶à¸öÃû×ÖµÄÇé¿ö
-		//È¡ÔªËØµÄÊ±ºò½«¶ÔÏóÓ³Éä¸øÁÙÊ±ÔªËØÃû³Æ£¬µ«ÊÇÃ»ÓĞ½â³ıÓ³Éä¹ØÏµ
-		//²éÕÒÖØ¸´×¢²áµÄÔªËØ£¬²¢ÇÒ½â³ıÓ³Éä
-		//std::wstring tempname =FindKeyByValue(userobjmap,temp,tempname);
+		//å¤„ç†ä¸€ä¸ªå¯¹è±¡æœ‰å¤šä¸ªåå­—çš„æƒ…å†µ
+		//å–å…ƒç´ çš„æ—¶å€™å°†å¯¹è±¡æ˜ å°„ç»™ä¸´æ—¶å…ƒç´ åç§°ï¼Œä½†æ˜¯æ²¡æœ‰è§£é™¤æ˜ å°„å…³ç³»
+		//æŸ¥æ‰¾é‡å¤æ³¨å†Œçš„å…ƒç´ ï¼Œå¹¶ä¸”è§£é™¤æ˜ å°„
+		//std::string tempname =FindKeyByValue(userobjmap,temp,tempname);
 		//while(!tempname.empty())
 		//{
 		//	UnMapObject(tempname);
@@ -223,16 +223,16 @@ VTSTRINGS ScpUserObject::EnumObjects()
 	for(ITUSEROBJMAP it =userobjmap.begin();
 		it!=userobjmap.end();it++)
 	{
-		std::wstring temp;
+		std::string temp;
 		temp=it->first;
-		temp+=L",";
+		temp+=",";
 		temp+=ScpGlobalObject::GetInstance()->GetTypeName(it->second->GetType());
 		allobjects.push_back(temp);
 	}
 	UnLock();
 	return allobjects;
 }
-void ScpUserObject::DumpObject(const std::wstring& objectname, CScriptEngine * engine)
+void ScpUserObject::DumpObject(const std::string& objectname, CScriptEngine * engine)
 {
 	ScpObject *  obj =GetObject(objectname);
 	if(obj)
@@ -252,10 +252,10 @@ void ScpUserObject::DeepCopy(ScpUserObject * userobject)
 	ITUSEROBJMAP it = userobject->userobjmap.begin();
 	while (it != userobject->userobjmap.end())
 	{
-		std::wstring name = it->first;
+		std::string name = it->first;
 		ScpObject * obj = it->second;
 		if(obj->GetType()!=ObjFunction)
-			MapObject(name, it->second->Clone(L""));
+			MapObject(name, it->second->Clone(""));
 		else
 			MapObject(name, it->second);
 		it++;
@@ -267,7 +267,7 @@ void ScpUserObject::Lock()
 #ifdef WIN32
 	//EnterCriticalSection(&cs);
 #else 
-	//µİ¹éµ÷ÓÃÊ±ÎŞ·¨·µ»Ø,LINUXÏÂ²»ÒËÊ¹ÓÃ
+	//é€’å½’è°ƒç”¨æ—¶æ— æ³•è¿”å›,LINUXä¸‹ä¸å®œä½¿ç”¨
 	//pthread_mutex_lock(&mutex);
 #endif	
 }
@@ -276,7 +276,7 @@ void ScpUserObject::UnLock()
 #ifdef WIN32
 	//LeaveCriticalSection(&cs);
 #else 
-	//µİ¹éµ÷ÓÃÊ±ÎŞ·¨·µ»Ø,LINUXÏÂ²»ÒËÊ¹ÓÃ
+	//é€’å½’è°ƒç”¨æ—¶æ— æ³•è¿”å›,LINUXä¸‹ä¸å®œä½¿ç”¨
 	//pthread_mutex_unlock(&mutex);
 #endif
 }
@@ -301,7 +301,7 @@ ULONG ScpUserObject2::GetSize()
 {
 	return userobjmap.size();
 }
-int ScpUserObject2::IsInMap(std::wstring strObjname)
+int ScpUserObject2::IsInMap(std::string strObjname)
 {
 	int ret = 0;
 	ITUSEROBJMAP2 it ;
@@ -314,7 +314,7 @@ int ScpUserObject2::IsInMap(std::wstring strObjname)
 	UnLock();
 	return ret;
 }
-ScpObjectType ScpUserObject2::GetType(const std::wstring& strObjname)
+ScpObjectType ScpUserObject2::GetType(const std::string& strObjname)
 {
 	ScpObject *  obj=NULL;
 	Lock();
@@ -328,7 +328,7 @@ ScpObjectType ScpUserObject2::GetType(const std::wstring& strObjname)
 	UnLock();
 	return type;
 }
-BOOL ScpUserObject2::MapObject(const std::wstring& strObjname,ScpObject *obj,std::wstring scope)
+BOOL ScpUserObject2::MapObject(const std::string& strObjname,ScpObject *obj,std::string scope)
 {
 	BOOL ret = FALSE ;
 	
@@ -354,7 +354,7 @@ BOOL ScpUserObject2::MapObject(const std::wstring& strObjname,ScpObject *obj,std
 	}
 	return ret;
 }
-ScpObject * ScpUserObject2::GetObject(const std::wstring& strObjname)
+ScpObject * ScpUserObject2::GetObject(const std::string& strObjname)
 {
 	ScpObject * temp = NULL;
 	Lock();
@@ -383,7 +383,7 @@ ScpObject * ScpUserObject2::GetObject(unsigned long objindex)
 	UnLock();
 	return obj;
 }
-ScpObject * ScpUserObject2::UnMapObject(const std::wstring& strObjname)
+ScpObject * ScpUserObject2::UnMapObject(const std::string& strObjname)
 {
 	ScpObject *  obj=NULL;
 	Lock();
@@ -421,17 +421,17 @@ void ScpUserObject2::UnMapObject(unsigned long objindex)
 	}
 	UnLock();
 }
-std::wstring  ScpUserObject2::GetObjectName(ScpObject *obj)
+std::string  ScpUserObject2::GetObjectName(ScpObject *obj)
 {
-	std::wstring name;
+	std::string name;
 	Lock();
 	name = FindKeyByValue(userobjmap,obj,name);
 	UnLock();
 	return name;
 }
-std::wstring ScpUserObject2::GetObjectName(unsigned long objIndex)
+std::string ScpUserObject2::GetObjectName(unsigned long objIndex)
 {
-	std::wstring name;
+	std::string name;
 	Lock();
 	ITUSEROBJMAP2 it = userobjmap.begin();
 	while(it!=userobjmap.end() && (objIndex>0))
@@ -458,10 +458,10 @@ void ScpUserObject2::Destroy()
 		it++;
 #endif
 
-		//´¦ÀíÒ»¸ö¶ÔÏóÓĞ¶à¸öÃû×ÖµÄÇé¿ö
-		//È¡ÔªËØµÄÊ±ºò½«¶ÔÏóÓ³Éä¸øÁÙÊ±ÔªËØÃû³Æ£¬µ«ÊÇÃ»ÓĞ½â³ıÓ³Éä¹ØÏµ
-		//²éÕÒÖØ¸´×¢²áµÄÔªËØ£¬²¢ÇÒ½â³ıÓ³Éä
-		//std::wstring tempname =FindKeyByValue(userobjmap,temp,tempname);
+		//å¤„ç†ä¸€ä¸ªå¯¹è±¡æœ‰å¤šä¸ªåå­—çš„æƒ…å†µ
+		//å–å…ƒç´ çš„æ—¶å€™å°†å¯¹è±¡æ˜ å°„ç»™ä¸´æ—¶å…ƒç´ åç§°ï¼Œä½†æ˜¯æ²¡æœ‰è§£é™¤æ˜ å°„å…³ç³»
+		//æŸ¥æ‰¾é‡å¤æ³¨å†Œçš„å…ƒç´ ï¼Œå¹¶ä¸”è§£é™¤æ˜ å°„
+		//std::string tempname =FindKeyByValue(userobjmap,temp,tempname);
 		//while(!tempname.empty())
 		//{
 		//	UnMapObject(tempname);
@@ -484,16 +484,16 @@ VTSTRINGS ScpUserObject2::EnumObjects()
 	for(ITUSEROBJMAP2 it =userobjmap.begin();
 		it!=userobjmap.end();it++)
 	{
-		std::wstring temp;
+		std::string temp;
 		temp=it->first;
-		temp+=L",";
+		temp+=",";
 		temp+=ScpGlobalObject::GetInstance()->GetTypeName(it->second->GetType());
 		allobjects.push_back(temp);
 	}
 	UnLock();
 	return allobjects;
 }
-void ScpUserObject2::DumpObject(const std::wstring& objectname, CScriptEngine * engine)
+void ScpUserObject2::DumpObject(const std::string& objectname, CScriptEngine * engine)
 {
 	ScpObject *  obj =GetObject(objectname);
 	if(obj)
@@ -512,7 +512,7 @@ void ScpUserObject2::Lock()
 #ifdef WIN32
 	//EnterCriticalSection(&cs);
 #else 
-	//µİ¹éµ÷ÓÃÊ±ÎŞ·¨·µ»Ø,LINUXÏÂ²»ÒËÊ¹ÓÃ
+	//é€’å½’è°ƒç”¨æ—¶æ— æ³•è¿”å›,LINUXä¸‹ä¸å®œä½¿ç”¨
 	//pthread_mutex_lock(&mutex);
 #endif	
 }
@@ -521,7 +521,7 @@ void ScpUserObject2::UnLock()
 #ifdef WIN32
 	//LeaveCriticalSection(&cs);
 #else 
-	//µİ¹éµ÷ÓÃÊ±ÎŞ·¨·µ»Ø,LINUXÏÂ²»ÒËÊ¹ÓÃ
+	//é€’å½’è°ƒç”¨æ—¶æ— æ³•è¿”å›,LINUXä¸‹ä¸å®œä½¿ç”¨
 	//pthread_mutex_unlock(&mutex);
 #endif
 }
@@ -560,7 +560,7 @@ int ScpUserObject3::IsInMap(ScpObject * obj)
 	UnLock();
 	return ret;
 }
-int ScpUserObject3::IsInMap(const std::wstring &strObjname)
+int ScpUserObject3::IsInMap(const std::string &strObjname)
 {
 	int ret = 0;
 	ITUSEROBJMAP3 it ;
@@ -577,7 +577,7 @@ int ScpUserObject3::IsInMap(const std::wstring &strObjname)
 	UnLock();
 	return ret;
 }
-ScpObjectType ScpUserObject3::GetType(const std::wstring& strObjname)
+ScpObjectType ScpUserObject3::GetType(const std::string& strObjname)
 {
 	ScpObject *  obj=NULL;
 	Lock();
@@ -595,7 +595,7 @@ ScpObjectType ScpUserObject3::GetType(const std::wstring& strObjname)
 	UnLock();
 	return type;
 }
-BOOL ScpUserObject3::MapObject(const std::wstring& strObjname,ScpObject *obj,std::wstring scope)
+BOOL ScpUserObject3::MapObject(const std::string& strObjname,ScpObject *obj,std::string scope)
 {
 	BOOL ret = FALSE ;
 	
@@ -608,7 +608,7 @@ BOOL ScpUserObject3::MapObject(const std::wstring& strObjname,ScpObject *obj,std
 		else
 		{
 			Lock();
-			userobjmap.push_back(std::pair<std::wstring,ScpObject *>(strObjname,obj));
+			userobjmap.push_back(std::pair<std::string,ScpObject *>(strObjname,obj));
 			obj->AddRef();
 			UnLock();
 		}
@@ -616,13 +616,13 @@ BOOL ScpUserObject3::MapObject(const std::wstring& strObjname,ScpObject *obj,std
 	else
 	{
 		Lock();
-		userobjmap.push_back(std::pair<std::wstring,ScpObject *>(strObjname,obj));
+		userobjmap.push_back(std::pair<std::string,ScpObject *>(strObjname,obj));
 		UnLock();
 	}
 	
 	return ret;
 }
-ScpObject * ScpUserObject3::GetObject(const std::wstring& strObjname)
+ScpObject * ScpUserObject3::GetObject(const std::string& strObjname)
 {
 	ScpObject * temp = NULL;
 	Lock();
@@ -646,7 +646,7 @@ ScpObject * ScpUserObject3::GetObject(unsigned long objindex)
 	UnLock();
 	return obj;
 }
-BOOL ScpUserObject3::SetObject(unsigned long objindex,const std::wstring& strObjname,ScpObject *obj)
+BOOL ScpUserObject3::SetObject(unsigned long objindex,const std::string& strObjname,ScpObject *obj)
 {
 	Lock();
 	userobjmap.at(objindex).first = strObjname;
@@ -654,7 +654,7 @@ BOOL ScpUserObject3::SetObject(unsigned long objindex,const std::wstring& strObj
 	UnLock();
 	return TRUE;
 }
-ScpObject * ScpUserObject3::UnMapObject(const std::wstring& strObjname)
+ScpObject * ScpUserObject3::UnMapObject(const std::string& strObjname)
 {
 	ScpObject *  obj=NULL;
 	Lock();
@@ -698,9 +698,9 @@ void ScpUserObject3::UnMapObject(unsigned long objindex)
 	}
 	UnLock();
 }
-std::wstring  ScpUserObject3::GetObjectName(ScpObject *obj)
+std::string  ScpUserObject3::GetObjectName(ScpObject *obj)
 {
-	std::wstring name;
+	std::string name;
 	
 	Lock();
 	ITUSEROBJMAP3 it = it=userobjmap.begin();
@@ -717,7 +717,7 @@ std::wstring  ScpUserObject3::GetObjectName(ScpObject *obj)
 	}
 	return name;
 }
-ULONG ScpUserObject3::GetObjectIndex(const std::wstring& objectname)
+ULONG ScpUserObject3::GetObjectIndex(const std::string& objectname)
 {
 	ULONG uRet=-1;
 	ULONG index=0;
@@ -737,9 +737,9 @@ ULONG ScpUserObject3::GetObjectIndex(const std::wstring& objectname)
 	UnLock();
 	return uRet;
 }
-std::wstring ScpUserObject3::GetObjectName(unsigned long objIndex)
+std::string ScpUserObject3::GetObjectName(unsigned long objIndex)
 {
-	std::wstring name;
+	std::string name;
 	Lock();
 	ITUSEROBJMAP3 it = userobjmap.begin();
 	while(it!=userobjmap.end() && (objIndex>0))
@@ -766,10 +766,10 @@ void ScpUserObject3::Destroy()
 		it++;
 #endif
 
-		//´¦ÀíÒ»¸ö¶ÔÏóÓĞ¶à¸öÃû×ÖµÄÇé¿ö
-		//È¡ÔªËØµÄÊ±ºò½«¶ÔÏóÓ³Éä¸øÁÙÊ±ÔªËØÃû³Æ£¬µ«ÊÇÃ»ÓĞ½â³ıÓ³Éä¹ØÏµ
-		//²éÕÒÖØ¸´×¢²áµÄÔªËØ£¬²¢ÇÒ½â³ıÓ³Éä
-		//std::wstring tempname =FindKeyByValue(userobjmap,temp,tempname);
+		//å¤„ç†ä¸€ä¸ªå¯¹è±¡æœ‰å¤šä¸ªåå­—çš„æƒ…å†µ
+		//å–å…ƒç´ çš„æ—¶å€™å°†å¯¹è±¡æ˜ å°„ç»™ä¸´æ—¶å…ƒç´ åç§°ï¼Œä½†æ˜¯æ²¡æœ‰è§£é™¤æ˜ å°„å…³ç³»
+		//æŸ¥æ‰¾é‡å¤æ³¨å†Œçš„å…ƒç´ ï¼Œå¹¶ä¸”è§£é™¤æ˜ å°„
+		//std::string tempname =FindKeyByValue(userobjmap,temp,tempname);
 		//while(!tempname.empty())
 		//{
 		//	UnMapObject(tempname);
@@ -792,16 +792,16 @@ VTSTRINGS ScpUserObject3::EnumObjects()
 	for(ITUSEROBJMAP3 it =userobjmap.begin();
 		it!=userobjmap.end();it++)
 	{
-		std::wstring temp;
+		std::string temp;
 		temp=it->first;
-		temp+=L",";
+		temp+=",";
 		temp+=ScpGlobalObject::GetInstance()->GetTypeName(it->second->GetType());
 		allobjects.push_back(temp);
 	}
 	UnLock();
 	return allobjects;
 }
-void ScpUserObject3::DumpObject(const std::wstring& objectname, CScriptEngine * engine)
+void ScpUserObject3::DumpObject(const std::string& objectname, CScriptEngine * engine)
 {
 	ScpObject *  obj =GetObject(objectname);
 	if(obj)
@@ -821,10 +821,10 @@ void ScpUserObject3::DeepCopy(ScpUserObject3 * userobject)
 	ITUSEROBJMAP3 it = userobject->userobjmap.begin();
 	while (it != userobject->userobjmap.end())
 	{
-		std::wstring name = it->first;
+		std::string name = it->first;
 		ScpObject * obj = it->second;
 		if (obj->GetType() != ObjFunction)
-			MapObject(name, it->second->Clone(L""));
+			MapObject(name, it->second->Clone(""));
 		else
 			MapObject(name, it->second);
 		it++;
@@ -836,7 +836,7 @@ void ScpUserObject3::Lock()
 #ifdef WIN32
 	//EnterCriticalSection(&cs);
 #else 
-	//µİ¹éµ÷ÓÃÊ±ÎŞ·¨·µ»Ø,LINUXÏÂ²»ÒËÊ¹ÓÃ
+	//é€’å½’è°ƒç”¨æ—¶æ— æ³•è¿”å›,LINUXä¸‹ä¸å®œä½¿ç”¨
 	//pthread_mutex_lock(&mutex);
 #endif	
 }
@@ -845,7 +845,7 @@ void ScpUserObject3::UnLock()
 #ifdef WIN32
 	//LeaveCriticalSection(&cs);
 #else 
-	//µİ¹éµ÷ÓÃÊ±ÎŞ·¨·µ»Ø,LINUXÏÂ²»ÒËÊ¹ÓÃ
+	//é€’å½’è°ƒç”¨æ—¶æ— æ³•è¿”å›,LINUXä¸‹ä¸å®œä½¿ç”¨
 	//pthread_mutex_unlock(&mutex);
 #endif
 }

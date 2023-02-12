@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//±í´ïÊ½½âÎö£¬½øĞĞÓï·¨¼ì²é£¬Éú³ÉÓï·¨Ê÷
+//è¡¨è¾¾å¼è§£æï¼Œè¿›è¡Œè¯­æ³•æ£€æŸ¥ï¼Œç”Ÿæˆè¯­æ³•æ ‘
 */
 #include "ScpExpressionAnalyser.h"
 #include "ScriptEngine.h"
@@ -17,6 +17,9 @@
 #include "ScpWhileStatementObject.h"
 #include "ScpObjectNammes.h"
 #include "commanddefine_uni.h"
+#ifndef _WIN32
+#include <climits>
+#endif
 ScpExpressionTreeNode::ScpExpressionTreeNode()
 {
 	LeftChild = NULL ;
@@ -103,15 +106,15 @@ ScpObject * ScpExpressionTreeNode::CalculateEx(CScriptEngine * engine)
 ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
-	//ÔÚÕâÀïÉú³É×Ö½ÚÂë
+	//åœ¨è¿™é‡Œç”Ÿæˆå­—èŠ‚ç 
 	ScpObject * numvalue=NULL;
 	if(nodestackop.size()==1)
 	{
-		std::wstring op = nodestackop.top();
+		std::string op = nodestackop.top();
 		//nodestackop.pop();
 		ScpObject* tempobjLeft = NULL ;
 		ScpObject* tempobjRight = NULL ;
-		//µ¥²Ù×÷ÊıÔËËã
+		//å•æ“ä½œæ•°è¿ç®—
 		if(NodeObjectStack.size()==1)
 		{
 			tempobjLeft=NodeObjectStack.top();
@@ -125,22 +128,22 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 				}
 				else if (op==scpOperationNot)
 				{
-					//Âß¼­·Ç
+					//é€»è¾‘é
 					numvalue = Not(tempobjLeft, engine);
 				}
 				else if (op==scpOperationBitNot)
 				{
-					//°´Î»Çó·´
+					//æŒ‰ä½æ±‚å
 					numvalue = BitNot(tempobjLeft, engine);
 				}
 				else if (op == scpOperationSelfAdd)
 				{
-					//×ÔÔö
+					//è‡ªå¢
 					numvalue = PostSelfAdd(tempobjLeft, engine);
 				}
 				else if (op == scpOperationSelfSub)
 				{
-					//×Ô¼õ
+					//è‡ªå‡
 					numvalue = PostSelfSub(tempobjLeft, engine);
 				}
 
@@ -156,8 +159,8 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 			{
 				ScpObjectType type1 = tempobjLeft->GetType();
 				ScpObjectType type2 = tempobjRight->GetType();
-				//NULL ¶ÔÏó²»ÄÜ²ÎÓëÈÎºÎÔËËã
-				//ÕâÀïÔÚ¶ÔNULL¶ÔÏó½øĞĞ²Ù×÷Ê±½«Æä×ª»»ÎªÁíÒ»²Ù×÷ÊıµÄ¶ÔÏóÀàĞÍ
+				//NULL å¯¹è±¡ä¸èƒ½å‚ä¸ä»»ä½•è¿ç®—
+				//è¿™é‡Œåœ¨å¯¹NULLå¯¹è±¡è¿›è¡Œæ“ä½œæ—¶å°†å…¶è½¬æ¢ä¸ºå¦ä¸€æ“ä½œæ•°çš„å¯¹è±¡ç±»å‹
 				if (type1 == ObjNull && type2 == ObjInt)
 				{
 					ScpArrayObject * arrayobj = (ScpArrayObject *)((ScpNullObject*)tempobjLeft)->parentObj;
@@ -166,6 +169,28 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 						ScpIntObject * intobj = (ScpIntObject *)BaseObjectFactory(ObjInt);
 						arrayobj->ReplaceElementObj(tempobjLeft, (ScpObject *)intobj);
 						tempobjLeft = intobj;
+						type1 = tempobjLeft->GetType();
+					}
+				}
+				if (type1 == ObjNull && type2 == ObjBigInt)
+				{
+					ScpArrayObject * arrayobj = (ScpArrayObject *)((ScpNullObject*)tempobjLeft)->parentObj;
+					if (arrayobj)
+					{
+						ScpBigIntObject * intobj = (ScpBigIntObject *)BaseObjectFactory(ObjBigInt);
+						arrayobj->ReplaceElementObj(tempobjLeft, (ScpObject *)intobj);
+						tempobjLeft = intobj;
+						type1 = tempobjLeft->GetType();
+					}
+				}
+				if (type1 == ObjNull && type2 == ObjDouble)
+				{
+					ScpArrayObject * arrayobj = (ScpArrayObject *)((ScpNullObject*)tempobjLeft)->parentObj;
+					if (arrayobj)
+					{
+						ScpDoubleObject * doubleobj = (ScpDoubleObject *)BaseObjectFactory(ObjDouble);
+						arrayobj->ReplaceElementObj(tempobjLeft, (ScpObject *)doubleobj);
+						tempobjLeft = doubleobj;
 						type1 = tempobjLeft->GetType();
 					}
 				}
@@ -182,8 +207,8 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 				}
 				if (op == scpOperationAssign)
 				{
-					//±í´ïÊ½ÓĞÁ½¸ö¶ÔÏó
-					//ÆäÖĞÒ»¸ö²ÎÊıÍ¬Ê±Ò²ÊÇ·µ»ØÖµ£¬²»ÄÜÊÇÁÙÊ±¶ÔÏó
+					//è¡¨è¾¾å¼æœ‰ä¸¤ä¸ªå¯¹è±¡
+					//å…¶ä¸­ä¸€ä¸ªå‚æ•°åŒæ—¶ä¹Ÿæ˜¯è¿”å›å€¼ï¼Œä¸èƒ½æ˜¯ä¸´æ—¶å¯¹è±¡
 					numvalue = Assign(tempobjLeft, tempobjRight, engine);
 					if (tempobjRight->istemp)
 					{
@@ -280,8 +305,8 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 				}
 				else
 				{
-					//±í´ïÊ½ÓĞÈı¸ö²Ù×÷Êı
-					//²ÎÊı¿ÉÄÜÊÇÁÙÊ±¶ÔÏó£¬·µ»ØÖµ²»Ó¦ÊÇÁÙÊ±¶ÔÏó
+					//è¡¨è¾¾å¼æœ‰ä¸‰ä¸ªæ“ä½œæ•°
+					//å‚æ•°å¯èƒ½æ˜¯ä¸´æ—¶å¯¹è±¡ï¼Œè¿”å›å€¼ä¸åº”æ˜¯ä¸´æ—¶å¯¹è±¡
 					if (op == scpOperationEqual)
 					{
 						numvalue = Equal(tempobjLeft, tempobjRight, engine);
@@ -355,7 +380,7 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 					{
 						numvalue = BitShiftRight(tempobjLeft, tempobjRight, engine);
 					}
-					//ÇåÀíÁÙÊ±¶ÔÏó
+					//æ¸…ç†ä¸´æ—¶å¯¹è±¡
 					if (tempobjRight->istemp)
 					{
 						objectSpace->ReleaseTempObject(tempobjRight);
@@ -377,7 +402,7 @@ ScpObject * ScpExpressionTreeNode::CalcStackEx(CScriptEngine * engine)
 				numvalue = ((ScpExpressionTreeNode*)nodeobject)->CalculateEx(engine);	
 				if(!InnerFunctionName.empty())
 				{
-					//×¢Òâ:ÕâÀïµÄĞŞ¸Ä²»ÄÜÈ·ÈÏ
+					//æ³¨æ„:è¿™é‡Œçš„ä¿®æ”¹ä¸èƒ½ç¡®è®¤
 					if(numvalue)
 					//numvalue = numvalue->CallInnerFunction(InnerFunctionName,&((ScpExpressionTreeNode*)nodeobject)->vtFuncparameters,engine);
 					numvalue = numvalue->CallInnerFunction(InnerFunctionName, &vtFuncparameters, engine);
@@ -428,11 +453,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 {
 	ULONG resultresid;
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
-	//ÔÚÕâÀïÉú³É×Ö½ÚÂë
+	//åœ¨è¿™é‡Œç”Ÿæˆå­—èŠ‚ç 
 	ScpObject * numvalue = NULL;
 	if (nodestackop.size() == 1)
 	{
-		std::wstring op = nodestackop.top();
+		std::string op = nodestackop.top();
 		//nodestackop.pop();
 		ScpObject* tempobjLeft = NULL;
 		ScpObject* tempobjRight = NULL;
@@ -463,7 +488,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 				{
 					numvalue = PostSelfSub(tempobjLeft, engine);
 				}
-				std::wstring name = objectSpace->GetObjectNameR(tempobjLeft);
+				std::string name = objectSpace->GetObjectNameR(tempobjLeft);
 				if (!name.empty())
 				{
 					ULONG idleft = engine->bytecode.resourcepool->scpFindResource(name);
@@ -482,7 +507,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 			if (tempobjRight && tempobjLeft)
 			{
 
-				std::wstring name = objectSpace->GetObjectNameR(tempobjLeft);		
+				std::string name = objectSpace->GetObjectNameR(tempobjLeft);		
 				ULONG idleft = engine->bytecode.resourcepool->scpFindResource(name);
 				if (name.empty())
 				{
@@ -530,8 +555,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 						}
 						else
 						{
-							std::wstring lname = L"tempint";
-							lname += IntToWString(((ScpIntObject*)tempobjLeft)->value);
+							std::string lname = "tempint";
+							lname += IntToString(((ScpIntObject*)tempobjLeft)->value);
 							idleft = engine->bytecode.resourcepool->AppendResource(lname);
 							ByteCodeMemoryStream stream;
 							engine->bytecode.GetByteCodeInitRes(lname, stream, idleft);
@@ -539,9 +564,9 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 							stream.Release();
 
 							VTPARAMETERS param;
-							param.push_back(L"int");
+							param.push_back("int");
 							param.push_back(lname);
-							param.push_back(IntToWString(((ScpIntObject*)tempobjLeft)->value));
+							param.push_back(IntToString(((ScpIntObject*)tempobjLeft)->value));
 							engine->bytecode.GenByteCodeObjectDefine(tempobjLeft->GetType(), param, stream);
 							engine->bytecode.bytecodemem->AppendByteCode(&stream);
 							stream.Release();
@@ -558,7 +583,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 					stream.Release();
 
 					VTPARAMETERS param;
-					param.push_back(L"int");
+					param.push_back("int");
 					param.push_back(name);
 					engine->bytecode.GenByteCodeObjectDefine(tempobjLeft->GetType(), param, stream);
 					engine->bytecode.bytecodemem->AppendByteCode(&stream);
@@ -582,7 +607,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 						stream.Release();
 
 						VTPARAMETERS param;
-						param.push_back(L"int");
+						param.push_back("int");
 						param.push_back(name);
 						engine->bytecode.GenByteCodeObjectDefine(tempobjRight->GetType(), param, stream);
 						engine->bytecode.bytecodemem->AppendByteCode(&stream);
@@ -592,8 +617,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 
 				ScpObjectType type1 = tempobjLeft->GetType();
 				ScpObjectType type2 = tempobjRight->GetType();
-				//NULL ¶ÔÏó²»ÄÜ²ÎÓëÈÎºÎÔËËã
-				//ÕâÀïÔÚ¶ÔNULL¶ÔÏó½øĞĞ²Ù×÷Ê±½«Æä×ª»»ÎªÁíÒ»²Ù×÷ÊıµÄ¶ÔÏóÀàĞÍ
+				//NULL å¯¹è±¡ä¸èƒ½å‚ä¸ä»»ä½•è¿ç®—
+				//è¿™é‡Œåœ¨å¯¹NULLå¯¹è±¡è¿›è¡Œæ“ä½œæ—¶å°†å…¶è½¬æ¢ä¸ºå¦ä¸€æ“ä½œæ•°çš„å¯¹è±¡ç±»å‹
 				if (type1 == ObjNull && type2 == ObjInt)
 				{
 					ScpArrayObject * arrayobj = (ScpArrayObject *)((ScpNullObject*)tempobjLeft)->parentObj;
@@ -602,6 +627,28 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 						ScpIntObject * intobj = (ScpIntObject *)BaseObjectFactory(ObjInt);
 						arrayobj->ReplaceElementObj(tempobjLeft, (ScpObject *)intobj);
 						tempobjLeft = intobj;
+						type1 = tempobjLeft->GetType();
+					}
+				}
+				if (type1 == ObjNull && type2 == ObjBigInt)
+				{
+					ScpArrayObject * arrayobj = (ScpArrayObject *)((ScpNullObject*)tempobjLeft)->parentObj;
+					if (arrayobj)
+					{
+						ScpBigIntObject * intobj = (ScpBigIntObject *)BaseObjectFactory(ObjBigInt);
+						arrayobj->ReplaceElementObj(tempobjLeft, (ScpObject *)intobj);
+						tempobjLeft = intobj;
+						type1 = tempobjLeft->GetType();
+					}
+				}
+				if (type1 == ObjNull && type2 == ObjDouble)
+				{
+					ScpArrayObject * arrayobj = (ScpArrayObject *)((ScpNullObject*)tempobjLeft)->parentObj;
+					if (arrayobj)
+					{
+						ScpDoubleObject * doubleobj = (ScpDoubleObject *)BaseObjectFactory(ObjDouble);
+						arrayobj->ReplaceElementObj(tempobjLeft, (ScpObject *)doubleobj);
+						tempobjLeft = doubleobj;
 						type1 = tempobjLeft->GetType();
 					}
 				}
@@ -629,8 +676,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 					op == scpOpeartionBitShiftLeftAndAssign ||
 					op == scpOpeartionBitShiftRightAndAssign)
 				{
-					//±í´ïÊ½ÓĞÁ½¸ö¶ÔÏó
-					//ÆäÖĞÒ»¸ö²ÎÊıÍ¬Ê±Ò²ÊÇ·µ»ØÖµ£¬²»ÄÜÊÇÁÙÊ±¶ÔÏó
+					//è¡¨è¾¾å¼æœ‰ä¸¤ä¸ªå¯¹è±¡
+					//å…¶ä¸­ä¸€ä¸ªå‚æ•°åŒæ—¶ä¹Ÿæ˜¯è¿”å›å€¼ï¼Œä¸èƒ½æ˜¯ä¸´æ—¶å¯¹è±¡
 
 										
 					ByteCodeMemoryStream stream;
@@ -697,8 +744,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 				}			
 				else
 				{
-					//±í´ïÊ½ÓĞÈı¸ö²Ù×÷Êı
-					//²ÎÊı¿ÉÄÜÊÇÁÙÊ±¶ÔÏó£¬·µ»ØÖµ²»Ó¦ÊÇÁÙÊ±¶ÔÏó
+					//è¡¨è¾¾å¼æœ‰ä¸‰ä¸ªæ“ä½œæ•°
+					//å‚æ•°å¯èƒ½æ˜¯ä¸´æ—¶å¯¹è±¡ï¼Œè¿”å›å€¼ä¸åº”æ˜¯ä¸´æ—¶å¯¹è±¡
 					
 					
 					if (op == scpOperationAdd||
@@ -792,7 +839,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 						{
 							numvalue = BitShiftRight(tempobjLeft, tempobjRight, engine);
 						}
-						std::wstring name;
+						std::string name;
 						ULONG idret =GenTempObjectByteCode(numvalue, name, engine,true);
 
 						ByteCodeMemoryStream stream;
@@ -804,7 +851,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 						stream.Release();						
 					}			
 					
-					//ÇåÀíÁÙÊ±¶ÔÏó
+					//æ¸…ç†ä¸´æ—¶å¯¹è±¡
 					//if (tempobjRight->istemp)
 					//{
 					//	objectSpace->ReleaseTempObject(tempobjRight);
@@ -838,7 +885,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 								objectSpace->AddObject(vtFuncparameters.at(i), objret);
 							}
 						}
-						std::wstring name = objectSpace->GetObjectNameR(numvalue);
+						std::string name = objectSpace->GetObjectNameR(numvalue);
 						if (name.empty())
 						{
 							GenTempObjectByteCode(numvalue, name, engine,false);
@@ -846,12 +893,15 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodeStack(CScriptEngine * engine, Byt
 						
 
 						ByteCodeMemoryStream stream;
-						engine->bytecode.GenByteCodeCallInner(name, InnerFunctionName, vtFuncparameters, stream);
+						engine->bytecode.GenByteCodeCallInner(name, InnerFunctionName, vtFuncparameters, stream,engine);
 						memstream.AppendByteCode(&stream);
 						stream.Release();
 
 						//numvalue = ((ScpExpressionTreeNode*)nodeobject)->MakeByteCodePerformFunctionCall(engine, memstream);
-						numvalue = numvalue->CallInnerFunction(InnerFunctionName, &((ScpExpressionTreeNode*)nodeobject)->vtFuncparameters, engine);
+						if (!engine->Build)
+						{
+							numvalue = numvalue->CallInnerFunction(InnerFunctionName, &((ScpExpressionTreeNode*)nodeobject)->vtFuncparameters, engine);
+						}
 					
 					}
 				}
@@ -892,7 +942,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 				}
 			}
 
-			std::wstring objname = objectSpace->GetObjectNameR(nodeobject);
+			std::string objname = objectSpace->GetObjectNameR(nodeobject);
 
 			ULONG idobject = engine->bytecode.resourcepool->scpFindResource(objname);
 			if (idobject == -1)
@@ -902,7 +952,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 				engine->bytecode.GetByteCodeInitRes(objname, stream, idobject);
 				engine->bytecode.bytecodemem->AppendByteCode(&stream);
 				stream.Release();
-				std::wstring type_name = L"int";
+				std::string type_name = "int";
 				type_name = ScpGlobalObject::GetInstance()->GetTypeName(objectSpace->GetType(objname));
 
 				VTPARAMETERS param;
@@ -931,10 +981,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 
 			}
 
-			//µ÷ÓÃÀàµÄ³ÉÔ±º¯Êı
-			//º¯Êı×Ö½ÚÂë»¹Ã»ÓĞÉú³É
-			//ÀàµÄ¶¨ÒåÒÑ¾­Éú³É£¬º¯Êı×Ö½ÚÂë²»³É²åÈëµ½ÀàµÄ¶¨ÒåÖĞ
-			//¶øÊÇÒª·Åµ½È«¾Ö¿Õ¼ä
+			//è°ƒç”¨ç±»çš„æˆå‘˜å‡½æ•°
+			//å‡½æ•°å­—èŠ‚ç è¿˜æ²¡æœ‰ç”Ÿæˆ
+			//ç±»çš„å®šä¹‰å·²ç»ç”Ÿæˆï¼Œå‡½æ•°å­—èŠ‚ç ä¸æˆæ’å…¥åˆ°ç±»çš„å®šä¹‰ä¸­
+			//è€Œæ˜¯è¦æ”¾åˆ°å…¨å±€ç©ºé—´
 			
 			if (nodeobject->GetType() == ObjClass || nodeobject->GetType() == ObjClassInstance)
 			{
@@ -963,8 +1013,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 								}
 								else
 								{
-									//ÕâÀïĞèÒª¿¼ÂÇº¯ÊıµÄ²ÎÊıÊÇ±í´ïÊ½µÄÇé¿ö
-									std::wstring Expression = vtFuncparameters.at(i);
+									//è¿™é‡Œéœ€è¦è€ƒè™‘å‡½æ•°çš„å‚æ•°æ˜¯è¡¨è¾¾å¼çš„æƒ…å†µ
+									std::string Expression = vtFuncparameters.at(i);
 									ULONG residexp = engine->bytecode.resourcepool->scpFindResource(Expression);
 									ULONG residname;
 									if (residexp == -1)
@@ -973,11 +1023,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 										VTPARAMETERS param;
 										if (IsStaticNumber(Expression))
 										{
-											std::wstring name = L"tempint";
+											std::string name = "tempint";
 											residname = engine->bytecode.resourcepool->scpFindResource(name);
 											while (residname != -1)
 											{
-												name += L"0";
+												name += "0";
 												residname = engine->bytecode.resourcepool->scpFindResource(name);
 											}
 											residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -986,7 +1036,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 											engine->bytecode.bytecodemem->AppendByteCode(&stream);
 											stream.Release();
 
-											param.push_back(L"int");
+											param.push_back("int");
 											param.push_back(name);
 											param.push_back(Expression);
 											engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
@@ -1003,11 +1053,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 										}
 										else if (IsStaticString(Expression))
 										{
-											std::wstring name = L"tempstring";
+											std::string name = "tempstring";
 											residname = engine->bytecode.resourcepool->scpFindResource(name);
 											while (residname != -1)
 											{
-												name += L"0";
+												name += "0";
 												residname = engine->bytecode.resourcepool->scpFindResource(name);
 											}
 											residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1016,7 +1066,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 											engine->bytecode.bytecodemem->AppendByteCode(&stream);
 											stream.Release();
 
-											param.push_back(L"string");
+											param.push_back("string");
 											param.push_back(name);
 											param.push_back(Expression);
 											engine->bytecode.GenByteCodeObjectDefine(ObjString, param, stream);
@@ -1036,10 +1086,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									{
 										ByteCodeMemoryStream stream;
 										VTPARAMETERS param;
-										if (Expression == L"0")
+										if (Expression == "0")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"zero";
+											std::string numname = "gl_";
+											numname += "zero";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1061,10 +1111,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"1")
+										else if (Expression == "1")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"one";
+											std::string numname = "gl_";
+											numname += "one";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1086,10 +1136,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"2")
+										else if (Expression == "2")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"two";
+											std::string numname = "gl_";
+											numname += "two";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1111,10 +1161,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"3")
+										else if (Expression == "3")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"three";
+											std::string numname = "gl_";
+											numname += "three";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1136,10 +1186,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"4")
+										else if (Expression == "4")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"four";
+											std::string numname = "gl_";
+											numname += "four";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1161,10 +1211,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"5")
+										else if (Expression == "5")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"five";
+											std::string numname = "gl_";
+											numname += "five";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1186,10 +1236,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"6")
+										else if (Expression == "6")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"six";
+											std::string numname = "gl_";
+											numname += "six";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1211,10 +1261,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"7")
+										else if (Expression == "7")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"seven";
+											std::string numname = "gl_";
+											numname += "seven";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1236,10 +1286,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"8")
+										else if (Expression == "8")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"eight";
+											std::string numname = "gl_";
+											numname += "eight";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1261,10 +1311,10 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 												func->RealParameters.push_back(numname);
 											}
 										}
-										else if (Expression == L"9")
+										else if (Expression == "9")
 										{
-											std::wstring numname = L"gl_";
-											numname += L"nine";
+											std::string numname = "gl_";
+											numname += "nine";
 											if (engine->GetCurrentObjectSpace()->FindObject(numname))
 											{
 												func->RealParameters.push_back(numname);
@@ -1288,11 +1338,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 										}										
 										else if (IsStaticNumber(Expression))
 										{
-											std::wstring name = L"tempint";
+											std::string name = "tempint";
 											residname = engine->bytecode.resourcepool->scpFindResource(name);
 											while (residname != -1)
 											{
-												name += L"0";
+												name += "0";
 												residname = engine->bytecode.resourcepool->scpFindResource(name);
 											}
 											residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1301,7 +1351,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 											engine->bytecode.bytecodemem->AppendByteCode(&stream);
 											stream.Release();
 
-											param.push_back(L"int");
+											param.push_back("int");
 											param.push_back(name);
 											param.push_back(Expression);
 											engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
@@ -1312,11 +1362,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 										}
 										else if (IsStaticString(Expression))
 										{
-											std::wstring name = L"tempstring";
+											std::string name ="tempstring";
 											residname = engine->bytecode.resourcepool->scpFindResource(name);
 											while (residname != -1)
 											{
-												name += L"0";
+												name += "0";
 												residname = engine->bytecode.resourcepool->scpFindResource(name);
 											}
 											residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1325,7 +1375,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 											engine->bytecode.bytecodemem->AppendByteCode(&stream);
 											stream.Release();
 
-											param.push_back(L"string");
+											param.push_back("string");
 											param.push_back(name);
 											param.push_back(Expression);
 											engine->bytecode.GenByteCodeObjectDefine(ObjString, param, stream);
@@ -1342,7 +1392,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 						}
 						if (func->BindParameters(engine) != -1)
 						{
-							std::wstring objname = objectSpace->GetObjectNameR(nodeobject);
+							std::string objname = objectSpace->GetObjectNameR(nodeobject);
 
 							VTPARAMETERS param;
 							for (int i = 0;i < func->RealParameters.size();i++)
@@ -1369,7 +1419,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 				}
 				else
 				{
-					//²»ÊÇÓÃ»§¶¨ÒåµÄ³ÉÔ±º¯Êı£¬¶øÊÇÄÚÖÃº¯Êı
+					//ä¸æ˜¯ç”¨æˆ·å®šä¹‰çš„æˆå‘˜å‡½æ•°ï¼Œè€Œæ˜¯å†…ç½®å‡½æ•°
 					if (vtFuncparameters.size() > 0)
 					{
 						for (ULONG i = 0;i < vtFuncparameters.size();i++)
@@ -1377,8 +1427,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 							ScpObject * obj = objectSpace->FindObject(vtFuncparameters.at(i));
 							if (!obj)
 							{
-								//ÕâÀïĞèÒª¿¼ÂÇº¯ÊıµÄ²ÎÊıÊÇ±í´ïÊ½µÄÇé¿ö
-								std::wstring Expression = vtFuncparameters.at(i);
+								//è¿™é‡Œéœ€è¦è€ƒè™‘å‡½æ•°çš„å‚æ•°æ˜¯è¡¨è¾¾å¼çš„æƒ…å†µ
+								std::string Expression = vtFuncparameters.at(i);
 								ULONG residexp = engine->bytecode.resourcepool->scpFindResource(Expression);
 								ULONG residname;
 								if (residexp == -1)
@@ -1387,11 +1437,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									VTPARAMETERS param;
 									if (IsStaticNumber(Expression))
 									{
-										std::wstring name = L"tempint";
+										std::string name = "tempint";
 										residname = engine->bytecode.resourcepool->scpFindResource(name);
 										while (residname != -1)
 										{
-											name += L"0";
+											name += "0";
 											residname = engine->bytecode.resourcepool->scpFindResource(name);
 										}
 										residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1400,7 +1450,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 										engine->bytecode.bytecodemem->AppendByteCode(&stream);
 										stream.Release();
 
-										param.push_back(L"int");
+										param.push_back("int");
 										param.push_back(name);
 										param.push_back(Expression);
 										engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
@@ -1410,11 +1460,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									}
 									else if (IsStaticString(Expression))
 									{
-										std::wstring name = L"tempstring";
+										std::string name = "tempstring";
 										residname = engine->bytecode.resourcepool->scpFindResource(name);
 										while (residname != -1)
 										{
-											name += L"0";
+											name += "0";
 											residname = engine->bytecode.resourcepool->scpFindResource(name);
 										}
 										residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1423,7 +1473,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 										engine->bytecode.bytecodemem->AppendByteCode(&stream);
 										stream.Release();
 
-										param.push_back(L"string");
+										param.push_back("string");
 										param.push_back(name);
 										param.push_back(Expression);
 										engine->bytecode.GenByteCodeObjectDefine(ObjString, param, stream);
@@ -1448,8 +1498,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 						ScpObject * obj = objectSpace->FindObject(vtFuncparameters.at(i));
 						if (!obj)
 						{
-							//ÕâÀïĞèÒª¿¼ÂÇº¯ÊıµÄ²ÎÊıÊÇ±í´ïÊ½µÄÇé¿ö
-							std::wstring Expression = vtFuncparameters.at(i);
+							//è¿™é‡Œéœ€è¦è€ƒè™‘å‡½æ•°çš„å‚æ•°æ˜¯è¡¨è¾¾å¼çš„æƒ…å†µ
+							std::string Expression = vtFuncparameters.at(i);
 							ULONG residexp = engine->bytecode.resourcepool->scpFindResource(Expression);
 							ULONG residname;
 							if (residexp == -1)
@@ -1458,11 +1508,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 								VTPARAMETERS param;
 								if (IsStaticNumber(Expression))
 								{
-									std::wstring name = L"tempint";
+									std::string name = "tempint";
 									residname = engine->bytecode.resourcepool->scpFindResource(name);
 									while (residname != -1)
 									{
-										name += L"0";
+										name += "0";
 										residname = engine->bytecode.resourcepool->scpFindResource(name);
 									}
 									residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1471,7 +1521,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									engine->bytecode.bytecodemem->AppendByteCode(&stream);
 									stream.Release();
 
-									param.push_back(L"int");
+									param.push_back("int");
 									param.push_back(name);
 									param.push_back(Expression);
 									engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
@@ -1481,11 +1531,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 								}
 								else if (IsStaticString(Expression))
 								{
-									std::wstring name = L"tempstring";
+									std::string name = "tempstring";
 									residname = engine->bytecode.resourcepool->scpFindResource(name);
 									while (residname != -1)
 									{
-										name += L"0";
+										name += "0";
 										residname = engine->bytecode.resourcepool->scpFindResource(name);
 									}
 									residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1494,7 +1544,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									engine->bytecode.bytecodemem->AppendByteCode(&stream);
 									stream.Release();
 
-									param.push_back(L"string");
+									param.push_back("string");
 									param.push_back(name);
 									param.push_back(Expression);
 									engine->bytecode.GenByteCodeObjectDefine(ObjString, param, stream);
@@ -1509,7 +1559,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 				}
 			}
 			ByteCodeMemoryStream stream;
-			engine->bytecode.GenByteCodeCallInner(objname, InnerFunctionName, vtFuncparameters, stream);
+			engine->bytecode.GenByteCodeCallInner(objname, InnerFunctionName, vtFuncparameters, stream, engine);
 			memstream.AppendByteCode(&stream);
 			stream.Release();
 			retobj = nodeobject->CallInnerFunction(InnerFunctionName, &vtFuncparameters, engine);
@@ -1535,8 +1585,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 						else
 						{
 
-							//ÕâÀïĞèÒª¿¼ÂÇº¯ÊıµÄ²ÎÊıÊÇ±í´ïÊ½µÄÇé¿ö
-							std::wstring Expression = vtFuncparameters.at(i);
+							//è¿™é‡Œéœ€è¦è€ƒè™‘å‡½æ•°çš„å‚æ•°æ˜¯è¡¨è¾¾å¼çš„æƒ…å†µ
+							std::string Expression = vtFuncparameters.at(i);
 							ULONG residexp = engine->bytecode.resourcepool->scpFindResource(vtFuncparameters.at(i));
 							ULONG residname;
 							if (residexp == -1)
@@ -1545,11 +1595,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 								VTPARAMETERS param;
 								if (IsStaticNumber(Expression))
 								{
-									std::wstring name = L"tempint";
+									std::string name = "tempint";
 									residname = engine->bytecode.resourcepool->scpFindResource(name);
 									while (residname != -1)
 									{
-										name += L"0";
+										name += "0";
 										residname = engine->bytecode.resourcepool->scpFindResource(name);
 									}
 									residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1558,7 +1608,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									engine->bytecode.bytecodemem->AppendByteCode(&stream);
 									stream.Release();
 
-									param.push_back(L"int");
+									param.push_back("int");
 									param.push_back(name);
 									param.push_back(Expression);
 									engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
@@ -1578,11 +1628,11 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 								}
 								else if (IsStaticString(Expression))
 								{
-									std::wstring name = L"tempstring";
+									std::string name = "tempstring";
 									residname = engine->bytecode.resourcepool->scpFindResource(name);
 									while (residname != -1)
 									{
-										name += L"0";
+										name += "0";
 										residname = engine->bytecode.resourcepool->scpFindResource(name);
 									}
 									residname = engine->bytecode.resourcepool->AppendResource(name);
@@ -1591,7 +1641,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 									engine->bytecode.bytecodemem->AppendByteCode(&stream);
 									stream.Release();
 
-									param.push_back(L"string");
+									param.push_back("string");
 									param.push_back(name);
 									param.push_back(Expression);
 									engine->bytecode.GenByteCodeObjectDefine(ObjString, param, stream);
@@ -1619,7 +1669,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 				}
 				if (func->BindParameters(engine) != -1)
 				{
-					std::wstring objname = objectSpace->GetObjectNameR(nodeobject);
+					std::string objname = objectSpace->GetObjectNameR(nodeobject);
 
 					VTPARAMETERS param;
 					for (int i = 1;i < vtFuncparameters.size();i++)
@@ -1627,17 +1677,18 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 						param.push_back(vtFuncparameters.at(i));
 					}
 					int gencode = 0;
+					//å‡½æ•°æ²¡æœ‰è°ƒç”¨è¿‡ï¼Œæ²¡æœ‰ç”Ÿæˆå‡½æ•°å®šä¹‰å’Œå‡½æ•°ä½“çš„å­—èŠ‚ç 
 					if (func->bytecodemem_funcbody.codelength == 0)
 					{
 						gencode = 1;
 						ByteCodeMemoryStream stream;
 						func->functionexpressionblock->GenByteCode(engine, stream);
 						engine->bytecode.GenByteCodeFunctionBody(stream);
-						func->bytecodemem_funcbody.AppendByteCode(&stream);	
+						func->bytecodemem_funcbody.AppendByteCode(&stream);
 
 						engine->bytecode.bytecodemem->AppendByteCode(&func->bytecodemem_funcdef);
-						engine->bytecode.bytecodemem->AppendByteCode(&func->bytecodemem_funcbody);	
-							
+						engine->bytecode.bytecodemem->AppendByteCode(&func->bytecodemem_funcbody);
+
 					}
 
 					ByteCodeMemoryStream stream;
@@ -1666,7 +1717,7 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 	}
 	return retobj;
 }
-ULONG ScpExpressionTreeNode::GenTempObjectByteCode(ScpObject* obj, std::wstring &name, CScriptEngine* engine, bool retvalue)
+ULONG ScpExpressionTreeNode::GenTempObjectByteCode(ScpObject* obj, std::string &name, CScriptEngine* engine, bool retvalue)
 {
 	ULONG idret;
 	if (obj)
@@ -1723,63 +1774,63 @@ ULONG ScpExpressionTreeNode::GenTempObjectByteCode(ScpObject* obj, std::wstring 
 				{
 					idret = residnine;
 				}
-				name = L"tempint";
+				name = "tempint";
 				idret = engine->bytecode.resourcepool->scpFindResource(name);
 				while (idret != -1)
 				{
-					name += L"0";
+					name += "0";
 					idret = engine->bytecode.resourcepool->scpFindResource(name);
 				}
 			}			
 			else
 			{
-				//ËµÃ÷ÊÇ¼´½«±»¸³ÖµµÄ·µ»ØÖµ£¬²»ÊÊÓÃÔ¤ÖÃĞ¡ÕûÊı×ÊÔ´
-				name = L"tempint";
+				//è¯´æ˜æ˜¯å³å°†è¢«èµ‹å€¼çš„è¿”å›å€¼ï¼Œä¸é€‚ç”¨é¢„ç½®å°æ•´æ•°èµ„æº
+				name = "tempint";
 				idret = engine->bytecode.resourcepool->scpFindResource(name);
 				while (idret != -1)
 				{
-					name += L"0";
+					name += "0";
 					idret = engine->bytecode.resourcepool->scpFindResource(name);
 				}
 			}			
 		}
 		else if (obj->GetType() == ObjString)
 		{
-			name = L"tempstring";
+			name = "tempstring";
 			idret = engine->bytecode.resourcepool->scpFindResource(name);
 			while (idret != -1)
 			{
-				name += L"0";
+				name += "0";
 				idret = engine->bytecode.resourcepool->scpFindResource(name);
 			}
 		}
 		else if (obj->GetType() == ObjDouble)
 		{
-			name = L"tempdouble";
+			name = "tempdouble";
 			idret = engine->bytecode.resourcepool->scpFindResource(name);
 			while (idret != -1)
 			{
-				name += L"0";
+				name += "0";
 				idret = engine->bytecode.resourcepool->scpFindResource(name);
 			}
 		}
 		else if (obj->GetType() == ObjBigInt)
 		{
-			name = L"tempbigint";
+			name = "tempbigint";
 			idret = engine->bytecode.resourcepool->scpFindResource(name);
 			while (idret != -1)
 			{
-				name += L"0";
+				name += "0";
 				idret = engine->bytecode.resourcepool->scpFindResource(name);
 			}
 		}
 		else if (obj->GetType() == ObjTable)
 		{
-			name = L"temptable";
+			name = "temptable";
 			idret = engine->bytecode.resourcepool->scpFindResource(name);
 			while (idret != -1)
 			{
-				name += L"0";
+				name += "0";
 				idret = engine->bytecode.resourcepool->scpFindResource(name);
 			}
 		}
@@ -1792,15 +1843,15 @@ ULONG ScpExpressionTreeNode::GenTempObjectByteCode(ScpObject* obj, std::wstring 
 			stream.Release();
 			VTPARAMETERS param;
 			if (obj->GetType() == ObjInt)
-				param.push_back(L"int");
+				param.push_back("int");
 			else if (obj->GetType() == ObjString)
-				param.push_back(L"string");
+				param.push_back("string");
 			else if (obj->GetType() == ObjDouble)
-				param.push_back(L"double");
+				param.push_back("double");
 			else if (obj->GetType() == ObjBigInt)
-				param.push_back(L"int64");
+				param.push_back("int64");
 			else if (obj->GetType() == ObjTable)
-				param.push_back(L"table");
+				param.push_back("table");
 			param.push_back(name);
 			
 			if (obj->GetType() == ObjInt)
@@ -1873,6 +1924,19 @@ ScpObject * ScpExpressionTreeNode::PerformFunctionCall(CScriptEngine * engine)
 				retobj = nodeobject;
 			}
 		}
+		else if (nodeobject->GetType() == ObjCFunction)
+		{
+			if (vtFuncparameters.size() > 0)
+			{
+				vtFuncparameters.insert(vtFuncparameters.begin(), str_EN_ObjCFunction);
+				engine->scriptcommand->Do_Call_Command(&vtFuncparameters, engine);
+				//retobj = ((ScpFunctionObject*)nodeobject)->Result;
+			}
+			else
+			{
+				retobj = nodeobject;
+			}
+		}
 		else
 		{
 			retobj = nodeobject;
@@ -1897,12 +1961,20 @@ ScpObject * ScpExpressionTreeNode::DoArrayItemRef(CScriptEngine * engine)
 			else
 			{
 				StringStripQuote(ArrayItem);
-				ScpIntObject * itemindex = (ScpIntObject *)objectSpace->FindObject(ArrayItem);
+				ScpObject * itemindex = (ScpObject *)objectSpace->FindObject(ArrayItem);
 				if (itemindex)
 				{
 					if (itemindex->GetType() == ObjInt)
 					{
-						index = itemindex->value;
+						index = ((ScpIntObject *)itemindex)->value;
+					}
+					else if (itemindex->GetType() == ObjBigInt)
+					{
+						index = ((ScpBigIntObject *)itemindex)->value;
+					}
+					else
+					{
+						//engine->PrintError(scpErrorEnInvalidArrayItemRef);
 					}
 				}
 
@@ -1961,12 +2033,12 @@ void ScpExpressionAnalyser::Attach(CScriptEngine * eng)
 	lex.Attach(eng);
 	engine = eng;
 }
-ScpExpressionTreeNode *ScpExpressionAnalyser::BuildExressionTreeNode(std::wstring Expression, size_t &startpos)
+ScpExpressionTreeNode *ScpExpressionAnalyser::BuildExressionTreeNode(std::string Expression, size_t &startpos)
 {
 	ScpExpressionTreeNode * thisnode =(ScpExpressionTreeNode * ) engine->GetCurrentObjectSpace()->AcquireTempObject(ObjExpressionNode);
 	//thisnode->AddRef();
-	std::wstring NewExpression;
-	std::wstring token;
+	std::string NewExpression;
+	std::string token;
 
 	token=lex.GetNextToken();
 	while(token!=scpEndofExpression)
@@ -2152,7 +2224,7 @@ ScpExpressionTreeNode *ScpExpressionAnalyser::BuildExressionTreeNode(std::wstrin
 
 
 }
-void ScpExpressionAnalyser::PopStack(std::wstring &PostFixExpression,ScpObjStack &OperationStack)
+void ScpExpressionAnalyser::PopStack(std::string &PostFixExpression,ScpObjStack &OperationStack)
 {
 
 	while(OperationStack.size()>0)
@@ -2161,7 +2233,7 @@ void ScpExpressionAnalyser::PopStack(std::wstring &PostFixExpression,ScpObjStack
 		{
 			if(!PostFixExpression.empty())
 			{
-				PostFixExpression+=L",";				
+				PostFixExpression+=",";				
 			}
 			PostFixExpression+=OperationStack.top();
 			OperationStack.pop();
@@ -2173,7 +2245,7 @@ void ScpExpressionAnalyser::PopStack(std::wstring &PostFixExpression,ScpObjStack
 		}
 	}
 }
-void ScpExpressionAnalyser::EmptyStack(std::wstring &PostFixExpression,ScpObjStack &OperationStack)
+void ScpExpressionAnalyser::EmptyStack(std::string &PostFixExpression,ScpObjStack &OperationStack)
 {
 	while(OperationStack.size()>0)
 	{
@@ -2181,7 +2253,7 @@ void ScpExpressionAnalyser::EmptyStack(std::wstring &PostFixExpression,ScpObjSta
 		{
 			if(!PostFixExpression.empty())
 			{
-				PostFixExpression+=L",";				
+				PostFixExpression+=",";				
 			}
 			PostFixExpression+=OperationStack.top();
 			OperationStack.pop();
@@ -2193,7 +2265,7 @@ void ScpExpressionAnalyser::EmptyStack(std::wstring &PostFixExpression,ScpObjSta
 	}
 }
 
-ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * obj,std::wstring token,ScpObjectSpace * objectSpace)
+ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * obj,std::string token,ScpObjectSpace * objectSpace)
 {
 	ScpExpressionTreeNode * FuncCallNode=NULL;
 	BOOL bInnerFunctionCall = FALSE;
@@ -2201,11 +2273,11 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 	{
 		bInnerFunctionCall = TRUE;
 	}
-	std::wstring temptoken=lex.PeekNextToken();
+	std::string temptoken=lex.PeekNextToken();
 	if(temptoken== scpLeftParentheses)
 	{
 		FuncCallNode= (ScpExpressionTreeNode *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjExpressionNode);
-		//ºóÃæÒªÓ³Éäµ½Ãû×Ö¿Õ¼äÖĞ£¬ËùÒÔÕâÀï²»Ôö¼ÓÒıÓÃ¼ÆÊı
+		//åé¢è¦æ˜ å°„åˆ°åå­—ç©ºé—´ä¸­ï¼Œæ‰€ä»¥è¿™é‡Œä¸å¢åŠ å¼•ç”¨è®¡æ•°
 		//FuncCallNode->AddRef();
 		FuncCallNode->nodeobject = obj;
 		if (bInnerFunctionCall)
@@ -2218,7 +2290,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 		}
 		temptoken=lex.GetNextToken();
 		temptoken=lex.GetNextToken();
-		std::wstring parameterExpression;
+		std::string parameterExpression;
 		while(!temptoken.empty())
 		{				
 			if(temptoken!= scpComma 
@@ -2246,7 +2318,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 							ScpObject * retobj2 = ParseFunctionCall(obj2, parameterExpression,objectSpace);
 							if (retobj2)
 							{					
-								std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+								std::string tempobjname = objectSpace->GetNewTempObjectName();
 								objectSpace->AddObject(tempobjname,retobj2);
 								FuncCallNode->vtFuncparameters.push_back(tempobjname);							
 							}
@@ -2259,7 +2331,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 						{
 							if(temptoken==scpColon ||temptoken==scpOperationObjectRefrence ||temptoken==ScpObjectNames::GetSingleInsatnce()->strScpColoncn)
 							{
-								std::wstring temptoken1=lex.PeekNextToken();						
+								std::string temptoken1=lex.PeekNextToken();						
 								ScpObject * obj1 =((ScpClassObject * )obj2)->UserClassObjectSpace.FindObject(temptoken1);
 								if(obj1 )
 								{
@@ -2272,7 +2344,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 										ScpObject * retobj= ParseFunctionCall(obj1,parameterExpression,objectSpace);	
 										if(retobj)
 										{		
-											std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+											std::string tempobjname = objectSpace->GetNewTempObjectName();
 											objectSpace->AddObject(tempobjname,retobj);
 											FuncCallNode->vtFuncparameters.push_back(tempobjname);		
 										}
@@ -2280,7 +2352,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 									else
 									{
 										lex.GetNextToken();
-										std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+										std::string tempobjname = objectSpace->GetNewTempObjectName();
 										objectSpace->AddObject(tempobjname, obj1);
 										FuncCallNode->vtFuncparameters.push_back(tempobjname);
 										
@@ -2296,7 +2368,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 						{	
 							if(temptoken ==scpOperationObjectRefrence)
 							{
-								std::wstring temptoken2=lex.PeekNextToken();	
+								std::string temptoken2=lex.PeekNextToken();	
 								if(obj2->IsInnerFunction(temptoken2))
 								{
 									lex.GetNextToken();
@@ -2305,7 +2377,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 									ScpObject * retobj= ParseFunctionCall(obj2,temptoken2,objectSpace);	
 									if(retobj)
 									{
-										std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+										std::string tempobjname = objectSpace->GetNewTempObjectName();
 										objectSpace->AddObject(tempobjname,retobj);
 										parameterExpression=tempobjname;
 									}
@@ -2325,7 +2397,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 					}
 					else
 					{
-						//ÕâÀïĞŞ¸Äºó£¬º¯ÊıµÄ²ÎÊı²»ÔÙÊÇÔ­Ê¼×Ö·û´®£¬¶øÊÇÁÙÊ±×Ö·û´®¶ÔÏó
+						//è¿™é‡Œä¿®æ”¹åï¼Œå‡½æ•°çš„å‚æ•°ä¸å†æ˜¯åŸå§‹å­—ç¬¦ä¸²ï¼Œè€Œæ˜¯ä¸´æ—¶å­—ç¬¦ä¸²å¯¹è±¡
 						if(//ScpObjectNames::IsValidObjectName(parameterExpression)||
 							IsStaticNumber(parameterExpression)||
 							IsStaticDoubleNumber(parameterExpression))
@@ -2338,7 +2410,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 							{
 								ScpObject * tempobj = NULL;
 								tempobj = root->CalculateEx(engine);
-								std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+								std::string tempobjname = objectSpace->GetNewTempObjectName();
 								if(tempobj)
 								objectSpace->AddObject(tempobjname, tempobj);
 								FuncCallNode->vtFuncparameters.push_back(tempobjname);
@@ -2348,9 +2420,14 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 						}
 												
 					}
-					parameterExpression = L"";
+					parameterExpression = "";
 					if (temptoken == scpRightParentheses)
 					{
+						std::string temptoken2 = lex.PeekNextToken();
+						if (temptoken2 == scpOperationObjectRefrence)
+						{
+							//è¿™é‡Œæ˜¯è¿ç»­çš„å¯¹è±¡å¼•ç”¨
+						}
 						break;
 					}
 					temptoken = lex.GetNextToken();					
@@ -2376,19 +2453,19 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseFunctionCall(ScpObject * ob
 	}
 	else
 	{
-		//std::wstring error= L"error invalid function call ";
+		//std::string error= "error invalid function call ";
 		//error += engine->GetCurrentSourceLine();
 		//engine->PrintError(error);
 		return NULL;
 	}
 	return FuncCallNode;
 }
-bool ScpExpressionAnalyser::ParseClassDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline)
+bool ScpExpressionAnalyser::ParseClassDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline)
 {
 	bool bret = true;
-	//µ±Ç°ÕıÔÚ¶¨ÒåÒ»¸öÀà
-	std::wstring & wcommandline = ScriptBody.at(currentcommandline);
-	//Ê×ÏÈ¼ì²âµ÷ÊÔ¶Ïµã
+	//å½“å‰æ­£åœ¨å®šä¹‰ä¸€ä¸ªç±»
+	std::string & wcommandline = ScriptBody.at(currentcommandline);
+	//é¦–å…ˆæ£€æµ‹è°ƒè¯•æ–­ç‚¹
 	if (engine->debugger)
 	{
 		engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2403,7 +2480,7 @@ bool ScpExpressionAnalyser::ParseClassDefine(const wchar_t * ScriptFile, VTSTRIN
 
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	ScpClassObject * classobj = (ScpClassObject *)currentObjectSpace->belongto;
-	//Èç¹û¿ªÆôÁËÉú³É×Ö½ÚÂëµÄ¿ª¹Ø
+	//å¦‚æœå¼€å¯äº†ç”Ÿæˆå­—èŠ‚ç çš„å¼€å…³
 	if (engine->Jit)
 	{
 		ByteCodeMemoryStream stream;
@@ -2413,7 +2490,7 @@ bool ScpExpressionAnalyser::ParseClassDefine(const wchar_t * ScriptFile, VTSTRIN
 	}
 
 
-	//Èç¹ûµ±Ç°µÄÃû³Æ¿Õ¼äÈÔÊÇÀà£¬¶øÃ»ÓĞÇĞ»»ÎªÀàµÄ³ÉÔ±º¯Êı
+	//å¦‚æœå½“å‰çš„åç§°ç©ºé—´ä»æ˜¯ç±»ï¼Œè€Œæ²¡æœ‰åˆ‡æ¢ä¸ºç±»çš„æˆå‘˜å‡½æ•°
 	while (currentObjectSpace->ObjectSpaceType == Space_Class)
 	{
 		if (currentcommandline >= ScriptBody.size())
@@ -2452,7 +2529,7 @@ bool ScpExpressionAnalyser::ParseClassDefine(const wchar_t * ScriptFile, VTSTRIN
 					{
 						continue;
 					}
-				}//ÀàµÄÄÚ²¿²»ÄÜ¶¨ÒåÀà Ò²²»ÄÜÓĞÌõ¼şÓï¾äºÍÑ­»·Óï¾ä
+				}//ç±»çš„å†…éƒ¨ä¸èƒ½å®šä¹‰ç±» ä¹Ÿä¸èƒ½æœ‰æ¡ä»¶è¯­å¥å’Œå¾ªç¯è¯­å¥
 				else if (vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjClass ||
 					vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjIfStatement||
 					vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjWhileStatement)
@@ -2478,8 +2555,8 @@ bool ScpExpressionAnalyser::ParseClassDefine(const wchar_t * ScriptFile, VTSTRIN
 			}
 			else
 			{
-				//ÕâÀï²»ÒªÉú³ÉÀàµÄ×Ö½ÚÂë
-				//µÈµ½Ê×´Î·ÃÎÊÀà³ÉÔ±º¯ÊıµÄÊ±ºòÔÙÉú³É
+				//è¿™é‡Œä¸è¦ç”Ÿæˆç±»çš„å­—èŠ‚ç 
+				//ç­‰åˆ°é¦–æ¬¡è®¿é—®ç±»æˆå‘˜å‡½æ•°çš„æ—¶å€™å†ç”Ÿæˆ
 				engine->bytecode.bytecodemem->AppendByteCode(&classobj->bytecodeclassdef);
 				engine->bytecode.bytecodemem->AppendByteCode(&classobj->bytecodeclassbody);
 				engine->bytecode.bytecodemem->AppendByteCode((unsigned char*)&BC_END, 1);
@@ -2501,14 +2578,14 @@ bool ScpExpressionAnalyser::ParseClassDefine(const wchar_t * ScriptFile, VTSTRIN
 	}
 	if (!parsed)
 	{
-		engine->PrintError(L"Error Invalid Class Define");
+		engine->PrintError("Error Invalid Class Define");
 	}
 	return bret;
 }
-bool ScpExpressionAnalyser::ParseStructDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline)
+bool ScpExpressionAnalyser::ParseStructDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline)
 {
 	bool bret = true;
-	std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+	std::string & wcommandline = ScriptBody.at(currentcommandline);
 	if (engine->debugger)
 	{
 		engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2520,14 +2597,14 @@ bool ScpExpressionAnalyser::ParseStructDefine(const wchar_t * ScriptFile, VTSTRI
 	currentcommandline++;
 	bool parsed = false;
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
-	//Èç¹ûµ±Ç°Ãû³Æ¿Õ¼äÊÇ½á¹¹Ìå£¬²¢ÇÒresultÖ¸Ïò½á¹¹Ìå¶ÔÏó
+	//å¦‚æœå½“å‰åç§°ç©ºé—´æ˜¯ç»“æ„ä½“ï¼Œå¹¶ä¸”resultæŒ‡å‘ç»“æ„ä½“å¯¹è±¡
 	while (currentObjectSpace->ObjectSpaceType == Space_Struct)
 	{
 		if (currentcommandline >= ScriptBody.size())
 		{
 			break;
 		}
-		std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+		std::string & wcommandline = ScriptBody.at(currentcommandline);
 		ULONG value;
 		VTPARAMETERS vtparameters;
 		if (!lex.ParseCommandLine(wcommandline, value, vtparameters))
@@ -2556,14 +2633,15 @@ bool ScpExpressionAnalyser::ParseStructDefine(const wchar_t * ScriptFile, VTSTRI
 	}
 	if (!parsed)
 	{
-		engine->PrintError(L"Error Invalid Struct Define");
+		engine->PrintError("Error Invalid Struct Define");
 	}
 	return bret;
 }
-bool ScpExpressionAnalyser::ParseFunctionDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline)
+bool ScpExpressionAnalyser::ParseFunctionDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline)
 {
 	bool bret = true;
-	std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+	int const functionstartline = currentcommandline;
+	std::string & wcommandline = ScriptBody.at(currentcommandline);
 	if (engine->debugger)
 	{
 		engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2577,7 +2655,7 @@ bool ScpExpressionAnalyser::ParseFunctionDefine(const wchar_t * ScriptFile, VTST
 	currentcommandline++;
 	bool parsed = false;
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
-	//Èç¹ûµ±Ç°µÄÃû³Æ¿Õ¼äÊÇº¯Êı»òÕßÑ­»·Óï¾ä
+	//å¦‚æœå½“å‰çš„åç§°ç©ºé—´æ˜¯å‡½æ•°æˆ–è€…å¾ªç¯è¯­å¥
 	ScpFunctionObject * func = NULL;
 	if (currentObjectSpace->belongto)
 	{
@@ -2652,8 +2730,9 @@ bool ScpExpressionAnalyser::ParseFunctionDefine(const wchar_t * ScriptFile, VTST
 			
 			if (value == vl_define)
 			{
-				//º¯ÊıÄÚ²¿²»ÄÜ¶¨ÒåÀà
-				if (vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjClass)
+				//å‡½æ•°å†…éƒ¨ä¸èƒ½å®šä¹‰ç±»
+				if (vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjClass||
+					vtparameters.at(0) == ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction))
 				{
 					engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidFunctionDefine);
 					bret = false;
@@ -2679,13 +2758,14 @@ bool ScpExpressionAnalyser::ParseFunctionDefine(const wchar_t * ScriptFile, VTST
 	if (!parsed)
 	{
 		engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidFunctionDefine);
+		engine->PrintError(ScriptBody.at(functionstartline));
 	}
 	return bret;
 }
-ScpObject *  ScpExpressionAnalyser::ParseWhileDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline, bool doimmediately)
+ScpObject *  ScpExpressionAnalyser::ParseWhileDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline, bool doimmediately)
 {
 	ScpObject *  obj = NULL;
-	std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+	std::string & wcommandline = ScriptBody.at(currentcommandline);
 	if (engine->debugger &&  doimmediately)
 	{
 		engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2707,14 +2787,14 @@ ScpObject *  ScpExpressionAnalyser::ParseWhileDefine(const wchar_t * ScriptFile,
 		}
 	}
 	bool parsed = false;
-	//Èç¹ûµ±Ç°µÄÃû³Æ¿Õ¼äÊÇº¯Êı»òÕßÑ­»·Óï¾ä
+	//å¦‚æœå½“å‰çš„åç§°ç©ºé—´æ˜¯å‡½æ•°æˆ–è€…å¾ªç¯è¯­å¥
 	while ( currentObjectSpace->ObjectSpaceType == Space_While)
 	{
 		if (currentcommandline >= ScriptBody.size())
 		{
 			break;
 		}
-		std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+		std::string & wcommandline = ScriptBody.at(currentcommandline);
 		if (engine->debugger && doimmediately)
 		{
 			engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2778,11 +2858,15 @@ ScpObject *  ScpExpressionAnalyser::ParseWhileDefine(const wchar_t * ScriptFile,
 			break;
 		}
 		else
-		{
-			
+		{			
 			if (value == vl_define)
 			{
-				
+				//è¯­æ³•é”™è¯¯ï¼Œé”™è¯¯çš„åµŒå¥—å®šä¹‰
+				if (vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjClass ||
+					vtparameters.at(0) == ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction))
+				{
+					break;
+				}
 				engine->FetchCommand(value, &vtparameters);
 			}
 			else
@@ -2798,14 +2882,14 @@ ScpObject *  ScpExpressionAnalyser::ParseWhileDefine(const wchar_t * ScriptFile,
 	}
 	if (!parsed)
 	{
-		engine->PrintError(L"Error Invalid while statement");
+		engine->PrintError("Error Invalid while statement");
 	}
 	return obj;
 }
-ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const wchar_t * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline, bool doimmediately)
+ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const char * ScriptFile, VTSTRINGS & ScriptBody,int & currentcommandline, bool doimmediately)
 {
 	ScpObject *  obj = NULL;
-	std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+	std::string & wcommandline = ScriptBody.at(currentcommandline);
 	if (engine->debugger && doimmediately)
 	{
 		engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2817,7 +2901,7 @@ ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const wchar_t * ScriptFile, VT
 	currentcommandline++;
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	ScpIfStatementObject * ifstmtobj = NULL;
-	//Èç¹ûµ±Ç°Ãû³Æ¿Õ¼äÊÇÌõ¼şÓï¾ä
+	//å¦‚æœå½“å‰åç§°ç©ºé—´æ˜¯æ¡ä»¶è¯­å¥
 	if (currentObjectSpace->belongto)
 	{
 		if (currentObjectSpace->belongto->GetType() == ObjIfStatement)
@@ -2835,7 +2919,7 @@ ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const wchar_t * ScriptFile, VT
 		{
 			break;
 		}
-		std::wstring & wcommandline = ScriptBody.at(currentcommandline);
+		std::string & wcommandline = ScriptBody.at(currentcommandline);
 		if (engine->debugger && doimmediately)
 		{
 			engine->debugger->CheckDebugEvent(ScriptFile, currentcommandline, INFINITE);
@@ -2928,7 +3012,12 @@ ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const wchar_t * ScriptFile, VT
 			
 			if (value == vl_define)
 			{
-				
+				//è¯­æ³•é”™è¯¯ï¼Œé”™è¯¯çš„åµŒå¥—å®šä¹‰
+				if (vtparameters.at(0) == ScpObjectNames::GetSingleInsatnce()->strObjClass ||
+					vtparameters.at(0) == ScpGlobalObject::GetInstance()->GetTypeName(ObjFunction))
+				{
+					break;
+				}
 				engine->FetchCommand(value, &vtparameters);
 			}
 			else
@@ -2949,7 +3038,7 @@ ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const wchar_t * ScriptFile, VT
 	}
 	if (!parsed)
 	{
-		engine->PrintError(L"Error Invalid if statement");
+		engine->PrintError("Error Invalid if statement");
 	}
 	return obj;
 }
@@ -2960,32 +3049,32 @@ void ScpExpressionAnalyser::ClearNodeStack()
 		thenodestack.pop();
 	}
 }
-ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &InFixExpression,std::wstring &PostFixExpression,ScpObjectSpace * objectSpace, size_t &startpos)
+ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::string &InFixExpression,std::string &PostFixExpression,ScpObjectSpace * objectSpace, size_t &startpos)
 {
 	ScpExpressionTreeNode * node= NULL;
-	std::wstring token;
+	std::string token;
 	ScpObjStack OperationStack;
 	token=lex.GetNextToken();
-	while(token!=scpEndofExpression && token!=L"")
+	while(token!=scpEndofExpression && token!="")
 	{
 		//	engine->PrintError(token);
 		if(token==scpLeftParentheses)
 		{			
-			//×óÀ¨ºÅ£¬½øÈë×Ó±í´ïÊ½
-			std::wstring temp ;
+			//å·¦æ‹¬å·ï¼Œè¿›å…¥å­è¡¨è¾¾å¼
+			std::string temp ;
 			ScpExpressionTreeNode * subnode= InFixToPostFixEx(InFixExpression,temp,objectSpace,startpos);	
 			if(subnode)
 			{
 				
 				if(!PostFixExpression.empty())
 				{
-					PostFixExpression+=L",";				
+					PostFixExpression+=",";				
 				}
 				
-				std::wstring temptoken = lex.PeekNextToken();
+				std::string temptoken = lex.PeekNextToken();
 				if(temptoken==scpOperationObjectRefrence)					
 				{						
-					std::wstring temptoken1=lex.PeekNext2Token();	
+					std::string temptoken1=lex.PeekNext2Token();	
 					if(subnode->IsInnerFunction(temptoken1))
 					{
 						lex.GetNextToken();
@@ -2994,9 +3083,21 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 						ScpObject * retobj= ParseFunctionCall(subnode,temptoken1,objectSpace);	
 						if(retobj)
 						{
-							std::wstring tempobjname1 = objectSpace->GetNewTempObjectName();
+							std::string tempobjname1 = objectSpace->GetNewTempObjectName();
 							objectSpace->AddObject(tempobjname1,retobj);
-							PostFixExpression+=tempobjname1;
+							//PostFixExpression+=tempobjname1;
+
+							std::string temptoken1 = lex.PeekNextToken();
+							if (temptoken1 == scpOperationObjectRefrence)
+							{
+								//å†æ¬¡å¼•ç”¨å‡½æ•°è°ƒç”¨å¯¹è±¡
+								tempobjname1= ParseObjectRefrence(retobj, objectSpace);
+								PostFixExpression += tempobjname1;
+							}
+							else
+							{
+								PostFixExpression += tempobjname1;
+							}
 						}
 						else
 						{
@@ -3006,7 +3107,7 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 				}
 				else
 				{
-					std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+					std::string tempobjname = objectSpace->GetNewTempObjectName();
 					objectSpace->AddObject(tempobjname, subnode);
 					PostFixExpression+=tempobjname;
 				}
@@ -3014,14 +3115,14 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 		}
 		else if (token==scpRightParentheses)
 		{		
-			//ÓÒÀ¨ºÅ£¬½áÊø×Ó±í´ïÊ½
+			//å³æ‹¬å·ï¼Œç»“æŸå­è¡¨è¾¾å¼
 			EmptyStack(PostFixExpression,OperationStack);
 			node = PostFixExpressionToTree(PostFixExpression);
 			return node;
 		}		
 		else if(ScpScriptLex::IsBinaryOperator(token))
 		{	
-			//Ë«²Ù×÷ÊıÔËËã·û£¬¸ù¾İÔËËã·ûµÄÓÅÏÈ¼¶ÅĞ¶ÏÊÇ·ñµ¯³ö¶ÑÕ»ÖĞµÄÉÏÒ»¸öÔËËã·û
+			//åŒæ“ä½œæ•°è¿ç®—ç¬¦ï¼Œæ ¹æ®è¿ç®—ç¬¦çš„ä¼˜å…ˆçº§åˆ¤æ–­æ˜¯å¦å¼¹å‡ºå †æ ˆä¸­çš„ä¸Šä¸€ä¸ªè¿ç®—ç¬¦
 			if((OperationStack.size()>0)  && lex.GetBinaryOperationPriority(OperationStack.top())<=lex.GetBinaryOperationPriority(token))
 				PopStack(PostFixExpression,OperationStack);
 			OperationStack.push(token);
@@ -3029,8 +3130,8 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 		}		
 		else if(ScpScriptLex::IsAssignOperator(token))
 		{
-			//¸³Öµ£¬ĞèÒª°ÑµÈºÅÓÒ±ßµÄ²¿·Öµ±×öÒ»¸ö×Ó±í´ïÊ½
-			std::wstring temp ;
+			//èµ‹å€¼ï¼Œéœ€è¦æŠŠç­‰å·å³è¾¹çš„éƒ¨åˆ†å½“åšä¸€ä¸ªå­è¡¨è¾¾å¼
+			std::string temp ;
 			node = InFixToPostFixEx(InFixExpression,temp,objectSpace,startpos);
 			ScpExpressionTreeNode * subnodeop = (ScpExpressionTreeNode *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjExpressionNode);
 			//subnodeop->AddRef();
@@ -3039,7 +3140,7 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 			ScpObject * objLeft = objectSpace->FindObject(PostFixExpression);
 			if (objLeft == NULL)
 			{
-				//×óÖµ¶ÔÏó²»´æÔÚ
+				//å·¦å€¼å¯¹è±¡ä¸å­˜åœ¨
 			}
 			subnode->nodeobject = objLeft;
 			subnodeop->nodestackop.push(token) ;
@@ -3052,8 +3153,8 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 			||token==scpOperationBitNot
 			)
 		{
-			//µ¥²Ù×÷ÊıÔËËã·û,Ç°ÖÃ
-			std::wstring temptoken=lex.PeekNextToken();
+			//å•æ“ä½œæ•°è¿ç®—ç¬¦,å‰ç½®
+			std::string temptoken=lex.PeekNextToken();
 			ScpObject * obj =objectSpace->FindObject(temptoken);
 			if(obj )
 			{
@@ -3063,12 +3164,12 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 		else if ( token == scpOperationSelfAdd
 			|| token == scpOperationSelfSub)
 		{
-			//µ¥²Ù×÷ÊıÔËËã·û£¬×ÔÔö£¬×Ô¼õ
-			std::wstring temptoken = lex.PeekNextToken();
+			//å•æ“ä½œæ•°è¿ç®—ç¬¦ï¼Œè‡ªå¢ï¼Œè‡ªå‡
+			std::string temptoken = lex.PeekNextToken();
 			ScpObject * obj = objectSpace->FindObject(temptoken);
 			if (obj)
 			{
-				//ºóÃæ½ô¸ú²Ù×÷Êı£¬ËµÃ÷ÊÇÇ°ÖÃ×ÔÔö
+				//åé¢ç´§è·Ÿæ“ä½œæ•°ï¼Œè¯´æ˜æ˜¯å‰ç½®è‡ªå¢
 			}
 			OperationStack.push(token);
 		}
@@ -3076,6 +3177,10 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 		{
 			if(!PostFixExpression.empty())
 			{
+				if (token == scpOperationObjectRefrence)
+				{
+					//è¿™ä¸ªæ—¶å€™æ˜¯è¿ç»­çš„å¯¹è±¡å¼•ç”¨
+				}
 				if(token!=scpComma)
 				{
 					PostFixExpression+=scpComma;				
@@ -3086,8 +3191,8 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 				ScpObject * obj =objectSpace->FindObject(token);
 				if(obj )
 				{		
-					std::wstring temptoken=lex.PeekNextToken();
-					//½âÎöÊı×é»ò±íÒıÓÃ
+					std::string temptoken=lex.PeekNextToken();
+					//è§£ææ•°ç»„æˆ–è¡¨å¼•ç”¨
 					if (temptoken == scpLeftBracket)
 					{
 						if (obj->GetType() == ObjArray || obj->GetType() == ObjTable || obj->GetType() == ObjList)
@@ -3095,11 +3200,11 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 							ScpObject * ArrayItemNode = ParseArrayItemRefrence(obj, objectSpace);
 							if (ArrayItemNode)
 							{
-								std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+								std::string tempobjname = objectSpace->GetNewTempObjectName();
 								objectSpace->AddObject(tempobjname, ArrayItemNode);
 								token = tempobjname;
 
-								std::wstring temptoken1 = lex.PeekNextToken();
+								std::string temptoken1 = lex.PeekNextToken();
 								if (temptoken1 == scpOperationObjectRefrence)
 								{
 									token = ParseObjectRefrence(ArrayItemNode, objectSpace);
@@ -3110,7 +3215,7 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 							}
 						}
 					}
-					//½âÎö¶ÔÏóÒıÓÃ
+					//è§£æå¯¹è±¡å¼•ç”¨
 					else if (temptoken == scpOperationObjectRefrence)
 					{
 						token = ParseObjectRefrence(obj, objectSpace);
@@ -3118,13 +3223,13 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 					//build function call node 
 					else if( obj->GetType()==ObjFunction)
 					{
-						//Ö±½Óº¯Êıµ÷ÓÃ
+						//ç›´æ¥å‡½æ•°è°ƒç”¨
 						ScpObject * retobj = ParseFunctionCall(obj, token, objectSpace);
 						if (retobj)
 						{
-							std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+							std::string tempobjname = objectSpace->GetNewTempObjectName();
 							objectSpace->AddObject(tempobjname, retobj);
-							std::wstring temptoken1 = lex.PeekNextToken();
+							std::string temptoken1 = lex.PeekNextToken();
 							if (temptoken1 == scpOperationObjectRefrence)
 							{
 								token = ParseObjectRefrence(retobj, objectSpace);
@@ -3138,22 +3243,50 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 						{
 							//error invalid function call
 						}
-					}					
+					}	
+					else if (obj->GetType() == ObjCFunction)
+					{
+						//ç›´æ¥å‡½æ•°è°ƒç”¨
+						ScpObject * retobj = ParseFunctionCall(obj, token, objectSpace);
+						if (retobj)
+						{
+							std::string tempobjname = objectSpace->GetNewTempObjectName();
+							objectSpace->AddObject(tempobjname, retobj);
+							std::string temptoken1 = lex.PeekNextToken();
+							if (temptoken1 == scpOperationObjectRefrence)
+							{
+								token = ParseObjectRefrence(retobj, objectSpace);
+							}
+							else
+							{
+								token = tempobjname;
+							}
+						}
+						else
+						{
+							//error invalid function call
+						}
+						
+					}
 				}
 				else
 				{
-					std::wstring temptoken = lex.PeekNextToken();
-					//ÔÊĞí¶Ô¾²Ì¬×Ö·û´®µÄ²Ù×÷
+					std::string temptoken = lex.PeekNextToken();
+					//å…è®¸å¯¹é™æ€å­—ç¬¦ä¸²çš„æ“ä½œ
 					if (temptoken == scpOperationObjectRefrence || ScpScriptLex::IsAssignOperator(temptoken)|| ScpScriptLex::IsBinaryOperator(temptoken))
 					{	
 						if(!IsStaticString(token))
 							engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorObjNotExist+ token);
-						//´íÎó¶ÔÏó²»´æÔÚ
+						//é”™è¯¯å¯¹è±¡ä¸å­˜åœ¨
 					}
 				}
 			}
 			if(token!=scpComma)
 			{
+				if (token == scpOperationObjectRefrence)
+				{
+					//å¯¹è±¡å¼•ç”¨
+				}
 				PostFixExpression+=token;
 			}
 		}
@@ -3170,16 +3303,16 @@ ScpExpressionTreeNode * ScpExpressionAnalyser::InFixToPostFixEx(std::wstring &In
 ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseArrayItemRefrence(ScpObject * arrayObj,ScpObjectSpace * objectSpace)
 {
 	ScpExpressionTreeNode * ArrayItemNode=NULL;
-	std::wstring temptoken=lex.GetNextToken();
+	std::string temptoken=lex.GetNextToken();
 	if(temptoken==scpLeftBracket)
 	{
 		
 		temptoken=lex.GetNextToken();		
-		std::wstring temptoken1=lex.GetNextToken();
+		std::string temptoken1=lex.GetNextToken();
 		if(temptoken1==scpRightBracket)
 		{
 			ArrayItemNode = (ScpExpressionTreeNode *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjExpressionNode);
-			//ºóÃæÒªÓ³Éäµ½Ãû×Ö¿Õ¼äÖĞ£¬ËùÒÔÕâÀï²»Ôö¼ÓÒıÓÃ¼ÆÊı
+			//åé¢è¦æ˜ å°„åˆ°åå­—ç©ºé—´ä¸­ï¼Œæ‰€ä»¥è¿™é‡Œä¸å¢åŠ å¼•ç”¨è®¡æ•°
 			//ArrayItemNode->AddRef();			
 			ArrayItemNode->ArrayItem=temptoken;
 			ArrayItemNode->nodeobject=arrayObj;
@@ -3189,22 +3322,22 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::ParseArrayItemRefrence(ScpObject
 	return ArrayItemNode;
 
 }
-std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObjectSpace * objectSpace)
+std::string ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObjectSpace * objectSpace)
 {
-	std::wstring token;
-	std::wstring temptoken1 = lex.PeekNext2Token();
+	std::string token;
+	std::string temptoken1 = lex.PeekNext2Token();
 	if (obj->GetType() == ObjClassInstance)
 	{
 		ScpObject * obj1 = ((ScpClassObject *)obj)->UserClassObjectSpace.FindObject(temptoken1);
 		if (obj1)
 		{
-			//ÏÈÅĞ¶ÏÊÇ·ñÊÇË½ÓĞ³ÉÔ±
+			//å…ˆåˆ¤æ–­æ˜¯å¦æ˜¯ç§æœ‰æˆå‘˜
 			if (((ScpClassObject *)obj)->memberattrmap[temptoken1] == ScpClassObject::Attr_Private)
 			{
 				if (obj1->GetType() == ObjFunction)
-					engine->PrintError(L"Member Function is Private Access");
+					engine->PrintError("Member Function is Private Access");
 				else
-					engine->PrintError(L"Member Variable is Private Access");
+					engine->PrintError("Member Variable is Private Access");
 			}
 			else
 			{
@@ -3219,9 +3352,9 @@ std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObje
 					ScpObject * retobj = ParseFunctionCall(obj, token, objectSpace);
 					if (retobj)
 					{
-						std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+						std::string tempobjname = objectSpace->GetNewTempObjectName();
 						objectSpace->AddObject(tempobjname, retobj);
-						std::wstring temptoken2 = lex.PeekNextToken();
+						std::string temptoken2 = lex.PeekNextToken();
 						if (temptoken2 == scpOperationObjectRefrence)
 						{
 							token = ParseObjectRefrence(retobj, objectSpace);
@@ -3235,7 +3368,7 @@ std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObje
 				}
 				else
 				{
-					//Àà³ÉÔ±±äÁ¿µÄ·ÃÎÊ
+					//ç±»æˆå‘˜å˜é‡çš„è®¿é—®
 					//token += temptoken;
 					token += temptoken1;
 					lex.GetNextToken();
@@ -3244,9 +3377,9 @@ std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObje
 					ScpObject * retobj = ((ScpClassObject *)obj)->UserClassObjectSpace.FindObject(token);
 					if (retobj)
 					{
-						std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+						std::string tempobjname = objectSpace->GetNewTempObjectName();
 						objectSpace->AddObject(tempobjname, retobj);
-						std::wstring temptoken2 = lex.PeekNextToken();
+						std::string temptoken2 = lex.PeekNextToken();
 						if (temptoken2 == scpOperationObjectRefrence)
 						{
 							token = ParseObjectRefrence(retobj, objectSpace);
@@ -3261,11 +3394,11 @@ std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObje
 							ScpObject * ArrayItemNode = ParseArrayItemRefrence(retobj, objectSpace);
 							if (ArrayItemNode)
 							{
-								std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+								std::string tempobjname = objectSpace->GetNewTempObjectName();
 								objectSpace->AddObject(tempobjname, ArrayItemNode);
 								token = tempobjname;
 
-								std::wstring temptoken1 = lex.PeekNextToken();
+								std::string temptoken1 = lex.PeekNextToken();
 								if (temptoken1 == scpOperationObjectRefrence)
 								{
 									token = ParseObjectRefrence(ArrayItemNode, objectSpace);
@@ -3291,10 +3424,10 @@ std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObje
 		ScpObject * retobj = ParseFunctionCall(obj, temptoken1, objectSpace);
 		if (retobj)
 		{
-			std::wstring tempobjname = objectSpace->GetNewTempObjectName();
+			std::string tempobjname = objectSpace->GetNewTempObjectName();
 			objectSpace->AddObject(tempobjname, retobj);
 
-			std::wstring temptoken2 = lex.PeekNextToken();
+			std::string temptoken2 = lex.PeekNextToken();
 			if (temptoken2 == scpOperationObjectRefrence)
 			{
 				token = ParseObjectRefrence(retobj, objectSpace);
@@ -3313,11 +3446,11 @@ std::wstring ScpExpressionAnalyser::ParseObjectRefrence(ScpObject * obj, ScpObje
 
 	return token;
 }
-std::wstring ScpExpressionAnalyser::GetATokenFromPostFix(std::wstring &PostFixExpression,size_t &startpos)
+std::string ScpExpressionAnalyser::GetATokenFromPostFix(std::string &PostFixExpression,size_t &startpos)
 {
-	//´Óºó×º±í´ïÊ½ÖĞ»ñµÃÒ»¸ötoken
-	std::wstring temp ;
-	if (startpos !=std::wstring::npos)
+	//ä»åç¼€è¡¨è¾¾å¼ä¸­è·å¾—ä¸€ä¸ªtoken
+	std::string temp ;
+	if (PostFixExpression.size()>0 && startpos !=std::string::npos)
 	{
 		if (PostFixExpression.at(startpos) == L',')
 		{
@@ -3336,20 +3469,20 @@ std::wstring ScpExpressionAnalyser::GetATokenFromPostFix(std::wstring &PostFixEx
 				startpos++;
 				if (startpos >= PostFixExpression.length())
 				{
-					startpos = std::wstring::npos;
+					startpos = std::string::npos;
 				}
 				return temp;
 			}
 		}
 		size_t pos = PostFixExpression.find(scpComma,startpos) ;
-		if(pos!=std::wstring::npos)
+		if(pos!=std::string::npos)
 		{		
 			temp=PostFixExpression.substr(startpos,pos-startpos);	
 			startpos=pos+1;
 		}
 		else 
 		{
-			if(startpos!=std::wstring::npos)
+			if(startpos!=std::string::npos)
 			{
 				temp=PostFixExpression.substr(startpos,PostFixExpression.length()-startpos);
 				startpos=pos;
@@ -3361,21 +3494,21 @@ std::wstring ScpExpressionAnalyser::GetATokenFromPostFix(std::wstring &PostFixEx
 	return temp;
 }
 
-ScpExpressionTreeNode *  ScpExpressionAnalyser::BuildExressionTreeEx(std::wstring Expression)
+ScpExpressionTreeNode *  ScpExpressionAnalyser::BuildExressionTreeEx(std::string Expression)
 {	
 	ClearNodeStack();
 	lex.SetExpression(Expression);
 	size_t startpos = 0 ;
-	std::wstring PostFixExpression ;	
+	std::string PostFixExpression ;	
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
-	//¹¹½¨±í´ïÊ½Ê÷Ö®ºó£¬Í¨¹ıÉî¶ÈÓÅÏÈ±éÀú£¬ÊµÏÖ×Ö½ÚÂëµÄÉú³É£¬Õâ¸öºÍÃ¿Ò»´Î½âÊÍÖ´ĞĞÊ±Ò»ÑùµÄ
+	//æ„å»ºè¡¨è¾¾å¼æ ‘ä¹‹åï¼Œé€šè¿‡æ·±åº¦ä¼˜å…ˆéå†ï¼Œå®ç°å­—èŠ‚ç çš„ç”Ÿæˆï¼Œè¿™ä¸ªå’Œæ¯ä¸€æ¬¡è§£é‡Šæ‰§è¡Œæ—¶ä¸€æ ·çš„
 	return InFixToPostFixEx(Expression,PostFixExpression,objectSpace,startpos);	
 }
-ScpExpressionTreeNode *  ScpExpressionAnalyser::PostFixExpressionToTree(std::wstring PostFixExpression)
+ScpExpressionTreeNode *  ScpExpressionAnalyser::PostFixExpressionToTree(std::string PostFixExpression)
 {
 	ScpObjectSpace * objectSpace = engine->GetCurrentObjectSpace();
 	ScpExpressionTreeNode * root=NULL;//=new ScpExpressionTreeNode;
-	std::wstring  token;
+	std::string  token;
 	size_t startpos=0;
 	token= GetATokenFromPostFix(PostFixExpression,startpos);
 	while(!token.empty())
@@ -3421,7 +3554,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::PostFixExpressionToTree(std::wst
 		else 
 		{	
 			ScpExpressionTreeNode * subnode=NULL;
-			std::wstring elementname= token;
+			std::string elementname= token;
 			ScpObject * tempobj =NULL;
 			if(ScpObjectNames::IsValidObjectName(token))
 				tempobj = objectSpace->FindObject(token);
@@ -3446,8 +3579,18 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::PostFixExpressionToTree(std::wst
 				//subnode->AddRef();
 				if(IsStaticNumber(token))
 				{
-					tempobj = objectSpace->AcquireTempObject(ObjInt);
-					((ScpIntObject*)tempobj)->value = StringToInt(token);
+					__int64 v = StringToInt64(token);
+					if (v > INT_MAX)
+					{
+						tempobj = objectSpace->AcquireTempObject(ObjBigInt);
+						((ScpBigIntObject*)tempobj)->value = v;
+					}
+					else
+					{
+						tempobj = objectSpace->AcquireTempObject(ObjInt);
+						((ScpIntObject*)tempobj)->value = StringToInt(token);
+					}
+					
 				}
 				else if(IsStaticDoubleNumber(token))
 				{
@@ -3457,7 +3600,7 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::PostFixExpressionToTree(std::wst
 				else 
 				{
 					tempobj = objectSpace->AcquireTempObject(ObjString);
-					std::wstring content = token;
+					std::string content = token;
 					StringStripQuote(content);
 					((ScpStringObject*)tempobj)->content = content;					
 				}
@@ -3483,8 +3626,8 @@ ScpExpressionTreeNode *  ScpExpressionAnalyser::PostFixExpressionToTree(std::wst
 
 
 
-int ScpExpressionTreeNode::GenTempObjectByteCodeOfExpression(std::wstring Expression, CScriptEngine* engine)
+int ScpExpressionTreeNode::GenTempObjectByteCodeOfExpression(std::string Expression, CScriptEngine* engine)
 {
-	// TODO: ÔÚ´Ë´¦Ìí¼ÓÊµÏÖ´úÂë.
+	// TODO: åœ¨æ­¤å¤„æ·»åŠ å®ç°ä»£ç .
 	return 0;
 }

@@ -9,6 +9,7 @@
 #include <tlhelp32.h>
 #else
 #define wcsicmp wcscasecmp
+#define _stricmp strcasecmp
 #endif
 
 ScpObject * __stdcall ScpProcObjectFactory(VTPARAMETERS * paramters, CScriptEngine * engine)
@@ -38,7 +39,7 @@ BOOL WINAPI Proc_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngine * e
 {
 	if (vtparameters)
 	{
-		std::wstring text;
+		std::string text;
 		if (vtparameters->size() == 2)
 		{
 			text = vtparameters->at(1);
@@ -52,7 +53,7 @@ BOOL WINAPI Proc_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngine * e
 		{
 			if (obj->GetType() == ObjProc)
 			{
-				std::wstring func = scpcommand_en_shutdown;
+				std::string func = scpcommand_en_shutdown;
 				((ScpProcObject *)obj)->CallInnerFunction(func, NULL, engine);
 				engine->GetCurrentObjectSpace()->EraseObject(text);
 			}
@@ -63,7 +64,7 @@ BOOL WINAPI Proc_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngine * e
 			}
 			else if (obj->GetType() == ObjString)
 			{
-				std::wstring procname = ((ScpStringObject*)obj)->content;
+				std::string procname = ((ScpStringObject*)obj)->content;
 				ScpProcObject::ShutDown(procname);
 			}
 		}	
@@ -78,7 +79,7 @@ BOOL WINAPI Proc_Wait_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 {
 	if (vtparameters)
 	{
-		std::wstring text;
+		std::string text;
 		if (vtparameters->size() == 1)
 		{
 			text = vtparameters->at(0);
@@ -99,7 +100,7 @@ BOOL WINAPI Proc_Reboot_Command(VTPARAMETERS * vtparameters, CScriptEngine * eng
 {
 	if (vtparameters)
 	{
-		std::wstring text;
+		std::string text;
 		if (vtparameters->size() == 2)
 		{
 			text = vtparameters->at(1);
@@ -113,7 +114,7 @@ BOOL WINAPI Proc_Reboot_Command(VTPARAMETERS * vtparameters, CScriptEngine * eng
 		{
 			if (obj->GetType() == ObjProc)
 			{
-				std::wstring func = scpcommand_en_reboot;
+				std::string func = scpcommand_en_reboot;
 				((ScpProcObject *)obj)->CallInnerFunction(func, NULL, engine);
 			}
 		}		
@@ -125,16 +126,16 @@ BOOL WINAPI Proc_Run_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() >= 2)
 	{
-		std::wstring strobjtype = vtparameters->at(0);
-		std::wstring procobjname = vtparameters->at(1);
+		std::string strobjtype = vtparameters->at(0);
+		std::string procobjname = vtparameters->at(1);
 
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobjtype.c_str());
 		if (ObjProc == type)
 		{
 			if (vtparameters->size() >= 3)
 			{
-				std::wstring pathname = vtparameters->at(2);
-				std::wstring parameter;
+				std::string pathname = vtparameters->at(2);
+				std::string parameter;
 				if (vtparameters->size() == 4)
 				{
 					parameter = vtparameters->at(3);
@@ -161,10 +162,10 @@ BOOL WINAPI Proc_Run_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine
 				}
 				if (procobj && procobj->GetType() == ObjProc)
 				{
-					std::wstring procpathname;
+					std::string procpathname;
 					if (pathname.at(0) != '\"' && pathname.at(pathname.length() - 1) != '\"')
 					{
-						procpathname = STDSTRINGEXT::Format(L"\"%s\"", pathname.c_str());
+						procpathname = STDSTRINGEXT::Format("\"%s\"", pathname.c_str());
 					}
 					else
 					{
@@ -180,7 +181,7 @@ BOOL WINAPI Proc_Run_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine
 					}*/
 					//procobj->Parameter = parameter;
 					//procobj->Open();
-					std::wstring func = scpcommand_en_open;
+					std::string func = scpcommand_en_open;
 					VTPARAMETERS param;
 					param.push_back(procpathname);
 					param.push_back(parameter);
@@ -200,23 +201,23 @@ BOOL WINAPI Proc_Enum_Command(VTPARAMETERS * vtparameters, CScriptEngine * engin
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring strobj = vtparameters->at(0);
-		std::wstring name1 = vtparameters->at(1);
+		std::string strobj = vtparameters->at(0);
+		std::string name1 = vtparameters->at(1);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 		if (ObjProc == type)
 		{
 			ScpTableObject * tableobj=(ScpTableObject *)currentObjectSpace->FindObject(name1);
 			if(tableobj && tableobj->GetType()==ObjTable)
 			{				
-			ScpProcObject::Enum(tableobj,L"name");
+			ScpProcObject::Enum(tableobj,"name");
 			}
 		}
 	}
 	else if (vtparameters->size() == 3)
 	{
-		std::wstring strobj = vtparameters->at(0);
-		std::wstring name1 = vtparameters->at(1);
-		std::wstring name2 = vtparameters->at(2);
+		std::string strobj = vtparameters->at(0);
+		std::string name1 = vtparameters->at(1);
+		std::string name2 = vtparameters->at(2);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 		if (ObjProc == type)
 		{		
@@ -272,7 +273,7 @@ ScpProcObject::~ScpProcObject()
 {
 	
 }
-ScpObject * ScpProcObject::Clone(std::wstring strObjName)
+ScpObject * ScpProcObject::Clone(std::string strObjName)
 {
 	ScpProcObject *procobj = new ScpProcObject;
 	if (procobj)
@@ -281,9 +282,9 @@ ScpObject * ScpProcObject::Clone(std::wstring strObjName)
 	}
 	return procobj;
 }	
-std::wstring ScpProcObject::ToString()
+std::string ScpProcObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp = procpathname;
 	return temp;
 }
@@ -291,13 +292,13 @@ void ScpProcObject::Release()
 {
 	delete this;
 }
-BOOL ScpProcObject::Open(std::wstring path, std::wstring param)
+BOOL ScpProcObject::Open(std::string path, std::string param)
 {
 #ifdef _WIN32
 	procpathname = path;
 	Parameter = param;
 	wchar_t CommandLine[2048]={0};
-	swprintf(CommandLine,L"%s %s",procpathname.c_str(),Parameter.c_str());
+	swprintf(CommandLine,L"%s %s",STDSTRINGEXT::UTF2W(procpathname).c_str(), STDSTRINGEXT::UTF2W(Parameter).c_str());
 
 	if (!isUIProcess)
 	{
@@ -331,7 +332,7 @@ BOOL ScpProcObject::Open(std::wstring path, std::wstring param)
 		si.hStdInput = hInputRead;
 		si.wShowWindow = SW_HIDE;
 		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-		DWORD dwWritten;
+
 		if (!CreateProcessW(NULL, CommandLine, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi))
 		{
 			return FALSE;
@@ -346,7 +347,7 @@ BOOL ScpProcObject::Open(std::wstring path, std::wstring param)
 			{
 				break;
 			}
-			procoutput += STDSTRINGEXT::AToW(buffer);
+			procoutput += buffer;
 			//printf(buffer);// 输出
 			Sleep(500);
 		}
@@ -381,9 +382,9 @@ BOOL ScpProcObject::Open(std::wstring path, std::wstring param)
 	}
 
 #endif
-	return FALSE;
+
 }
-BOOL ScpProcObject::ShutDown(std::wstring processname)
+BOOL ScpProcObject::ShutDown(std::string processname)
 {
 	BOOL bret = FALSE;
 #ifdef _WIN32
@@ -396,9 +397,9 @@ BOOL ScpProcObject::ShutDown(std::wstring processname)
 	BOOL fOk;
 	for (fOk = Process32First(hSnapshot, &pe); fOk; fOk = Process32Next(hSnapshot, &pe))
 	{
-		std::wstring tmpProcessName = STDSTRINGEXT::ToUpperW(pe.szExeFile);
-		processname=STDSTRINGEXT::ToUpperW(processname);
-		if(tmpProcessName.find(processname)!=std::wstring::npos)
+		std::string tmpProcessName = STDSTRINGEXT::W2UTF(STDSTRINGEXT::ToUpperW(pe.szExeFile));
+		processname=STDSTRINGEXT::ToUpperA(processname);
+		if(tmpProcessName.find(processname)!=std::string::npos)
 		{
 			bret =ShutDown(pe.th32ProcessID);			
 			break;
@@ -436,7 +437,7 @@ BOOL ScpProcObject::ShutDown(std::wstring processname)
 #endif
 	 return bret;
  }
- BOOL ScpProcObject::Enum(ScpObject * tableobj,std::wstring enumtype)
+ BOOL ScpProcObject::Enum(ScpObject * tableobj,std::string enumtype)
  {
 	 
 	 BOOL bret = FALSE;
@@ -458,27 +459,26 @@ BOOL ScpProcObject::ShutDown(std::wstring processname)
 		{
 			//ScpIntObject * tmpintobj =new ScpIntObject;
 			//tmpintobj->value=pe.th32ProcessID;
-			//std::wstring tmpintobjname=STDSTRINGEXT::Format(L"%d",pe.th32ProcessID);
+			//std::string tmpintobjname=STDSTRINGEXT::Format(L"%d",pe.th32ProcessID);
 			//((ScpTableObject *)tableobj)->AddElement(tmpintobjname,tmpintobj);
 
 
 			ScpStringObject * tmpstrobj= new ScpStringObject;
-			tmpstrobj->objname=pe.szExeFile;
-			tmpstrobj->content=STDSTRINGEXT::Format(L"%s,%d",pe.szExeFile,pe.th32ProcessID);
+			tmpstrobj->objname= STDSTRINGEXT::W2UTF(pe.szExeFile);
+			tmpstrobj->content=STDSTRINGEXT::Format("%s,%d",pe.szExeFile,pe.th32ProcessID);
 			((ScpTableObject *)tableobj)->AddElement(tmpstrobj->objname,tmpstrobj);	
 		}
 		else
 		{
 			ScpStringObject * tmpstrobj= new ScpStringObject;
-			tmpstrobj->objname=pe.szExeFile;
-			tmpstrobj->content=pe.szExeFile;
+			tmpstrobj->objname= STDSTRINGEXT::W2UTF(pe.szExeFile);
+			tmpstrobj->content= STDSTRINGEXT::W2UTF(pe.szExeFile);
 			((ScpTableObject *)tableobj)->AddElement(tmpstrobj->objname,tmpstrobj);			
 		}
 	}
 	bret =TRUE;
 	return bret;
 #endif
-	return FALSE;
  }
  BOOL ScpProcObject::Restart()
  {
@@ -495,7 +495,7 @@ BOOL ScpProcObject::ShutDown()
 	DWORD dwWaitResult;
 	if (pi.hProcess != NULL)
 	{
-dwWaitResult = WaitForSingleObject(pi.hProcess, 10);
+		dwWaitResult = WaitForSingleObject(pi.hProcess, 10);
 
 		if (dwWaitResult == STILL_ACTIVE || dwWaitResult == STATUS_TIMEOUT)
 			bRet = TerminateProcess(pi.hProcess, 0);
@@ -527,7 +527,7 @@ BOOL ScpProcObject::Wait(DWORD dwWaitTime)
 	#endif // WIN32
 	return TRUE;
 }
-bool ScpProcObject::IsInnerFunction(std::wstring & functionname)
+bool ScpProcObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -535,7 +535,7 @@ bool ScpProcObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpProcObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpProcObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -556,7 +556,7 @@ ScpObject * ScpProcObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -571,10 +571,34 @@ ScpObject * ScpProcObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 			}
 		}
 	}
+
+	return nullptr;
+}
+
+ScpObject * ScpProcObject::InnerFunction_set(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string opt = parameters->at(0);
+		StringStripQuote(opt);
+		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(opt);
+		if (objparam0 && objparam0->GetType() == ObjString)
+		{
+			opt = ((ScpStringObject *)objparam0)->content;
+		}
+		if (opt == str_EN_output ||
+			opt == str_CN_output)
+		{
+			ScpStringObject * tname = new ScpStringObject;
+			tname->content = ((ScpProcObject*)thisObject)->procoutput;
+			tname->istemp = true;
+			return tname;
+		}
+	}
 	if (parameters->size() == 2)
 	{
-		std::wstring param1 = parameters->at(0);
-		std::wstring param2 = parameters->at(1);
+		std::string param1 = parameters->at(0);
+		std::string param2 = parameters->at(1);
 		StringStripQuote(param1);
 		StringStripQuote(param2);
 
@@ -592,33 +616,10 @@ ScpObject * ScpProcObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETER
 		if (param1 == str_EN_option ||
 			param1 == str_CN_option)
 		{
-			if (wcsicmp(param2.c_str(), L"UI") == 0)
+			if (_stricmp(param2.c_str(), "UI") == 0)
 			{
 				((ScpProcObject*)thisObject)->isUIProcess = true;
 			}
-		}
-	}
-	return nullptr;
-}
-
-ScpObject * ScpProcObject::InnerFunction_set(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
-{
-	if (parameters->size() == 1)
-	{
-		std::wstring opt = parameters->at(0);
-		StringStripQuote(opt);
-		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(opt);
-		if (objparam0 && objparam0->GetType() == ObjString)
-		{
-			opt = ((ScpStringObject *)objparam0)->content;
-		}
-		if (opt == str_EN_output ||
-			opt == str_CN_output)
-		{
-			ScpStringObject * tname = new ScpStringObject;
-			tname->content = ((ScpProcObject*)thisObject)->procoutput;
-			tname->istemp = true;
-			return tname;
 		}
 	}
 	return nullptr;
@@ -639,7 +640,7 @@ ScpObject * ScpProcObject::InnerFunction_close(ScpObject * thisObject, VTPARAMET
 		((ScpProcObject*)thisObject)->ShutDown();
 	else if (parameters->size() == 1)
 	{
-		std::wstring text = parameters->at(0);
+		std::string text = parameters->at(0);
 		StringStripQuote(text);
 		ScpObject *obj = (ScpObject *)engine->GetCurrentObjectSpace()->FindObject(text);
 		if (obj)
@@ -651,7 +652,7 @@ ScpObject * ScpProcObject::InnerFunction_close(ScpObject * thisObject, VTPARAMET
 			}
 			else if (obj->GetType() == ObjString)
 			{
-				std::wstring procname = ((ScpStringObject*)obj)->content;
+				std::string procname = ((ScpStringObject*)obj)->content;
 				ScpProcObject::ShutDown(procname);
 			}
 		}
@@ -677,18 +678,18 @@ ScpObject * ScpProcObject::InnerFunction_enum(ScpObject * thisObject, VTPARAMETE
 	{
 		if (parameters->size() == 1)
 		{
-			std::wstring name1 = parameters->at(0);
+			std::string name1 = parameters->at(0);
 			StringStripQuote(name1);
 			ScpTableObject * tableobj = (ScpTableObject *)engine->GetCurrentObjectSpace()->FindObject(name1);
 			if (tableobj && tableobj->GetType() == ObjTable)
 			{
-				((ScpProcObject*)thisObject)->Enum(tableobj, L"name");
+				((ScpProcObject*)thisObject)->Enum(tableobj, "name");
 			}
 		}
 		else if (parameters->size() == 2)
 		{
-			std::wstring name1 = parameters->at(0);
-			std::wstring name2 = parameters->at(0);
+			std::string name1 = parameters->at(0);
+			std::string name2 = parameters->at(0);
 			StringStripQuote(name1);
 			StringStripQuote(name2);
 			ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(name2);
@@ -712,8 +713,8 @@ ScpObject * ScpProcObject::InnerFunction_open(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters && parameters->size() == 2)
 	{
-		std::wstring path = parameters->at(0);
-		std::wstring param = parameters->at(1);
+		std::string path = parameters->at(0);
+		std::string param = parameters->at(1);
 		StringStripQuote(path);
 		StringStripQuote(param);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(path);
@@ -744,7 +745,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 		{
 			if (((ScpProcObject*)thisObject)->procpathname.empty())
 			{
-				std::wstring name = parameters->at(0);
+				std::string name = parameters->at(0);
 				StringStripQuote(name);
 				ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 				if (obj && obj->GetType() == ObjString)
@@ -758,7 +759,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 			}
 			else
 			{
-				std::wstring temp = parameters->at(0);
+				std::string temp = parameters->at(0);
 				StringStripQuote(temp);
 				ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(temp);
 				if (obj && obj->GetType() == ObjString)
@@ -773,7 +774,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 		{
 			if (((ScpProcObject*)thisObject)->procpathname.empty())
 			{
-				std::wstring name = parameters->at(0);
+				std::string name = parameters->at(0);
 				StringStripQuote(name);
 				ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 				if (obj && obj->GetType() == ObjString)
@@ -784,7 +785,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 				{
 					((ScpProcObject*)thisObject)->procpathname = name;
 				}
-				std::wstring temp = parameters->at(1);
+				std::string temp = parameters->at(1);
 				StringStripQuote(temp);
 				ScpObject * objparam = engine->GetCurrentObjectSpace()->FindObject(temp);
 				if (objparam && objparam->GetType() == ObjString)
@@ -796,10 +797,10 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 			}
 			else
 			{
-				((ScpProcObject*)thisObject)->Parameter = L"";
+				((ScpProcObject*)thisObject)->Parameter = "";
 				for (int i = 0;i < parameters->size();i++)
 				{
-					std::wstring temp = parameters->at(i);
+					std::string temp = parameters->at(i);
 					StringStripQuote(temp);
 					ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(temp);
 					if (obj && obj->GetType() == ObjString)
@@ -807,7 +808,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 						temp = ((ScpStringObject*)obj)->content;
 					}
 					((ScpProcObject*)thisObject)->Parameter += temp;
-					((ScpProcObject*)thisObject)->Parameter += L" ";
+					((ScpProcObject*)thisObject)->Parameter += " ";
 				}
 				ret->value = ((ScpProcObject*)thisObject)->Open(((ScpProcObject*)thisObject)->procpathname, ((ScpProcObject*)thisObject)->Parameter) ? 1 : 0;
 			}
@@ -817,7 +818,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 		{
 			if (((ScpProcObject*)thisObject)->procpathname.empty())
 			{
-				std::wstring name = parameters->at(0);
+				std::string name = parameters->at(0);
 				StringStripQuote(name);
 				ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(name);
 				if (obj && obj->GetType() == ObjString)
@@ -828,10 +829,10 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 				{
 					((ScpProcObject*)thisObject)->procpathname = name;
 				}
-				((ScpProcObject*)thisObject)->Parameter = L"";
+				((ScpProcObject*)thisObject)->Parameter = "";
 				for (int i = 1;i < parameters->size();i++)
 				{
-					std::wstring temp = parameters->at(i);
+					std::string temp = parameters->at(i);
 					StringStripQuote(temp);
 					ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(temp);
 					if (obj && obj->GetType() == ObjString)
@@ -839,16 +840,16 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 						temp = ((ScpStringObject*)obj)->content;
 					}
 					((ScpProcObject*)thisObject)->Parameter += temp;
-					((ScpProcObject*)thisObject)->Parameter += L" ";
+					((ScpProcObject*)thisObject)->Parameter += " ";
 				}
 				ret->value = ((ScpProcObject*)thisObject)->Open(((ScpProcObject*)thisObject)->procpathname, ((ScpProcObject*)thisObject)->Parameter) ? 1 : 0;
 			}
 			else
 			{
-				((ScpProcObject*)thisObject)->Parameter = L"";
+				((ScpProcObject*)thisObject)->Parameter = "";
 				for (int i = 0;i < parameters->size();i++)
 				{
-					std::wstring temp = parameters->at(i);
+					std::string temp = parameters->at(i);
 					StringStripQuote(temp);
 					ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(temp);
 					if (obj && obj->GetType() == ObjString)
@@ -856,7 +857,7 @@ ScpObject * ScpProcObject::InnerFunction_run(ScpObject * thisObject, VTPARAMETER
 						temp = ((ScpStringObject*)obj)->content;
 					}
 					((ScpProcObject*)thisObject)->Parameter += temp;
-					((ScpProcObject*)thisObject)->Parameter += L" ";
+					((ScpProcObject*)thisObject)->Parameter += " ";
 				}
 				ret->value = ((ScpProcObject*)thisObject)->Open(((ScpProcObject*)thisObject)->procpathname, ((ScpProcObject*)thisObject)->Parameter) ? 1 : 0;
 			}

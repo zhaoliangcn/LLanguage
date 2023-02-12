@@ -6,19 +6,19 @@ const static ScpObjectType	ObjPipe = 57;
 #ifdef _WIN32
 #include "PipeUtil.h"
 #endif
-const static wchar_t * str_CN_ObjPipe = L"管道";
+const static char * str_CN_ObjPipe = "管道";
 
-const static wchar_t * str_EN_ObjPipe = L"pipe";
+const static char * str_EN_ObjPipe = "pipe";
 class ScpPipeObject :
 	public ScpObject
 {
 public:
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
 	virtual void Show(CScriptEngine * engine);
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	BOOL Open(const wchar_t * PipeName);
 	BOOL Read(char * Buffer,DWORD Len);
@@ -30,7 +30,7 @@ public:
 #ifdef _WIN32
 	CPipeUtil Pipe;
 #endif
-	std::wstring wsPipeName;
+	std::string wsPipeName;
 
 
 	static ScpObject * InnerFunction_Show(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);

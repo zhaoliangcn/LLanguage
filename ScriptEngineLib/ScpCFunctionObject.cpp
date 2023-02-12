@@ -6,9 +6,166 @@
 #include "ScpCFunctionObject.h"
 #include "ScpIntObject.h"
 #include "ScriptEngine.h"
+#include "../Common/commonutil.hpp"
+
 ScpCFunctionObject::ScpCFunctionObject()
 {
 	objecttype = ObjCFunction;
+	ffi = 1;
+#ifdef _WIN32
+	HMODULE hmodule = LoadLibraryA("Libffi.dll");
+	if (hmodule)
+	{
+		pffi_prep_cif =(func_ffi_prep_cif) GetProcAddress(hmodule, "ffi_prep_cif");
+		if (!pffi_prep_cif)
+		{
+			ffi = 0;
+		}
+		pffi_call =(func_ffi_call) GetProcAddress(hmodule, "ffi_call");
+		if (!pffi_call)
+		{
+			ffi = 0;
+		}
+		pffi_type_void = (ffi_type*)GetProcAddress(hmodule, "ffi_type_void");
+		if (!pffi_type_void)
+		{
+			ffi = 0;
+		}
+		pffi_type_uint8 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_uint8");
+		if (!pffi_type_uint8)
+		{
+			ffi = 0;
+		}			
+		pffi_type_sint8 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_sint8");
+		if (!pffi_type_sint8)
+		{
+			ffi = 0;
+		}
+		pffi_type_uint16 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_uint16");
+		if (!pffi_type_uint16)
+		{
+			ffi = 0;
+		}		
+		pffi_type_sint16 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_sint16");
+		if (!pffi_type_sint16)
+		{
+			ffi = 0;
+		}
+		pffi_type_uint32 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_uint32");
+		if (!pffi_type_uint32)
+		{
+			ffi = 0;
+		}
+		pffi_type_sint32 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_sint32");
+		if (!pffi_type_sint32)
+		{
+			ffi = 0;
+		}
+		pffi_type_uint64 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_uint64");
+		if (!pffi_type_uint64)
+		{
+			ffi = 0;
+		}
+		pffi_type_sint64 = (ffi_type*)GetProcAddress(hmodule, "ffi_type_sint64");
+		if (!pffi_type_sint64)
+		{
+			ffi = 0;
+		}
+		pffi_type_float = (ffi_type*)GetProcAddress(hmodule, "ffi_type_float");
+		if (!pffi_type_float)
+		{
+			ffi = 0;
+		}
+		pffi_type_double = (ffi_type*)GetProcAddress(hmodule, "ffi_type_double");
+		if (!pffi_type_double)
+		{
+			ffi = 0;
+		}
+
+		pffi_type_pointer = (ffi_type*)GetProcAddress(hmodule, "ffi_type_pointer");
+		if (!pffi_type_pointer)
+		{
+			ffi = 0;
+		}
+
+		
+	}
+#else
+	pffi_prep_cif = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_prep_cif");
+	if (!pffi_prep_cif)
+	{
+		ffi = 0;
+	}
+	pffi_call = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_call");
+	if (!pffi_call)
+	{
+		ffi = 0;
+	}
+	pffi_type_void = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_void");
+	if (!pffi_type_void)
+	{
+		ffi = 0;
+	}
+	pffi_type_uint8 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint8");
+	if (!pffi_type_uint8)
+	{
+		ffi = 0;
+	}
+	pffi_type_sint8 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint8");
+	if (!pffi_type_sint8)
+	{
+		ffi = 0;
+	}
+	pffi_type_uint16 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint16");
+	if (!pffi_type_uint16)
+	{
+		ffi = 0;
+	}
+	pffi_type_sint16 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint16");
+	if (!pffi_type_sint16)
+	{
+		ffi = 0;
+	}
+	pffi_type_uint32 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint32");
+	if (!pffi_type_uint32)
+	{
+		ffi = 0;
+	}
+	pffi_type_sint32 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint32");
+	if (!pffi_type_sint32)
+	{
+		ffi = 0;
+	}
+	pffi_type_uint64 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint64");
+	if (!pffi_type_uint64)
+	{
+		ffi = 0;
+	}
+	pffi_type_sint64 = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint64");
+	if (!pffi_type_sint64)
+	{
+		ffi = 0;
+	}
+		
+	pffi_type_float = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_float");
+	if (!pffi_type_float)
+	{
+		ffi = 0;
+	}
+	pffi_type_double = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_double");
+	if (!pffi_type_double)
+	{
+		ffi = 0;
+	}
+	pffi_type_pointer = dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_pointer");
+	if (!pffi_type_pointer)
+	{
+		ffi = 0;
+	}
+	
+
+#endif
+
 }
 ScpCFunctionObject::~ScpCFunctionObject()
 {
@@ -17,23 +174,23 @@ void ScpCFunctionObject::Show(CScriptEngine * engine)
 {
 	engine->PrintError(ToString());
 }
-ScpObject * ScpCFunctionObject::Clone(std::wstring strObjName)
+ScpObject * ScpCFunctionObject::Clone(std::string strObjName)
 {
 	return NULL;
 }	
-std::wstring ScpCFunctionObject::ToString()
+std::string ScpCFunctionObject::ToString()
 {
-	std::wstring temp;
-	std::wstring tempfuncbody =FunctionName;
-	tempfuncbody+=L"(";
+	std::string temp;
+	std::string tempfuncbody =FunctionName;
+	tempfuncbody+="(";
 	for(ITPARAMETERS it =FormalParameters.begin();it!=FormalParameters.end();it++)
 	{
-		std::wstring temp = *it;
+		std::string temp = *it;
 		tempfuncbody+=temp;
-		tempfuncbody+=L",";
+		tempfuncbody+=",";
 	}
 	tempfuncbody=tempfuncbody.substr(0,tempfuncbody.length()-1);
-	tempfuncbody+=L")\n";
+	tempfuncbody+=")\n";
 	temp=tempfuncbody;
 	return temp;
 }
@@ -41,30 +198,32 @@ void ScpCFunctionObject::Release()
 {
 	delete this;
 }
-bool ScpCFunctionObject::IsInnerFunction(std::wstring & functionname)
+bool ScpCFunctionObject::IsInnerFunction(std::string & functionname)
 {
 	return false;
 }
-ScpObject * ScpCFunctionObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpCFunctionObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	return nullptr;
 }
-void * ScpCFunctionObject::GetApiAddress(std::wstring CDLLName,std::wstring CFunctionName)
+void * ScpCFunctionObject::GetApiAddress(std::string CDLLName,std::string CFunctionName)
 {
 	void * addr=0;
-
+	StringStripQuote(CDLLName);
+	StringStripQuote(CFunctionName);
 #ifdef _WIN32
-	HMODULE hmodule = LoadLibraryW(CDLLName.c_str());
+	HMODULE hmodule = LoadLibraryA(CDLLName.c_str());
 	if(hmodule)
 	{
-		addr = (void *)GetProcAddress(hmodule,STDSTRINGEXT::WToA(CFunctionName).c_str());			
+		addr = (void *)GetProcAddress(hmodule,CFunctionName.c_str());			
 	}
 #else
+	addr = dlsym(dlopen(CDLLName.c_str(),RTLD_LAZY),CFunctionName.c_str());
 
 #endif
 	return addr;
 }
-BOOL ScpCFunctionObject::MakeCFunctionInterface(std::wstring myFunctionName,std::wstring DllName,std::wstring myCFunctionName,std::wstring ReturnType,VTPARAMETERS Parameters)
+BOOL ScpCFunctionObject::MakeCFunctionInterface(std::string myFunctionName,std::string DllName,std::string myCFunctionName,std::string ReturnType,VTPARAMETERS Parameters)
 {
 	FunctionName=myFunctionName;
 	CFunctionName = myCFunctionName;
@@ -76,51 +235,12 @@ BOOL ScpCFunctionObject::MakeCFunctionInterface(std::wstring myFunctionName,std:
 ScpCObject * ScpCFunctionObject::MakeParamObject(VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace,int paramindex)
 {
 	ScpCObject * param1;
-	std::wstring formaparam1=FormalParameters.at(paramindex);
-	std::wstring realparam1=RealParameters.at(paramindex);
+	std::string formaparam1=FormalParameters.at(paramindex);
+	std::string realparam1=RealParameters.at(paramindex);
 	ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(formaparam1.c_str());
-	if(type==ObjCInt32)
+	if(type== objectSpace->GetType(realparam1))
 	{
-
-		if(objectSpace->GetType(realparam1)==ObjNumber)
-		{
-			param1=new ScpObjCInt32;
-			ScpIntObject * obj1=(ScpIntObject *)objectSpace->FindObject(RealParameters.at(paramindex));
-			((ScpObjCInt32*)param1)->Value=obj1->value;
-		}
-		else if(objectSpace->GetType(realparam1)==ObjCInt32)
-		{
-			return (ScpObjCInt32*)objectSpace->FindObject(realparam1);
-		}
-	}
-	else if(type==ObjHandle)
-	{
-		
-		if(objectSpace->GetType(realparam1)==ObjHandle)
-		{
-			param1=(ScpObjHandle*)objectSpace->FindObject(realparam1);
-		}
-	}
-	else if(type==ObjPointerofChar)
-	{
-		if(objectSpace->GetType(realparam1)==ObjPointerofChar)
-		{
-			param1=(ScpObjPointerofChar*)objectSpace->FindObject(realparam1);
-		}
-	}
-	else if(type==ObjPointerofWchar)
-	{
-		if(objectSpace->GetType(realparam1)==ObjPointerofWchar)
-		{
-			param1=(ScpObjPointerofWchar*)objectSpace->FindObject(realparam1);
-		}
-	}
-	else if(type==ObjUnsignedInt32)
-	{
-		if(objectSpace->GetType(realparam1)==ObjUnsignedInt32)
-		{
-			param1=(ScpObjUnsignedInt32*)objectSpace->FindObject(realparam1);
-		}
+		param1 =(ScpCObject*)objectSpace->FindObject(realparam1);
 	}
 	return param1;
 }
@@ -128,20 +248,14 @@ BOOL ScpCFunctionObject::CopyBackParamObject(VTPARAMETERS& RealParameters,ScpObj
 {
 	if(objectSpace->GetType(FormalParameters.at(paramindex))==ObjCInt32)
 	{
-		if(objectSpace->GetType(RealParameters.at(paramindex))==ObjNumber)
-		{
-			ScpIntObject * obj1=(ScpIntObject *)objectSpace->FindObject(RealParameters.at(paramindex));
-			obj1->value=((ScpObjCInt32*)param)->Value;
-			delete param;
-		}
-		else if(objectSpace->GetType(RealParameters.at(paramindex))==ObjCInt32)
+		if(objectSpace->GetType(RealParameters.at(paramindex))==ObjCInt32)
 		{
 
 		}
 	}
 	return TRUE;
 }
-ScpCObject * ScpCFunctionObject::MakeRetValueObject(std::wstring retvalue,ScpObjectSpace * objectSpace)
+ScpCObject * ScpCFunctionObject::MakeRetValueObject(std::string retvalue,ScpObjectSpace * objectSpace)
 {
 	ScpCObject *retValueObj;
 	ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str());
@@ -164,7 +278,7 @@ ScpCObject * ScpCFunctionObject::MakeRetValueObject(std::wstring retvalue,ScpObj
 
 
 }
-BOOL ScpCFunctionObject::CopyBackRetValueObject(std::wstring retvalue,ScpObjectSpace * objectSpace,ScpCObject *retValueObj)
+BOOL ScpCFunctionObject::CopyBackRetValueObject(std::string retvalue,ScpObjectSpace * objectSpace,ScpCObject *retValueObj)
 {
 	if(ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str())==ObjHandle)
 	{
@@ -176,152 +290,127 @@ BOOL ScpCFunctionObject::CopyBackRetValueObject(std::wstring retvalue,ScpObjectS
 	return TRUE;
 
 }
-BOOL ScpCFunctionObject::Call(std::wstring retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace)
+
+BOOL ScpCFunctionObject::Call(std::string retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace)
 {
 	if(FormalParameters.size()==RealParameters.size())
 	{
-		if(RealParameters.size()==0)
-		{			
-			ScpCObject *retValueObj;
-			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str());
-			if(type==ObjHandle)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);
-				STDAPICAll0 api=(STDAPICAll0)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjHandle*)retValueObj)->Value=(HANDLE)api();
-			}	
-			if(type==ObjCInt32)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);	
-				STDAPICAll0 api=(STDAPICAll0)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjCInt32*)retValueObj)->Value=api();
-			}
-			if(type==ObjVoid)
-			{
-				STDAPICALL0_NORET api=(STDAPICALL0_NORET)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				api();
-			}
-			CopyBackRetValueObject(retvalue,objectSpace,retValueObj);			
-		}
-		if(RealParameters.size()==1)
+		ScpCObject* retValueObj;
+		void* api = GetApiAddress(CDllName, CFunctionName);
+		if (ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str()) != ObjVoid)
 		{
-			ScpCObject * param1=MakeParamObject(RealParameters,objectSpace,0);
-			ScpCObject *retValueObj;
-			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str());
-			if(type==ObjHandle)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);
-				STDAPICAll1 api=(STDAPICAll1)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjHandle*)retValueObj)->Value=(HANDLE)api(param1->GetValueAddress());
-			}	
-			if(type==ObjCInt32)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);	
-				STDAPICAll1 api=(STDAPICAll1)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjCInt32*)retValueObj)->Value=api(param1->GetValueAddress());
-			}
-			if(type==ObjVoid)
-			{
-				STDAPICALL1_NORET api=(STDAPICALL1_NORET)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				api(param1->GetValueAddress());
-			}
-			CopyBackRetValueObject(retvalue,objectSpace,retValueObj);
-			CopyBackParamObject(RealParameters,objectSpace,param1,0);
+			retValueObj = MakeRetValueObject(retvalue, objectSpace);
 		}
-		if(RealParameters.size()==2)
+		if (api != NULL && ffi==1)
 		{
-			ScpCObject * param1=MakeParamObject(RealParameters,objectSpace,0);
-			ScpCObject * param2=MakeParamObject(RealParameters,objectSpace,1);
-			ScpCObject *retValueObj;
-			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str());
-			if(type==ObjHandle)
+			void (*functionPtr)();
+			functionPtr = (void (*)())api;
+			int argCount = RealParameters.size();
+
+			ffi_type** ffiArgTypes = (ffi_type**)malloc(sizeof(ffi_type*) * argCount);
+
+			void** ffiArgs = (void**)malloc(sizeof(void*) * argCount);
+			for (int i = 0; i < argCount; i++)
 			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);
-				STDAPICAll2 api=(STDAPICAll2)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjHandle*)retValueObj)->Value=(HANDLE)api(param1->GetValueAddress(),param2->GetValueAddress());
-			}	
-			if(type==ObjCInt32)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);	
-				STDAPICAll2 api=(STDAPICAll2)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjCInt32*)retValueObj)->Value=api(param1->GetValueAddress(),param2->GetValueAddress());
+				if (ObjPointerofChar == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_pointer;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					*(PADDRESS*)ffiArgPtr = param->GetValueAddress();
+					ffiArgs[i] = ffiArgPtr;
+				}
+				else if(ObjCInt32 == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_sint32;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					*(int*)ffiArgPtr = ((ScpObjCInt32*)param)->Value;
+					ffiArgs[i] = ffiArgPtr;
+				}
+				else if(ObjUnsignedInt32 == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_uint32;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					*(unsigned int*)ffiArgPtr = ((ScpObjUnsignedInt32*)param)->Value;
+					ffiArgs[i] = ffiArgPtr;
+				}
+				else if(ObjPointerofWchar == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_pointer;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					void* p = (void*)param->GetValueAddress();
+					ffiArgs[i] = &p;
+				}
+				else if(ObjPointerofChar == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_pointer;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					void* p = (void*)param->GetValueAddress();
+					ffiArgs[i] = &p;
+				}
+				else if(ObjHandle == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_pointer;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					void* p = (void*)param->GetValueAddress();
+					ffiArgs[i] = &p;
+				}
+				else if(ObjPointer == ScpGlobalObject::GetInstance()->GetType(FormalParameters.at(i).c_str()))
+				{
+					ScpCObject* param = MakeParamObject(RealParameters, objectSpace, i);
+					ffiArgTypes[i] = pffi_type_pointer;
+					void* ffiArgPtr = malloc(ffiArgTypes[i]->size);
+					void* p = (void*)param->GetValueAddress();
+					ffiArgs[i] = &p;
+				}
 			}
-			if(type==ObjVoid)
+
+			ffi_cif cif;
+			ffi_type* returnFfiType = NULL;
+			if (ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str()) == ObjVoid)
 			{
-				STDAPICALL2_NORET api=(STDAPICALL2_NORET)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				api(param1->GetValueAddress(),param2->GetValueAddress());
+				returnFfiType = pffi_type_void;
 			}
-			CopyBackRetValueObject(retvalue,objectSpace,retValueObj);
-			CopyBackParamObject(RealParameters,objectSpace,param1,0);
-			CopyBackParamObject(RealParameters,objectSpace,param2,1);
-		}
-		else if(RealParameters.size()==3)
-		{
-			ScpCObject * param1=MakeParamObject(RealParameters,objectSpace,0);
-			ScpCObject * param2=MakeParamObject(RealParameters,objectSpace,1);
-			ScpCObject * param3=MakeParamObject(RealParameters,objectSpace,2);
-			ScpCObject *retValueObj;
-			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str());
-			if(type==ObjHandle)
+			else if (ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str()) == ObjCInt32)
 			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);
-				STDAPICAll3 api=(STDAPICAll3)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjHandle*)retValueObj)->Value=(HANDLE)api(param1->GetValueAddress(),param2->GetValueAddress(),param3->GetValueAddress());
-			}	
-			if(type==ObjCInt32)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);					
-				STDAPICAll3 api=(STDAPICAll3)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-				((ScpObjCInt32*)retValueObj)->Value=api(param1->GetValueAddress(),param2->GetValueAddress(),param3->GetValueAddress());
+				returnFfiType = pffi_type_sint32;
 			}
-			CopyBackRetValueObject(retvalue,objectSpace,retValueObj);
-			CopyBackParamObject(RealParameters,objectSpace,param1,0);
-			CopyBackParamObject(RealParameters,objectSpace,param2,1);
-			CopyBackParamObject(RealParameters,objectSpace,param3,2);
-		}
-		else if(RealParameters.size()==4)
-		{
-			ScpCObject * param1=MakeParamObject(RealParameters,objectSpace,0);
-			ScpCObject * param2=MakeParamObject(RealParameters,objectSpace,1);
-			ScpCObject * param3=MakeParamObject(RealParameters,objectSpace,2);
-			ScpCObject * param4=MakeParamObject(RealParameters,objectSpace,3);
-			ScpCObject *retValueObj;
-			ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str());
-			if(type==ObjHandle)
+			else if (ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str()) == ObjHandle)
 			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);
-				STDAPICAll4 api=(STDAPICAll4)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-					((ScpObjHandle*)retValueObj)->Value=(HANDLE)api(param1->GetValueAddress(),param2->GetValueAddress(),param3->GetValueAddress(),param4->GetValueAddress());
-			}	
-			if(type==ObjCInt32)
-			{
-				retValueObj=MakeRetValueObject(retvalue,objectSpace);	
-				STDAPICAll4 api=(STDAPICAll4)GetApiAddress(CDllName,CFunctionName);
-				if(api!=NULL)
-					((ScpObjCInt32*)retValueObj)->Value=api(param1->GetValueAddress(),param2->GetValueAddress(),param3->GetValueAddress(),param4->GetValueAddress());
+				returnFfiType = pffi_type_pointer;
 			}
-			CopyBackRetValueObject(retvalue,objectSpace,retValueObj);
-			CopyBackParamObject(RealParameters,objectSpace,param1,0);
-			CopyBackParamObject(RealParameters,objectSpace,param2,1);
-			CopyBackParamObject(RealParameters,objectSpace,param3,2);
-			CopyBackParamObject(RealParameters,objectSpace,param3,3);
+			ffi_status ffiPrepStatus = pffi_prep_cif(&cif, FFI_DEFAULT_ABI, (unsigned int)argCount, returnFfiType, ffiArgTypes);
+
+			if (ffiPrepStatus == FFI_OK) {
+
+				void* returnPtr = NULL;
+				if (returnFfiType->size) {
+					returnPtr = malloc(returnFfiType->size);
+				}
+
+				pffi_call(&cif, functionPtr, returnPtr, ffiArgs);
+
+				if (ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str()) == ObjCInt32)
+				{
+					((ScpObjCInt32*)retValueObj)->Value = *(int*)returnPtr;
+				}
+				else if (ScpGlobalObject::GetInstance()->GetType(CReturnType.c_str()) == ObjHandle)
+				{
+					((ScpObjHandle*)retValueObj)->Value =*(HANDLE*)returnPtr;
+				}
+
+			}
+			return TRUE;
 		}
 	}
-	return TRUE;
+	return FALSE;
 }
-BOOL ScpCFunctionObject::AsmCall(std::wstring retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace)
+BOOL ScpCFunctionObject::AsmCall(std::string retvalue,VTPARAMETERS& RealParameters,ScpObjectSpace * objectSpace)
 {
 
 	return FALSE;

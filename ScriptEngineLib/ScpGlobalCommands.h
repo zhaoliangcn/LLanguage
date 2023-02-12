@@ -4,8 +4,8 @@
 namespace GlobalCommands
 {
 	BOOL __stdcall Do_Sleep_Command(VTPARAMETERS * vtparameters, CScriptEngine * engine);
-	//对象操作
-	BOOL __stdcall Do_Clear_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine);//vtparameters 参数列表 engine 当前脚本引擎的上下文
+	//瀵硅薄鎿嶄綔
+	BOOL __stdcall Do_Clear_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine);//vtparameters 鍙傛暟鍒楄〃 engine 褰撳墠鑴氭湰寮曟搸鐨勪笂涓嬫枃
 	BOOL __stdcall Do_Shutdown_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine);
 	BOOL __stdcall Do_Popup_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine);
 	BOOL __stdcall Do_Run_Command(VTPARAMETERS * vtparameters,CScriptEngine * engine);

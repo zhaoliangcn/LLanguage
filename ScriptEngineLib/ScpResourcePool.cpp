@@ -2,8 +2,8 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//Î´Íê³É
-//ÓÃÓÚÊµÏÖ¾²Ì¬×ÊÔ´µÄ¹ÜÀí£¬¶Ô×Ö½ÚÂëÉú³ÉÌá¹©Ö§³Å
+//æœªå®Œæˆ
+//ç”¨äºå®ç°é™æ€èµ„æºçš„ç®¡ç†ï¼Œå¯¹å­—èŠ‚ç ç”Ÿæˆæä¾›æ”¯æ’‘
 */
 #include "ScpResourcePool.h"
 
@@ -19,7 +19,7 @@ ScpResourcePool::~ScpResourcePool()
 {
 }
 
-unsigned long ScpResourcePool::AppendResource(const std::wstring & resource)
+unsigned long ScpResourcePool::AppendResource(const std::string & resource)
 {
     unsigned long resid = scpFindResource(resource);
     if (resid == -1)
@@ -30,7 +30,7 @@ unsigned long ScpResourcePool::AppendResource(const std::wstring & resource)
     return resid;
 }
 
-unsigned long ScpResourcePool::scpFindResource(const std::wstring & resource)
+unsigned long ScpResourcePool::scpFindResource(const std::string & resource)
 {
 	for (size_t i = 0;i < pool.size();i++)
 	{
@@ -41,12 +41,11 @@ unsigned long ScpResourcePool::scpFindResource(const std::wstring & resource)
 	}
 	return -1;
 }
-const wchar_t * ScpResourcePool::scpGetResource(unsigned long id)
+std::string & ScpResourcePool::scpGetResource(unsigned long id)
 {
-	
 	if(id>=0 && id< pool.size())
-		return pool.at(id).c_str();
-	return nullptr;
+		return pool.at(id);
+	return emptyres;
 }
 
 void ScpResourcePool::unMapResource(unsigned long id)

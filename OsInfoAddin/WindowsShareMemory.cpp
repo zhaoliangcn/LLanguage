@@ -29,9 +29,9 @@ WindowsShareMemory::WindowsShareMemory(size_t BufferSize):BUF_SIZE(BufferSize)
 	InitializeSecurityDescriptor(&SecDesc, SECURITY_DESCRIPTOR_REVISION);
 	SetSecurityDescriptorDacl(&SecDesc, TRUE, 0, FALSE);
 	ghMutex = CreateMutex( 
-		&SecAttr,  
-		FALSE, 
-		L"Global\\BasicMutex"); 
+		&SecAttr,              //  security attributes
+		FALSE,             // initially not owned
+		L"Global\\BasicMutex");             // named mutex
 
 	if (ghMutex == NULL) 
 	{
@@ -54,16 +54,16 @@ WindowsShareMemory::~WindowsShareMemory()
 int WindowsShareMemory::OpenShareMemory(const wchar_t *szName)
 {	
 	hMapFile = OpenFileMapping(
-		FILE_MAP_ALL_ACCESS,
-		FALSE,
-		szName);
+		FILE_MAP_ALL_ACCESS,   // read/write access
+		FALSE,                 // do not inherit the name
+		szName);               // name of mapping object
 	if (hMapFile == NULL)
 	{
 		//_tprintf(TEXT("Could not open file mapping object (%d).\n"),	GetLastError());
 		return 1;
 	}
-	pShareMemoryAddress = MapViewOfFile(hMapFile,
-		FILE_MAP_ALL_ACCESS,
+	pShareMemoryAddress = MapViewOfFile(hMapFile, // handle to map object
+		FILE_MAP_ALL_ACCESS,  // read/write permission
 		0,
 		0,
 		BUF_SIZE);
@@ -78,20 +78,20 @@ int WindowsShareMemory::OpenShareMemory(const wchar_t *szName)
 int WindowsShareMemory::CreateShareMemory(const wchar_t *szName)
 {
 	hMapFile = CreateFileMapping(
-		INVALID_HANDLE_VALUE,
-		&SecAttr,  
-		PAGE_READWRITE, 
-		0,  
-		BUF_SIZE, 
-		szName);
+		INVALID_HANDLE_VALUE,    // use paging file
+		&SecAttr,                    // default security
+		PAGE_READWRITE,          // read/write access
+		0,                       // maximum object size (high-order DWORD)
+		BUF_SIZE,                // maximum object size (low-order DWORD)
+		szName);                 // name of mapping object
 
 	if (hMapFile == NULL)
 	{
 		//_tprintf(TEXT("Could not create file mapping object (%d).\n"),GetLastError());
 		return 1;
 	}
-	pShareMemoryAddress = MapViewOfFile(hMapFile,
-		FILE_MAP_ALL_ACCESS, 
+	pShareMemoryAddress = MapViewOfFile(hMapFile,   // handle to map object
+		FILE_MAP_ALL_ACCESS, // read/write permission
 		0,
 		0,
 		BUF_SIZE);
@@ -116,8 +116,8 @@ void * WindowsShareMemory::GetShareMemoryAddress()
 void WindowsShareMemory::Lock()
 {
 	WaitForSingleObject( 
-		ghMutex,
-		INFINITE);
+		ghMutex,    // handle to mutex
+		INFINITE);  // no time-out interval
 }
 void WindowsShareMemory::UnLock()
 {
@@ -184,16 +184,16 @@ WindowsFileShareMemory::~WindowsFileShareMemory()
 int WindowsFileShareMemory::OpenFileShareMemory(const wchar_t *szFilePathName)
 {	
 	hMapFile = OpenFileMapping(
-		FILE_MAP_ALL_ACCESS,
-		FALSE,
-		ParseNameW(szFilePathName));
+		FILE_MAP_ALL_ACCESS,   // read/write access
+		FALSE,                 // do not inherit the name
+		ParseNameW(szFilePathName));               // name of mapping object
 	if (hMapFile == NULL)
 	{
 		//_tprintf(TEXT("Could not open file mapping object (%d).\n"),GetLastError());
 		return 1;
 	}
-	pFileShareMemoryAddress = MapViewOfFile(hMapFile,
-		FILE_MAP_ALL_ACCESS,
+	pFileShareMemoryAddress = MapViewOfFile(hMapFile, // handle to map object
+		FILE_MAP_ALL_ACCESS,  // read/write permission
 		0,
 		0,
 		0);
@@ -206,9 +206,9 @@ int WindowsFileShareMemory::OpenFileShareMemory(const wchar_t *szFilePathName)
 	std::wstring wsGlobalMutexName=L"Global\\";
 	wsGlobalMutexName+=ParseNameW(szFilePathName);
 	ghMutex = CreateMutex( 
-		&SecAttr,
-		FALSE,
-		wsGlobalMutexName.c_str());
+		&SecAttr,              // security attributes
+		FALSE,             // initially not owned
+		wsGlobalMutexName.c_str());             // named mutex
 
 	if (ghMutex == NULL) 
 	{
@@ -239,20 +239,20 @@ int WindowsFileShareMemory::CreateFileShareMemory(const wchar_t *szFilePathName)
 	WriteFile(hFile,pBuffer,BUF_SIZE,&dwWriteCount,NULL);
 	free(pBuffer);
 	hMapFile = CreateFileMapping(
-		hFile,
-		&SecAttr,
-		PAGE_READWRITE,
-		0,
-		0,
-		ParseNameW(szFilePathName));
+		hFile,    // use  file
+		&SecAttr,                    // default security
+		PAGE_READWRITE,          // read/write access
+		0,                       // maximum object size (high-order DWORD)
+		0,                // maximum object size (low-order DWORD)
+		ParseNameW(szFilePathName));                 // name of mapping object
 
 	if (hMapFile == NULL)
 	{
 		//_tprintf(TEXT("Could not create file mapping object (%d).\n"),GetLastError());
 		return 1;
 	}
-	pFileShareMemoryAddress = MapViewOfFile(hMapFile,
-		FILE_MAP_ALL_ACCESS,
+	pFileShareMemoryAddress = MapViewOfFile(hMapFile,   // handle to map object
+		FILE_MAP_ALL_ACCESS, // read/write permission
 		0,
 		0,
 		0);
@@ -265,9 +265,9 @@ int WindowsFileShareMemory::CreateFileShareMemory(const wchar_t *szFilePathName)
 	std::wstring wsGlobalMutexName=L"Global\\";
 	wsGlobalMutexName+=ParseNameW(szFilePathName);
 	ghMutex = CreateMutex( 
-		&SecAttr, 
-		FALSE, 
-		wsGlobalMutexName.c_str());
+		&SecAttr,              // default security attributes
+		FALSE,             // initially not owned
+		wsGlobalMutexName.c_str());             // unnamed mutex
 
 	if (ghMutex == NULL) 
 	{
@@ -289,8 +289,8 @@ void * WindowsFileShareMemory::GetFileShareMemoryAddress()
 void WindowsFileShareMemory::Lock()
 {
 	WaitForSingleObject( 
-		ghMutex,
-		INFINITE);
+		ghMutex,    // handle to mutex
+		INFINITE);  // no time-out interval
 }
 void WindowsFileShareMemory::UnLock()
 {

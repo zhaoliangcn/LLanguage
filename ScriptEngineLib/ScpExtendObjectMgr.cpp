@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//¿©’π∂‘œÛµƒπ‹¿Ì£¨Õ®π˝µ˜”√‘§∂®“Âµƒµº≥ˆ∫Ø ˝£¨ªÒ÷™¿©’π∂‘œÛµƒ¿‡–ÕID°¢√˚≥∆°¢∂‘œÛπ§≥ß∫Ø ˝
+//Êâ©Â±ïÂØπË±°ÁöÑÁÆ°ÁêÜÔºåÈÄöËøáË∞ÉÁî®È¢ÑÂÆö‰πâÁöÑÂØºÂá∫ÂáΩÊï∞ÔºåËé∑Áü•Êâ©Â±ïÂØπË±°ÁöÑÁ±ªÂûãID„ÄÅÂêçÁß∞„ÄÅÂØπË±°Â∑•ÂéÇÂáΩÊï∞
 */
 #include "ScpExtendObjectMgr.h"
 #include "ScpOperationMgr.h"
@@ -24,7 +24,7 @@ ScpExtendObjectMgr::ScpExtendObjectMgr(void)
 ScpExtendObjectMgr::~ScpExtendObjectMgr(void)
 {
 }
-BOOL ScpExtendObjectMgr::IsExtendObject(const wchar_t * objtypename)
+BOOL ScpExtendObjectMgr::IsExtendObject(const char * objtypename)
 {
 	BOOL bRet = FALSE;
 	ITExtendObject it = extendobjects.begin();
@@ -32,11 +32,11 @@ BOOL ScpExtendObjectMgr::IsExtendObject(const wchar_t * objtypename)
 	{
 		ExtendObjectItem &item = *it;
 #ifdef WIN32
-		if (_wcsicmp(item.objtypename_cn, objtypename) == 0
-			|| _wcsicmp(item.objtypename_en, objtypename) == 0)
+		if (stricmp(item.objtypename_cn, objtypename) == 0
+			|| stricmp(item.objtypename_en, objtypename) == 0)
 #else
-		if (wcscasecmp(item.objtypename_cn, objtypename) == 0
-			|| wcscasecmp(item.objtypename_en, objtypename) == 0)
+		if (strcasecmp(item.objtypename_cn, objtypename) == 0
+			|| strcasecmp(item.objtypename_en, objtypename) == 0)
 
 #endif 
 		{
@@ -63,7 +63,7 @@ BOOL ScpExtendObjectMgr::IsExtendObject(ULONG UniqObjId)
 	}
 	return bRet;
 }
-ULONG ScpExtendObjectMgr::GetExtendObjectId(const wchar_t * objtypename)
+ULONG ScpExtendObjectMgr::GetExtendObjectId(const char * objtypename)
 {
 	ULONG id = -1;
 	ITExtendObject it = extendobjects.begin();
@@ -71,11 +71,11 @@ ULONG ScpExtendObjectMgr::GetExtendObjectId(const wchar_t * objtypename)
 	{
 		ExtendObjectItem &item = *it;
 #ifdef WIN32
-		if (_wcsicmp(item.objtypename_cn, objtypename) == 0
-			|| _wcsicmp(item.objtypename_en, objtypename) == 0)
+		if (stricmp(item.objtypename_cn, objtypename) == 0
+			|| stricmp(item.objtypename_en, objtypename) == 0)
 #else
-		if (wcscasecmp(item.objtypename_cn, objtypename) == 0
-			|| wcscasecmp(item.objtypename_en, objtypename) == 0)
+		if (strcasecmp(item.objtypename_cn, objtypename) == 0
+			|| strcasecmp(item.objtypename_en, objtypename) == 0)
 
 #endif 
 		{
@@ -86,7 +86,7 @@ ULONG ScpExtendObjectMgr::GetExtendObjectId(const wchar_t * objtypename)
 	}
 	return id;
 }
-ScpObject * ScpExtendObjectMgr::CreateExtendObject(const wchar_t * objtypename, VTPARAMETERS * paramters, CScriptEngine * engine)
+ScpObject * ScpExtendObjectMgr::CreateExtendObject(const char * objtypename, VTPARAMETERS * paramters, CScriptEngine * engine)
 {
 	ScpObject* obj = NULL;
 	ITExtendObject it = extendobjects.begin();
@@ -94,11 +94,11 @@ ScpObject * ScpExtendObjectMgr::CreateExtendObject(const wchar_t * objtypename, 
 	{
 		ExtendObjectItem &item = *it;
 #ifdef WIN32
-		if (_wcsicmp(item.objtypename_cn, objtypename) == 0
-			|| _wcsicmp(item.objtypename_en, objtypename) == 0)
+		if (stricmp(item.objtypename_cn, objtypename) == 0
+			|| stricmp(item.objtypename_en, objtypename) == 0)
 #else
-		if (wcscasecmp(item.objtypename_cn, objtypename) == 0
-			|| wcscasecmp(item.objtypename_en, objtypename) == 0)
+		if (strcasecmp(item.objtypename_cn, objtypename) == 0
+			|| strcasecmp(item.objtypename_en, objtypename) == 0)
 #endif
 		{
 			obj = item.factory(paramters, engine);
@@ -124,9 +124,9 @@ ScpObject * ScpExtendObjectMgr::CreateExtendObject(ULONG UniqObjId, VTPARAMETERS
 	}
 	return obj;
 }
-std::wstring ScpExtendObjectMgr::GetExtendObjectName(ULONG UniqObjId)
+std::string ScpExtendObjectMgr::GetExtendObjectName(ULONG UniqObjId)
 {
-	std::wstring temp;
+	std::string temp;
 	ScpObject* obj = NULL;
 	ITExtendObject it = extendobjects.begin();
 	while (it != extendobjects.end())
@@ -142,9 +142,9 @@ std::wstring ScpExtendObjectMgr::GetExtendObjectName(ULONG UniqObjId)
 	return temp;
 
 }
-BOOL ScpExtendObjectMgr::RegistExtendObject(const wchar_t * objtypename_cn, const wchar_t * objtypename_en, ULONG UniqObjId, ExtObjCreateFactoryFunction factoryfunc)
+BOOL ScpExtendObjectMgr::RegistExtendObject(const char * objtypename_cn, const char * objtypename_en, ULONG UniqObjId, ExtObjCreateFactoryFunction factoryfunc)
 {
-	if (IsExtendObject(objtypename_cn) || IsExtendObject(objtypename_en) || IsExtendObject(UniqObjId))
+	if (IsExtendObject(objtypename_cn) || IsExtendObject(objtypename_en) || IsExtendObject(UniqObjId)|| UniqObjId== INVALID_OBJECT_ID)
 	{
 		return FALSE;
 	}
@@ -152,17 +152,17 @@ BOOL ScpExtendObjectMgr::RegistExtendObject(const wchar_t * objtypename_cn, cons
 	{
 		ExtendObjectItem item;
 #ifdef WIN32
-		StringCchCopy(item.objtypename_cn, _countof(item.objtypename_cn), objtypename_cn);
-		StringCchCopy(item.objtypename_en, _countof(item.objtypename_en), objtypename_en);
+		StringCchCopyA(item.objtypename_cn, _countof(item.objtypename_cn), objtypename_cn);
+		StringCchCopyA(item.objtypename_en, _countof(item.objtypename_en), objtypename_en);
 #else 
-		wcscpy(item.objtypename_cn, objtypename_cn);
-		wcscpy(item.objtypename_en, objtypename_en);
+		strcpy(item.objtypename_cn, objtypename_cn);
+		strcpy(item.objtypename_en, objtypename_en);
 
 #endif
 		item.uniqobjid = UniqObjId;
 		item.factory = factoryfunc;
 		extendobjects.push_back(item);
-		return FALSE;
+		return TRUE;
 	}
 }
 
@@ -170,19 +170,19 @@ void ScpExtendObjectMgr::ClearExtendObject()
 {
 	extendobjects.clear();
 }
-BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlobalCommandObject * scpglobalcommands)
+BOOL  ScpExtendObjectMgr::LoadExtensions(const  char * ModulePathName, ScpGlobalCommandObject * scpglobalcommands)
 {
 	BOOL bRet = FALSE;
 #ifdef _WIN32
 	DWORD dwError;
-	HMODULE hdll = GetModuleHandleW(ModulePathName);
+	HMODULE hdll = GetModuleHandleA(ModulePathName);
 	if (hdll)
 	{
 		//return TRUE;
 	}		
 	else
 	{
-		hdll = LoadLibraryW(ModulePathName);
+		hdll = LoadLibraryA(ModulePathName);
 	}
 	if (hdll)
 	{
@@ -199,11 +199,11 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 			{
 				DWORD dwObjectId = -1;
 				static const DWORD dwObjectTypeNameMax = 256;
-				wchar_t ObjTypeNameCn[dwObjectTypeNameMax];
-				wchar_t ObjTypeNameEn[dwObjectTypeNameMax];
+				char ObjTypeNameCn[dwObjectTypeNameMax];
+				char ObjTypeNameEn[dwObjectTypeNameMax];
 				if (Func_GetObjectNameId(index, ObjTypeNameCn, dwObjectTypeNameMax, ObjTypeNameEn, dwObjectTypeNameMax, &dwObjectId))
 				{
-					if (!IsExtendObject(ObjTypeNameEn))//»∑±£Œ¥◊¢≤·
+					if (!IsExtendObject(ObjTypeNameEn))//Á°Æ‰øùÊú™Ê≥®ÂÜå
 					{
 						if (Func_GetUniqObjectIdEx && Func_GetObjFactoryEx)
 						{
@@ -220,8 +220,8 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 								DWORD dwObjId;
 								DWORD dwCommandId;
 								ExtObjectCommandFunction commandfunc = NULL;
-								wchar_t CommandNameCn[256] = { 0 };
-								wchar_t CommandNameEn[256] = { 0 };
+								char CommandNameCn[256] = { 0 };
+								char CommandNameEn[256] = { 0 };
 								Func_ExtObjCommandRegisterFunction(ObjTypeNameEn, i, &dwObjId, &dwCommandId, CommandNameCn, CommandNameEn, &commandfunc);
 								extobjcmd.dwCommandId = dwCommandId;
 								extobjcmd.dwObjectIdList.push_back(dwObjId);
@@ -244,7 +244,7 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 			for (int i = 0;i < dwOpCount;i++)
 			{
 				pBinaryOpertaion BinaryOpertaion_Func = NULL;
-				wchar_t opName[256] = { 0 };
+				char opName[256] = { 0 };
 				ScpObjectType obj1Type;
 				ScpObjectType obj2Type;
 				Func_BinaryOperationRegister(i, opName, 256, obj1Type, obj2Type, &BinaryOpertaion_Func);
@@ -262,7 +262,7 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 	}
 #else
 	void *hdll;
-	hdll = dlopen(STDSTRINGEXT::W2UTF(ModulePathName).c_str(), RTLD_LAZY);
+	hdll = dlopen(ModulePathName, RTLD_LAZY);
 	if (hdll) {
 		pGetObjectCount Func_GetObjectCount = (pGetObjectCount)dlsym(hdll, "GetObjectCount");
 		pGetObjectNameId Func_GetObjectNameId = (pGetObjectNameId)dlsym(hdll, "GetObjectNameId");
@@ -277,8 +277,8 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 			{
 				DWORD dwObjectId = -1;
 				static const DWORD dwObjectTypeNameMax = 256;
-				wchar_t ObjTypeNameCn[dwObjectTypeNameMax];
-				wchar_t ObjTypeNameEn[dwObjectTypeNameMax];
+				char ObjTypeNameCn[dwObjectTypeNameMax];
+				char ObjTypeNameEn[dwObjectTypeNameMax];
 				if (Func_GetObjectNameId(index, ObjTypeNameCn, dwObjectTypeNameMax, ObjTypeNameEn, dwObjectTypeNameMax, &dwObjectId))
 				{
 					if (Func_GetUniqObjectIdEx && Func_GetObjFactoryEx)
@@ -296,8 +296,8 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 							DWORD dwObjId;
 							DWORD dwCommandId;
 							ExtObjectCommandFunction commandfunc = NULL;
-							wchar_t CommandNameCn[256] = { 0 };
-							wchar_t CommandNameEn[256] = { 0 };
+							char CommandNameCn[256] = { 0 };
+							char CommandNameEn[256] = { 0 };
 							Func_ExtObjCommandRegisterFunction(ObjTypeNameEn, i, &dwObjId, &dwCommandId, CommandNameCn, CommandNameEn, &commandfunc);
 							extobjcmd.dwCommandId = dwCommandId;
 							extobjcmd.dwObjectIdList.push_back(dwObjId);
@@ -318,7 +318,7 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 			for (int i = 0;i < dwOpCount;i++)
 			{
 				pBinaryOpertaion BinaryOpertaion_Func = NULL;
-				wchar_t opName[256] = { 0 };
+				char opName[256] = { 0 };
 				ScpObjectType obj1Type;
 				ScpObjectType obj2Type;
 				Func_BinaryOperationRegister(i, opName, 256, obj1Type, obj2Type, &BinaryOpertaion_Func);
@@ -335,19 +335,19 @@ BOOL  ScpExtendObjectMgr::LoadExtensions(const  wchar_t * ModulePathName, ScpGlo
 #endif
 	return bRet;
 }
-BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalCommandObject * scpglobalcommands)
+BOOL ScpExtendObjectMgr::LoadExtension(const char * ModuleName, ScpGlobalCommandObject * scpglobalcommands)
 {
 	BOOL bRet = FALSE;
 #ifdef _WIN32
 	wchar_t ExtensionPath[MAX_PATH] = { 0 };
 	wchar_t szFind[MAX_PATH] = { L"\0" };
 	wchar_t szModuleFullName[MAX_PATH] = { L"\0" };
-	wcscpy_s(szModuleFullName, ModuleName);
-	wcscat_s(szModuleFullName, L"Addin.dll");
+	wcscpy_s(szModuleFullName, STDSTRINGEXT::UTF2W(ModuleName).c_str());
+	wcscat(szModuleFullName, L"Addin.dll");
 
 	if (GetModuleHandleW(szModuleFullName))
 	{
-		//µ˜ ‘∆˜ø…ƒ‹ª·‘⁄ƒ⁄¥Ê÷–º”‘ÿ∂‡∏ˆΩ‚ Õ“˝«Êµƒ µ¿˝£¨À˘“‘≤ª”√∂ØÃ¨ø‚µƒ“˝”√º∆ ˝≈–∂œ «∑Ò“—◊¢≤·¿©’π
+		//Ë∞ÉËØïÂô®ÂèØËÉΩ‰ºöÂú®ÂÜÖÂ≠ò‰∏≠Âä†ËΩΩÂ§ö‰∏™Ëß£ÈáäÂºïÊìéÁöÑÂÆû‰æãÔºåÊâÄ‰ª•‰∏çÁî®Âä®ÊÄÅÂ∫ìÁöÑÂºïÁî®ËÆ°Êï∞Âà§Êñ≠ÊòØÂê¶Â∑≤Ê≥®ÂÜåÊâ©Â±ï
 		//return TRUE;
 	}
 
@@ -364,7 +364,7 @@ BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalComm
 		return bRet;
 	}
 
-	//±È¿˙Œƒº˛º–
+	//ÈÅçÂéÜÊñá‰ª∂Â§π
 	while (TRUE)
 	{
 		if (findFileData.cFileName[0] != L'.')
@@ -376,7 +376,7 @@ BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalComm
 			}
 			else
 			{
-				LoadExtensions(pathname, scpglobalcommands);
+				LoadExtensions(STDSTRINGEXT::W2UTF(pathname).c_str(), scpglobalcommands);
 			}
 		}
 		bRet = ::FindNextFileW(hFind, &findFileData);
@@ -388,14 +388,14 @@ BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalComm
 	::FindClose(hFind);
 #else
 	char ExtensionPath[4096] = { 0 };
-	wchar_t szModuleFullName[MAX_PATH] = { L"\0" };
-	wcscpy(szModuleFullName, L"lib");
-	wcscat(szModuleFullName, ModuleName);
-	wcscat(szModuleFullName, L"Addin.so");
+	char szModuleFullName[MAX_PATH] = { "\0" };
+	strcpy(szModuleFullName, "lib");
+	strcat(szModuleFullName, ModuleName);
+	strcat(szModuleFullName, "Addin.so");
 
 	get_executable_path(ExtensionPath, NULL, 4096);
 	strcat(ExtensionPath, "Addin/");
-	char chBuf[PATH_MAX*2];
+	char chBuf[4096];
 	DIR * dir = NULL;
 	struct dirent *ptr;
 	int ret = 0;
@@ -416,10 +416,10 @@ BOOL ScpExtendObjectMgr::LoadExtension(const wchar_t * ModuleName, ScpGlobalComm
 		{
 			continue;
 		}
-		if (strcasecmp(ptr->d_name, STDSTRINGEXT::W2UTF(szModuleFullName).c_str()) == 0)
+		if (strcasecmp(ptr->d_name, szModuleFullName) == 0)
 		{
-			snprintf(chBuf, PATH_MAX*2, "%s/%s", ExtensionPath, ptr->d_name);
-			bRet = LoadExtensions(STDSTRINGEXT::UTF2W(chBuf).c_str(), scpglobalcommands);
+			snprintf(chBuf, 4096, "%s/%s", ExtensionPath, ptr->d_name);
+			bRet = LoadExtensions(chBuf, scpglobalcommands);
 		}
 	}
 	(void)closedir(dir);

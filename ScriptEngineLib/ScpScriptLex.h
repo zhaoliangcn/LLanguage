@@ -3,81 +3,81 @@
 #define _H_SCPSCRIPTLEX
 #include "ScpObject.h"
 #include "ScpObjectSpace.h"
-//¥ ∑®∑÷Œˆµƒ÷˜ÃÂ
+//ËØçÊ≥ïÂàÜÊûêÁöÑ‰∏ª‰Ωì
 
 
-const static wchar_t * scpOperationAdd = L"+";
-const static wchar_t * scpOperationSubtraction = L"-";
-const static wchar_t * scpOperationMinus = L"-";
+const static char  * scpOperationAdd = "+";
+const static char  * scpOperationSubtraction = "-";
+const static char  * scpOperationMinus = "-";
 
-const static wchar_t * scpOperationMultiplication = L"*";
-const static wchar_t * scpOperationDivision = L"/";
-const static wchar_t * scpOperationMod = L"%";
+const static char  * scpOperationMultiplication = "*";
+const static char  * scpOperationDivision = "/";
+const static char  * scpOperationMod = "%";
 
-const static wchar_t * scpOperationAssign = L"=";
-const static wchar_t * scpOperationAddAndAssign = L"+=";
-const static wchar_t * scpOperationSubAndAssign = L"-=";
-const static wchar_t * scpOperationMulAndAssign = L"*=";
-const static wchar_t * scpOperationDivAndAssign = L"/=";
-const static wchar_t * scpOpeartionModAndAssign = L"%=";
-
-
-
-
-
-
-const static wchar_t * scpOperationEqual = L"==";
-const static wchar_t * scpOperationLessthan = L"<";
-const static wchar_t * scpOperationLessorEqual = L"<=";
-const static wchar_t * scpOperationBigthan = L">";
-const static wchar_t * scpOperationBigorEqual = L">=";
-const static wchar_t * scpOperationNot = L"!";
-const static wchar_t * scpOperationNotEqual = L"!=";
-const static wchar_t * scpOperationSelfAdd = L"++";  //Œ¥ µœ÷
-const static wchar_t * scpOperationSelfSub = L"--"; //Œ¥ µœ÷
-
-const static wchar_t * scpOperationBitAnd = L"&";
-const static wchar_t * scpOperationBitAndAndAssign = L"&=";
-const static wchar_t * scpOperationBitOr = L"|";
-const static wchar_t * scpOperationBitOrAndAssign = L"|=";
-const static wchar_t * scpOperationBitNot = L"~";  
-const static wchar_t * scpOperationBitNotAndAssign = L"~=";
-const static wchar_t * scpOperationBitXor = L"^";
-const static wchar_t * scpOperationBitXorAndAssign = L"^=";
-const static wchar_t * scpOperationBitShiftLeft = L"<<";
-const static wchar_t * scpOpeartionBitShiftLeftAndAssign = L"<<=";
-const static wchar_t * scpOperationBitShiftRight = L">>";
-const static wchar_t * scpOpeartionBitShiftRightAndAssign = L">>=";
-const static wchar_t * scpOperationObjectRefrence = L".";
-
-const static wchar_t * scpOperationLogicalAnd = L"&&";
-const static wchar_t * scpOperationLogicalOr = L"||";
-
-const static wchar_t * scpOperationsRegExp = L"\\+|\\-|\\*|/|%";
-const static wchar_t * scpEndofExpression = L"EOF";
-
-const static wchar_t * scpLeftParentheses = L"(";
-const static wchar_t * scpRightParentheses = L")";
-
-const static wchar_t * scpLeftBrace = L"{";
-const static wchar_t * scpRightBrace = L"}";
-
-const static wchar_t * scpLeftBracket = L"[";
-const static wchar_t * scpRightBracket = L"]";
+const static char  * scpOperationAssign = "=";
+const static char  * scpOperationAddAndAssign = "+=";
+const static char  * scpOperationSubAndAssign = "-=";
+const static char  * scpOperationMulAndAssign = "*=";
+const static char  * scpOperationDivAndAssign = "/=";
+const static char  * scpOpeartionModAndAssign = "%=";
 
 
 
 
-const static wchar_t * strPathTag = L"\\";
-const static wchar_t * scpComment = L"#";
-const static wchar_t * scpDoubleQuote = L"\"";
 
-const static wchar_t * scpColon = L":";
 
-const static wchar_t * scpComma = L",";
+const static char  * scpOperationEqual = "==";
+const static char  * scpOperationLessthan = "<";
+const static char  * scpOperationLessorEqual = "<=";
+const static char  * scpOperationBigthan = ">";
+const static char  * scpOperationBigorEqual = ">=";
+const static char  * scpOperationNot = "!";
+const static char  * scpOperationNotEqual = "!=";
+const static char  * scpOperationSelfAdd = "++";  //Êú™ÂÆûÁé∞
+const static char  * scpOperationSelfSub = "--"; //Êú™ÂÆûÁé∞
 
-const static wchar_t * scpCppComment = L"//";
-const static wchar_t * scpSemicolon = L";";
+const static char  * scpOperationBitAnd = "&";
+const static char  * scpOperationBitAndAndAssign = "&=";
+const static char  * scpOperationBitOr = "|";
+const static char  * scpOperationBitOrAndAssign = "|=";
+const static char  * scpOperationBitNot = "~";  
+const static char  * scpOperationBitNotAndAssign = "~=";
+const static char  * scpOperationBitXor = "^";
+const static char  * scpOperationBitXorAndAssign = "^=";
+const static char  * scpOperationBitShiftLeft = "<<";
+const static char  * scpOpeartionBitShiftLeftAndAssign = "<<=";
+const static char  * scpOperationBitShiftRight = ">>";
+const static char  * scpOpeartionBitShiftRightAndAssign = ">>=";
+const static char  * scpOperationObjectRefrence = ".";
+
+const static char  * scpOperationLogicalAnd = "&&";
+const static char  * scpOperationLogicalOr = "||";
+
+const static char  * scpOperationsRegExp = "\\+|\\-|\\*|/|%";
+const static char  * scpEndofExpression = "EOF";
+
+const static char  * scpLeftParentheses = "(";
+const static char  * scpRightParentheses = ")";
+
+const static char  * scpLeftBrace = "{";
+const static char  * scpRightBrace = "}";
+
+const static char  * scpLeftBracket = "[";
+const static char  * scpRightBracket = "]";
+
+
+
+
+const static char  * strPathTag = "\\";
+const static char  * scpComment = "#";
+const static char  * scpDoubleQuote = "\"";
+
+const static char  * scpColon = ":";
+
+const static char  * scpComma = ",";
+
+const static char  * scpCppComment = "//";
+const static char  * scpSemicolon = ";";
 
 class CScriptEngine;
 class ScpScriptLex
@@ -87,28 +87,28 @@ public:
 	~ScpScriptLex(void);
 	void Attach(CScriptEngine * eng);
 
-	void SetExpression(std::wstring& Expression);
+	void SetExpression(std::string& Expression);
 
-	BOOL ParseCommandLine(std::wstring& wcommandstring,ULONG& commandvalue,VTPARAMETERS & vtparameters);
-	BOOL IsUserFunction(std::wstring token);
-	BOOL IsClassInstance(std::wstring token);
-	std::wstring GetNextToken(BOOL Convert = FALSE);
-	std::wstring GetPrevToken();
-	std::wstring PeekNextToken(BOOL Convert = FALSE);
-	std::wstring PeekNext2Token(BOOL Convert = FALSE);
-	std::wstring GetCurrentToken();
-	BOOL IsOperator(std::wstring token);
-	static BOOL IsBinaryOperator(std::wstring & token);
-	static BOOL IsUnaryOperator(std::wstring & Token);
-	static BOOL IsAssignOperator(std::wstring & Token);
-	int GetBinaryOperationPriority(std::wstring &strOperation);                     //ªÒµ√‘ÀÀ„∑˚µƒ”≈œ»º∂
-	int GetOperationPriority(std::wstring &strOperation);
+	BOOL ParseCommandLine(std::string& wcommandstring,ULONG& commandvalue,VTPARAMETERS & vtparameters);
+	BOOL IsUserFunction(std::string token);
+	BOOL IsClassInstance(std::string token);
+	std::string GetNextToken(BOOL Convert = FALSE);
+	std::string GetPrevToken();
+	std::string PeekNextToken(BOOL Convert = FALSE);
+	std::string PeekNext2Token(BOOL Convert = FALSE);
+	std::string GetCurrentToken();
+	BOOL IsOperator(std::string token);
+	static BOOL IsBinaryOperator(std::string & token);
+	static BOOL IsUnaryOperator(std::string & Token);
+	static BOOL IsAssignOperator(std::string & Token);
+	int GetBinaryOperationPriority(std::string &strOperation);                     //Ëé∑ÂæóËøêÁÆóÁ¨¶ÁöÑ‰ºòÂÖàÁ∫ß
+	int GetOperationPriority(std::string &strOperation);
 	CScriptEngine * engine;
 private:
-	std::wstring wcommandline;
-	std::wstring currenttoken;
-	std::wstring prevtoken;
-	std::wstring::iterator currentpos;
+	std::string wcommandline;
+	std::string currenttoken;
+	std::string prevtoken;
+	std::string::iterator currentpos;
 };
 
 #endif //_H_SCPSCRIPTLEX

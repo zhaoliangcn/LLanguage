@@ -2,22 +2,31 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//∏°µ„ ˝∂‘œÛ
+//ÊµÆÁÇπÊï∞ÂØπË±°
 */
 #ifndef _H_SCPDOUBLEOBJECT
 #define _H_SCPDOUBLEOBJECT
 #include "ScpObject.h"
+
+const static char * scpcommand_ceil_CN = "Âêë‰∏äÂèñÊï¥";
+const static char * scpcommand_floor_CN = "Âêë‰∏ãÂèñÊï¥";
+const static char * scpcommand_round_CN = "ËàçÂÖ•";
+
+const static char * scpcommand_ceil_EN = "ceil";
+const static char * scpcommand_floor_EN = "floor";
+const static char * scpcommand_round_EN = "round";
+
 class ScpDoubleObject :public ScpObject
 {
 public:
 	ScpDoubleObject();
 	~ScpDoubleObject();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	double value;
 
@@ -35,6 +44,12 @@ public:
 	static ScpObject * InnerFunction_sin(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_atan(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
 	static ScpObject * InnerFunction_tan(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject * InnerFunction_pow(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject * InnerFunction_ceil(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject * InnerFunction_floor(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject * InnerFunction_round(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine);
+	static ScpObject* InnerFunction_add(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine);
+	static ScpObject* InnerFunction_sub(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine);
 };
 
 ScpObject * __stdcall ScpDoubleObjectFactory(VTPARAMETERS * paramters, CScriptEngine * engine);

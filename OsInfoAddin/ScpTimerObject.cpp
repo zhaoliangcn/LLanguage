@@ -20,7 +20,7 @@ ScpTimerObject::ScpTimerObject(void)
 ScpTimerObject::~ScpTimerObject(void)
 {
 }
-void ScpTimerObject::Set(std::wstring timername,ScpFunctionObject * func,ULONG val)
+void ScpTimerObject::Set(std::string timername,ScpFunctionObject * func,ULONG val)
 {
 	name = timername;
 	timerfunc= func;
@@ -50,7 +50,7 @@ void ScpTimerObject::Show(CScriptEngine * engine)
 {
 
 }
-ScpObject * ScpTimerObject::Clone(std::wstring strObjName)
+ScpObject * ScpTimerObject::Clone(std::string strObjName)
 {
 	ScpTimerObject * obj = new ScpTimerObject;
 	if (obj)
@@ -62,16 +62,16 @@ ScpObject * ScpTimerObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpTimerObject::ToString()
+std::string ScpTimerObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpTimerObject::Release() 
 {
 	delete this;
 }
-bool ScpTimerObject::IsInnerFunction(std::wstring & functionname)
+bool ScpTimerObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -79,7 +79,7 @@ bool ScpTimerObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpTimerObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpTimerObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -99,7 +99,7 @@ ScpObject * ScpTimerObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)

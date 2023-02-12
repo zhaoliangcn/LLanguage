@@ -24,7 +24,7 @@ void ScpStringArrayObject::Show(CScriptEngine * engine)
 		engine->PrintError(*it);
 	}		
 }
-ScpObject * ScpStringArrayObject::Clone(std::wstring strObjName)
+ScpObject * ScpStringArrayObject::Clone(std::string strObjName)
 {
 	ScpStringArrayObject * obj = new ScpStringArrayObject;
 	if (obj)
@@ -35,14 +35,14 @@ ScpObject * ScpStringArrayObject::Clone(std::wstring strObjName)
 
 	return NULL;
 }	
-std::wstring ScpStringArrayObject::ToString()
+std::string ScpStringArrayObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 
 	for(ITSTRINGS it = content.begin();it!=content.end();it++)
 	{
 		temp+=*it;
-		temp+=L"\r\n";
+		temp+="\r\n";
 	}
 	return temp;
 }
@@ -50,7 +50,7 @@ void ScpStringArrayObject::Release()
 {
 	delete this;
 }
-bool ScpStringArrayObject::IsInnerFunction(std::wstring & functionname)
+bool ScpStringArrayObject::IsInnerFunction(std::string & functionname)
 {
 	if (functionname == scpcommand_cn_show || functionname == scpcommand_en_show)
 	{
@@ -58,7 +58,7 @@ bool ScpStringArrayObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpStringArrayObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpStringArrayObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (functionname == scpcommand_cn_show || functionname == scpcommand_en_show)
 	{
@@ -67,7 +67,7 @@ ScpObject * ScpStringArrayObject::CallInnerFunction(std::wstring & functionname,
 	}
 	return NULL;
 }
-void ScpStringArrayObject::Add(std::wstring strbody)
+void ScpStringArrayObject::Add(std::string strbody)
 {
 	content.push_back(strbody);
 }
@@ -85,7 +85,7 @@ BOOL ScpStringArrayObject::Del(unsigned int index)
 	}
 	return ret;
 }
-BOOL ScpStringArrayObject::Del(std::wstring strbody)
+BOOL ScpStringArrayObject::Del(std::string strbody)
 {
 	BOOL ret = FALSE;
 	for(VTSTRINGS::iterator it = content.begin();it!=content.end();it++)
@@ -98,4 +98,9 @@ BOOL ScpStringArrayObject::Del(std::wstring strbody)
 		}
 	}
 	return ret;
+}
+
+ScpObject* __stdcall ScpStringArrayObjectFactory(VTPARAMETERS* paramters, CScriptEngine* engine)
+{
+	return new ScpStringArrayObject();
 }

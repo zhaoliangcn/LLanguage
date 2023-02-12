@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//二元运算符管理，用于实现二元运算符的重载
+//浜屽厓杩愮畻绗︾鐞嗭紝鐢ㄤ簬瀹炵幇浜屽厓杩愮畻绗︾殑閲嶈浇
 */
 #include "ScpOperationMgr.h"
 
@@ -20,7 +20,7 @@ ScpOperationMgr * ScpOperationMgr::GetInstance()
 {
 	return &g_opmgr;
 }
-BOOL ScpOperationMgr::RegisterBinaryOperation(const wchar_t * op, ScpObjectType obj1Type, ScpObjectType obj2Type, pBinaryOpertaion BinaryOpertaionFunc)
+BOOL ScpOperationMgr::RegisterBinaryOperation(const char * op, ScpObjectType obj1Type, ScpObjectType obj2Type, pBinaryOpertaion BinaryOpertaionFunc)
 {
 	BOOL bRet = FALSE;
 	for (int i = 0;i < BinaryOperations.size();i++)
@@ -40,7 +40,7 @@ BOOL ScpOperationMgr::RegisterBinaryOperation(const wchar_t * op, ScpObjectType 
 	return TRUE;
 }
 
-pBinaryOpertaion ScpOperationMgr::GetBinaryOperation(const wchar_t * op, ScpObjectType obj1Type, ScpObjectType obj2Type)
+pBinaryOpertaion ScpOperationMgr::GetBinaryOperation(const char * op, ScpObjectType obj1Type, ScpObjectType obj2Type)
 {
 	pBinaryOpertaion opFunc = NULL;
 	for (int i = 0;i < BinaryOperations.size();i++)

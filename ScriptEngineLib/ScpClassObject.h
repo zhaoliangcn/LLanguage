@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//类对象及其成员变量、成员函数的管理
+//绫诲璞″強鍏舵垚鍛樺彉閲忋�佹垚鍛樺嚱鏁扮殑绠＄悊
 */
 #ifndef _H_SCPCLASSOBJECT
 #define _H_SCPCLASSOBJECT
@@ -20,18 +20,18 @@ public:
 	~ScpClassObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
-	void ClassDefine(std::wstring name);
-	ScpObject * CallMemberFunction(std::wstring functionname,VTPARAMETERS * RealParameters,CScriptEngine * engine);
-	void AddMemberVariable(std::wstring name,ScpObject * object);
-	void AddMemberFunction(std::wstring name,ScpObject * object);
-	ScpObject * FindMemberVariable(std::wstring name);
-	std::wstring userclassname ;
+	void ClassDefine(std::string name);
+	ScpObject * CallMemberFunction(std::string functionname,VTPARAMETERS * RealParameters,CScriptEngine * engine);
+	void AddMemberVariable(std::string name,ScpObject * object);
+	void AddMemberFunction(std::string name,ScpObject * object);
+	ScpObject * FindMemberVariable(std::string name);
+	std::string userclassname ;
 	ScpObjectSpace UserClassObjectSpace;
 	VTSTRINGS ClassBody;
 	CScriptEngine * scriptengine;

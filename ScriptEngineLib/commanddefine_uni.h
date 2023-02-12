@@ -3,387 +3,395 @@
 #include <string>
 
 
-const static wchar_t * scpcommand_cn_invalid = L"无效";
+const static char  * scpcommand_cn_invalid = "无效";
 
-const static wchar_t * scpcommand_cn_clear = L"清空";
+const static char  * scpcommand_cn_clear = "清空";
 
-const static wchar_t * scpcommand_cn_reserved = L"保留";
+const static char  * scpcommand_cn_reserved = "保留";
 
-const static wchar_t * scpcommand_cn_shutdown = L"关闭";
+const static char  * scpcommand_cn_shutdown = "关闭";
 
-const static wchar_t * scpcommand_cn_reboot = L"重启";
+const static char  * scpcommand_cn_reboot = "重启";
 
-const static wchar_t * scpcommand_cn_popup = L"弹出";
+const static char  * scpcommand_cn_popup = "弹出";
 
-const static wchar_t * scpcommand_cn_print = L"打印";
+const static char  * scpcommand_cn_print = "打印";
 
-const static wchar_t * scpcommand_cn_show = L"显示";
+const static char  * scpcommand_cn_show = "显示";
 
-const static wchar_t * scpcommand_cn_open = L"打开";
+const static char  * scpcommand_cn_open = "打开";
 
-const static wchar_t * scpcommand_cn_run = L"运行";
+const static char  * scpcommand_cn_run = "运行";
 
-const static wchar_t * scpcommand_cn_capture = L"捕获";
+const static char  * scpcommand_cn_capture = "捕获";
 
-const static wchar_t * scpcommand_cn_delete = L"删除";
+const static char  * scpcommand_cn_delete = "删除";
 
-const static wchar_t * scpcommand_cn_read= L"读取";
+const static char  * scpcommand_cn_read= "读取";
 
-const static wchar_t * scpcommand_cn_write = L"写入";
+const static char  * scpcommand_cn_write = "写入";
 
-const static wchar_t * scpcommand_cn_copy = L"复制";
+const static char  * scpcommand_cn_copy = "复制";
 
-const static wchar_t * scpcommand_cn_seek = L"定位";
+const static char  * scpcommand_cn_seek = "定位";
 
-const static wchar_t * scpcommand_cn_do = L"执行";
+const static char  * scpcommand_cn_do = "执行";
 
-const static wchar_t * scpcommand_cn_compare = L"比较";
+const static char  * scpcommand_cn_compare = "比较";
 
-const static wchar_t * scpcommand_cn_compute = L"计算";
+const static char  * scpcommand_cn_compute = "计算";
 
-const static wchar_t * scpcommand_cn_connect = L"连接";
+const static char  * scpcommand_cn_connect = "连接";
 
-const static wchar_t * scpcommand_cn_acquire = L"申请";
+const static char  * scpcommand_cn_acquire = "申请";
 
-const static wchar_t * scpcommand_cn_release = L"释放";
+const static char  * scpcommand_cn_release = "释放";
 
-const static wchar_t * scpcommand_cn_define = L"定义";
+const static char  * scpcommand_cn_define = "定义";
 
-const static wchar_t * scpcommand_cn_test = L"如果";
+const static char  * scpcommand_cn_test = "如果";
 
-const static wchar_t * scpcommand_cn_start = L"开始";
+const static char  * scpcommand_cn_start = "开始";
 
-const static wchar_t * scpcommand_cn_end = L"结束";
+const static char  * scpcommand_cn_end = "结束";
 
-const static wchar_t * scpcommand_cn_call = L"调用";
+const static char  * scpcommand_cn_call = "调用";
 
-const static wchar_t * scpcommand_cn_find = L"查找";
+const static char  * scpcommand_cn_find = "查找";
 
-const static wchar_t * scpcommand_cn_replace = L"替换";
+const static char  * scpcommand_cn_rfind = "右查找";
 
-const static wchar_t * scpcommand_cn_getsubstring = L"取子串";
+const static char  * scpcommand_cn_replace = "替换";
 
-const static wchar_t * scpcommand_cn_insert = L"插入";
+const static char  * scpcommand_cn_getsubstring = "取子串";
 
-const static wchar_t * scpcommand_cn_match = L"匹配";
+const static char  * scpcommand_cn_insert = "插入";
 
-const static wchar_t * scpcommand_cn_import =L"导入";
+const static char  * scpcommand_cn_match = "匹配";
 
-const static wchar_t * scpcommand_cn_while = L"当";
+const static char  * scpcommand_cn_import ="导入";
 
-const static wchar_t * scpcommand_cn_move = L"移动";
+const static char  * scpcommand_cn_while = "当";
 
-const static wchar_t * scpcommand_cn_getsize = L"取大小";
+const static char  * scpcommand_cn_move = "移动";
 
-const static wchar_t * scpcommand_cn_getlength = L"取长度";
+const static char  * scpcommand_cn_getsize = "取大小";
 
-const static wchar_t * scpcommand_cn_register =L"注册";
+const static char  * scpcommand_cn_getlength = "取长度";
 
-const static wchar_t * scpcommand_cn_send =L"发送";
+const static char  * scpcommand_cn_register ="注册";
 
-const static wchar_t * scpcommand_cn_receive =L"接收";
+const static char  * scpcommand_cn_send ="发送";
 
-const static wchar_t * scpcommand_cn_watch =L"监听";
+const static char  * scpcommand_cn_receive ="接收";
 
-const static wchar_t * scpcommand_cn_set =L"设置";
+const static char  * scpcommand_cn_watch ="监听";
 
-const static wchar_t * scpcommand_cn_sleep =L"睡眠";
+const static char  * scpcommand_cn_set ="设置";
 
-const static wchar_t * scpcommand_cn_wait =L"等待";
+const static char  * scpcommand_cn_sleep ="睡眠";
 
-const static wchar_t * scpcommand_cn_enum = L"枚举";
+const static char  * scpcommand_cn_wait ="等待";
 
-const static wchar_t * scpcommand_cn_otherwise = L"否则";
+const static char  * scpcommand_cn_enum = "枚举";
 
-const static wchar_t * scpcommand_cn_refresh = L"刷新";
+const static char  * scpcommand_cn_otherwise = "否则";
 
-const static wchar_t * scpcommand_cn_generate =L"生成";
+const static char  * scpcommand_cn_refresh = "刷新";
 
-const static wchar_t * scpcommand_cn_suspend = L"休眠";
+const static char  * scpcommand_cn_generate ="生成";
 
-const static wchar_t * scpcommand_cn_getelement = L"取元素";
+const static char  * scpcommand_cn_suspend = "休眠";
 
-const static wchar_t * scpcommand_cn_traverse = L"遍历";
+const static char  * scpcommand_cn_getelement = "取元素";
 
-const static wchar_t * scpcommand_cn_sort = L"排序";
+const static char  * scpcommand_cn_traverse = "遍历";
 
-const static wchar_t * scpcommand_cn_format = L"格式化";
+const static char  * scpcommand_cn_sort = "排序";
 
-const static wchar_t * scpcommand_cn_clone = L"克隆";
+const static char  * scpcommand_cn_format = "格式化";
 
-const static wchar_t * scpcommand_cn_get = L"获取";
+const static char  * scpcommand_cn_clone = "克隆";
 
-const static wchar_t * scpcommand_cn_inherit = L"继承";
+const static char  * scpcommand_cn_get = "获取";
 
-const static wchar_t * scpcommand_cn_encrypt = L"加密";
+const static char  * scpcommand_cn_inherit = "继承";
 
-const static wchar_t * scpcommand_cn_decrypt = L"解密";
+const static char  * scpcommand_cn_encrypt = "加密";
 
-const static wchar_t * scpcommand_cn_hash = L"求哈希";
+const static char  * scpcommand_cn_decrypt = "解密";
 
-const static wchar_t * scpcommand_cn_transform = L"转换";
+const static char  * scpcommand_cn_hash = "求哈希";
 
-const static wchar_t * scpcommand_cn_split = L"分割";
+const static char  * scpcommand_cn_transform = "转换";
 
-const static wchar_t * scpcommand_cn_post = L"提交";
+const static char  * scpcommand_cn_split = "分割";
 
-const static wchar_t * scpcommand_cn_load = L"加载";
+const static char  * scpcommand_cn_post = "提交";
 
-const static wchar_t * scpcommand_cn_exit = L"退出";
+const static char  * scpcommand_cn_load = "加载";
 
-const static wchar_t * scpcommand_cn_draw = L"画";
+const static char  * scpcommand_cn_exit = "退出";
 
-const static wchar_t * scpcommand_cn_push = L"压入";
+const static char  * scpcommand_cn_draw = "画";
 
-const static wchar_t * scpcommand_cn_continue = L"继续";
+const static char  * scpcommand_cn_push = "压入";
 
-const static wchar_t * scpcommand_cn_break = L"跳出";
+const static char  * scpcommand_cn_continue = "继续";
 
-const static wchar_t * scpcommand_cn_switch = L"开关";
+const static char  * scpcommand_cn_break = "跳出";
 
-const static wchar_t * scpcommand_cn_case = L"若";
+const static char  * scpcommand_cn_switch = "开关";
 
-const static wchar_t * scpcommand_cn_lock = L"锁定";
+const static char  * scpcommand_cn_case = "若";
 
-const static wchar_t * scpcommand_cn_unlock = L"解锁";
+const static char  * scpcommand_cn_lock = "锁定";
 
+const static char  * scpcommand_cn_unlock = "解锁";
 
 
-const static wchar_t * scpcommand_cn_create = L"创建";
 
-const static wchar_t * scpcommand_cn_loop = L"循环";
+const static char  * scpcommand_cn_create = "创建";
 
-const static wchar_t * scpcommand_cn_public = L"公开";
+const static char  * scpcommand_cn_loop = "循环";
 
-const static wchar_t * scpcommand_cn_private = L"私有";
+const static char  * scpcommand_cn_public = "公开";
 
-const static wchar_t * scpcommand_cn_save = L"保存";
+const static char  * scpcommand_cn_private = "私有";
 
-const static wchar_t * scpcommand_cn_return = L"返回";
+const static char  * scpcommand_cn_save = "保存";
 
-const static wchar_t * scpcommand_cn_encode =L"编码";
+const static char  * scpcommand_cn_return = "返回";
 
-const static wchar_t * scpcommand_cn_decode = L"解码";
+const static char  * scpcommand_cn_encode ="编码";
 
-const static wchar_t * scpcommand_cn_put = L"输出";
+const static char  * scpcommand_cn_decode = "解码";
 
-const static wchar_t * scpcommand_cn_query = L"查询";
+const static char  * scpcommand_cn_put = "输出";
 
-const static wchar_t * scpcommand_cn_execute = L"执行";
+const static char  * scpcommand_cn_query = "查询";
 
-const static wchar_t * scpcommand_cn_close = L"关闭";
+const static char  * scpcommand_cn_execute = "执行";
 
-const static wchar_t * scpcommand_cn_upload = L"上传";
+const static char  * scpcommand_cn_close = "关闭";
 
-const static wchar_t * scpcommand_cn_download = L"下载";
+const static char  * scpcommand_cn_upload = "上传";
 
-const static wchar_t * scpcommand_cn_erase = L"移除";
+const static char  * scpcommand_cn_download = "下载";
 
-const static wchar_t * scpcommand_cn_paste = L"粘贴";
+const static char  * scpcommand_cn_erase = "移除";
 
-const static wchar_t*  scpcommand_cn_cut = L"剪切";
+const static char  * scpcommand_cn_paste = "粘贴";
 
-const static wchar_t * scpcommand_cn_pop = L"弹出";
+const static char *  scpcommand_cn_cut = "剪切";
 
-const static wchar_t * scpcommand_cn_add = L"添加";
+const static char  * scpcommand_cn_pop = "弹出";
 
-const static wchar_t*  scpcommand_cn_append = L"追加";
+const static char  * scpcommand_cn_add = "添加";
 
-const static wchar_t*  scpcommand_cn_for = L"for";
+const static char *  scpcommand_cn_append = "追加";
 
+const static char *  scpcommand_cn_for = "for";
 
+const static char *  scpcommand_cn_contains = "包含";
 
-const static wchar_t * scpcommand_en_invalid = L"invalid";
 
-const static wchar_t * scpcommand_en_clear = L"clear";
 
-const static wchar_t * scpcommand_en_reserved = L"reserved";
+const static char  * scpcommand_en_invalid = "invalid";
 
-const static wchar_t * scpcommand_en_shutdown = L"shutdown";
+const static char  * scpcommand_en_clear = "clear";
 
-const static wchar_t * scpcommand_en_reboot = L"reboot";
+const static char  * scpcommand_en_reserved = "reserved";
 
-const static wchar_t * scpcommand_en_popup = L"popup";
+const static char  * scpcommand_en_shutdown = "shutdown";
 
-const static wchar_t * scpcommand_en_print = L"print";
+const static char  * scpcommand_en_reboot = "reboot";
 
-const static wchar_t * scpcommand_en_show = L"show";
+const static char  * scpcommand_en_popup = "popup";
 
-const static wchar_t * scpcommand_en_open = L"open";
+const static char  * scpcommand_en_print = "print";
 
-const static wchar_t * scpcommand_en_run = L"run";
+const static char  * scpcommand_en_show = "show";
 
-const static wchar_t * scpcommand_en_capture = L"capture";
+const static char  * scpcommand_en_open = "open";
 
-const static wchar_t * scpcommand_en_delete = L"delete";
+const static char  * scpcommand_en_run = "run";
 
-const static wchar_t * scpcommand_en_read= L"read";
+const static char  * scpcommand_en_capture = "capture";
 
-const static wchar_t * scpcommand_en_write = L"write";
+const static char  * scpcommand_en_delete = "delete";
 
-const static wchar_t * scpcommand_en_copy = L"copy";
+const static char  * scpcommand_en_read= "read";
 
-const static wchar_t * scpcommand_en_seek = L"seek";
+const static char  * scpcommand_en_write = "write";
 
-const static wchar_t * scpcommand_en_do = L"do";
+const static char  * scpcommand_en_copy = "copy";
 
-const static wchar_t * scpcommand_en_compare = L"compare";
+const static char  * scpcommand_en_seek = "seek";
 
-const static wchar_t * scpcommand_en_compute = L"compute";
+const static char  * scpcommand_en_do = "do";
 
-const static wchar_t * scpcommand_en_connect = L"connect";
+const static char  * scpcommand_en_compare = "compare";
 
-const static wchar_t * scpcommand_en_acquire = L"acquire";
+const static char  * scpcommand_en_compute = "compute";
 
-const static wchar_t * scpcommand_en_release = L"release";
+const static char  * scpcommand_en_connect = "connect";
 
-const static wchar_t * scpcommand_en_define = L"define";
+const static char  * scpcommand_en_acquire = "acquire";
 
-const static wchar_t * scpcommand_en_test = L"test";
+const static char  * scpcommand_en_release = "release";
 
-const static wchar_t * scpcommand_en_start = L"start";
+const static char  * scpcommand_en_define = "define";
 
-const static wchar_t * scpcommand_en_end = L"end";
+const static char  * scpcommand_en_test = "test";
 
-const static wchar_t * scpcommand_en_call = L"call";
+const static char  * scpcommand_en_start = "start";
 
-const static wchar_t * scpcommand_en_find = L"find";
+const static char  * scpcommand_en_end = "end";
 
-const static wchar_t * scpcommand_en_replace = L"replace";
+const static char  * scpcommand_en_call = "cal";
 
-const static wchar_t * scpcommand_en_getsubstring = L"getsubstring";
+const static char  * scpcommand_en_find = "find";
 
-const static wchar_t * scpcommand_en_insert = L"insert";
+const static char  * scpcommand_en_rfind = "rfind";
 
-const static wchar_t * scpcommand_en_match = L"match";
+const static char  * scpcommand_en_replace = "replace";
 
-const static wchar_t * scpcommand_en_import =L"import";
+const static char  * scpcommand_en_getsubstring = "getsubstring";
 
-const static wchar_t * scpcommand_en_while = L"while";
+const static char  * scpcommand_en_insert = "insert";
 
-const static wchar_t * scpcommand_en_move = L"move";
+const static char  * scpcommand_en_match = "match";
 
-const static wchar_t * scpcommand_en_getsize = L"getsize";
+const static char  * scpcommand_en_import ="import";
 
-const static wchar_t * scpcommand_en_getlength = L"getlength";
+const static char  * scpcommand_en_while = "while";
 
-const static wchar_t * scpcommand_en_register =L"register";
+const static char  * scpcommand_en_move = "move";
 
-const static wchar_t * scpcommand_en_send =L"send";
+const static char  * scpcommand_en_getsize = "getsize";
 
-const static wchar_t * scpcommand_en_receive =L"receive";
+const static char  * scpcommand_en_getlength = "getlength";
 
-const static wchar_t * scpcommand_en_watch =L"watch";
+const static char  * scpcommand_en_register ="register";
 
-const static wchar_t * scpcommand_en_set =L"set";
+const static char  * scpcommand_en_send ="send";
 
-const static wchar_t * scpcommand_en_sleep =L"sleep";
+const static char  * scpcommand_en_receive ="receive";
 
-const static wchar_t * scpcommand_en_wait =L"wait";
+const static char  * scpcommand_en_watch ="watch";
 
-const static wchar_t * scpcommand_en_enum = L"enum";
+const static char  * scpcommand_en_set ="set";
 
-const static wchar_t * scpcommand_en_otherwise = L"otherwise";
+const static char  * scpcommand_en_sleep ="sleep";
 
-const static wchar_t * scpcommand_en_refresh = L"refresh";
+const static char  * scpcommand_en_wait ="wait";
 
-const static wchar_t * scpcommand_en_generate =L"generate";
+const static char  * scpcommand_en_enum = "enum";
 
-const static wchar_t * scpcommand_en_suspend = L"suspend";
+const static char  * scpcommand_en_otherwise = "otherwise";
 
-const static wchar_t * scpcommand_en_getelement = L"getelement";
+const static char  * scpcommand_en_refresh = "refresh";
 
-const static wchar_t * scpcommand_en_traverse = L"traverse";
+const static char  * scpcommand_en_generate ="generate";
 
-const static wchar_t * scpcommand_en_sort = L"sort";
+const static char  * scpcommand_en_suspend = "suspend";
 
-const static wchar_t * scpcommand_en_format = L"format";
+const static char  * scpcommand_en_getelement = "getelement";
 
-const static wchar_t * scpcommand_en_clone = L"clone";
+const static char  * scpcommand_en_traverse = "traverse";
 
-const static wchar_t * scpcommand_en_get = L"get";
+const static char  * scpcommand_en_sort = "sort";
 
-const static wchar_t * scpcommand_en_inherit = L"inherit";
+const static char  * scpcommand_en_format = "format";
 
-const static wchar_t * scpcommand_en_encrypt = L"encrypt";
+const static char  * scpcommand_en_clone = "clone";
 
-const static wchar_t * scpcommand_en_decrypt = L"decrypt";
+const static char  * scpcommand_en_get = "get";
 
-const static wchar_t * scpcommand_en_hash = L"hash";
+const static char  * scpcommand_en_inherit = "inherit";
 
-const static wchar_t * scpcommand_en_transform = L"transform";
+const static char  * scpcommand_en_encrypt = "encrypt";
 
-const static wchar_t * scpcommand_en_split = L"split";
+const static char  * scpcommand_en_decrypt = "decrypt";
 
-const static wchar_t * scpcommand_en_post = L"post";
+const static char  * scpcommand_en_hash = "hash";
 
-const static wchar_t * scpcommand_en_load = L"load";
+const static char  * scpcommand_en_transform = "transform";
 
-const static wchar_t * scpcommand_en_exit = L"exit";
+const static char  * scpcommand_en_split = "split";
 
-const static wchar_t * scpcommand_en_draw = L"draw";
+const static char  * scpcommand_en_post = "post";
 
-const static wchar_t * scpcommand_en_push = L"push";
+const static char  * scpcommand_en_load = "load";
 
-const static wchar_t * scpcommand_en_continue = L"continue";
+const static char  * scpcommand_en_exit = "exit";
 
-const static wchar_t * scpcommand_en_break = L"break";
+const static char  * scpcommand_en_draw = "draw";
 
-const static wchar_t * scpcommand_en_switch = L"switch";
+const static char  * scpcommand_en_push = "push";
 
-const static wchar_t * scpcommand_en_case = L"case";
+const static char  * scpcommand_en_continue = "continue";
 
-const static wchar_t * scpcommand_en_lock = L"lock";
+const static char  * scpcommand_en_break = "break";
 
-const static wchar_t * scpcommand_en_unlock = L"unlock";
+const static char  * scpcommand_en_switch = "switch";
 
+const static char  * scpcommand_en_case = "case";
 
+const static char  * scpcommand_en_lock = "lock";
 
-const static wchar_t * scpcommand_en_create = L"create";
+const static char  * scpcommand_en_unlock = "unlock";
 
-const static wchar_t * scpcommand_en_loop = L"loop";
 
-const static wchar_t * scpcommand_en_public = L"public";
 
-const static wchar_t * scpcommand_en_private = L"private";
+const static char  * scpcommand_en_create = "create";
 
-const static wchar_t * scpcommand_en_save = L"save";
+const static char  * scpcommand_en_loop = "loop";
 
-const static wchar_t * scpcommand_en_return = L"return";
+const static char  * scpcommand_en_public = "public";
 
-const static wchar_t * scpcommand_en_encode =L"encode";
+const static char  * scpcommand_en_private = "private";
 
-const static wchar_t * scpcommand_en_decode = L"decode";
+const static char  * scpcommand_en_save = "save";
 
-const static wchar_t * scpcommand_en_put = L"put";
+const static char  * scpcommand_en_return = "return";
 
-const static wchar_t * scpcommand_en_query = L"query";
+const static char  * scpcommand_en_encode ="encode";
 
-const static wchar_t * scpcommand_en_execute = L"execute";
+const static char  * scpcommand_en_decode = "decode";
 
-const static wchar_t * scpcommand_en_close = L"close";
+const static char  * scpcommand_en_put = "put";
 
-const static wchar_t * scpcommand_en_upload = L"upload";
+const static char  * scpcommand_en_query = "query";
 
-const static wchar_t * scpcommand_en_download = L"download";
+const static char  * scpcommand_en_execute = "execute";
 
-const static wchar_t * scpcommand_en_erase = L"erase";
+const static char  * scpcommand_en_close = "close";
 
-const static wchar_t * scpcommand_en_paste = L"paste";
+const static char  * scpcommand_en_upload = "upload";
 
-const static wchar_t*  scpcommand_en_cut = L"cut";
+const static char  * scpcommand_en_download = "download";
 
-const static wchar_t * scpcommand_en_if = L"if";
+const static char  * scpcommand_en_erase = "erase";
 
-const static wchar_t * scpcommand_en_else = L"else";
+const static char  * scpcommand_en_paste = "paste";
 
-const static wchar_t * scpcommand_en_pop = L"pop";
+const static char *  scpcommand_en_cut = "cut";
 
-const static wchar_t * scpcommand_en_add = L"add";
+const static char  * scpcommand_en_if = "if";
 
-const static wchar_t*  scpcommand_en_append = L"append";
+const static char  * scpcommand_en_else = "else";
 
-const static wchar_t*  scpcommand_en_for = L"for";
+const static char  * scpcommand_en_pop = "pop";
+
+const static char  * scpcommand_en_add = "add";
+
+const static char *  scpcommand_en_append = "append";
+
+const static char *  scpcommand_en_for = "for";
+
+const static char *  scpcommand_en_contains = "contains";
 
 
 const static unsigned long vl_invalid = 0 ;

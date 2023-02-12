@@ -26,24 +26,24 @@ void ScpIfStatementObject::Show(CScriptEngine * engine)
 {
 
 }
-ScpObject * ScpIfStatementObject::Clone(std::wstring strObjName)
+ScpObject * ScpIfStatementObject::Clone(std::string strObjName)
 {
 	return NULL;
 }
-std::wstring ScpIfStatementObject::ToString()
+std::string ScpIfStatementObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpIfStatementObject::Release()
 {
 	delete this;
 }
-bool ScpIfStatementObject::IsInnerFunction(std::wstring & functionname)
+bool ScpIfStatementObject::IsInnerFunction(std::string & functionname)
 {
 	return false;
 }
-ScpObject * ScpIfStatementObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpIfStatementObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	return nullptr;
 }
@@ -85,7 +85,7 @@ int ScpIfStatementObject::ReComputeCondition()
 {
 	if(!ConditionExpression.empty())
 	{
-		if(ConditionExpression==L"1")
+		if(ConditionExpression=="1")
 		{
 			ConditionResult = 1;
 		}
@@ -98,7 +98,7 @@ int ScpIfStatementObject::ReComputeCondition()
 			}
 			else
 			{
-				//ÐèÒªÓÅ»¯£¬ÕâÀïÃ¿´Î¶¼¶ÔÌõ¼þ±í´ïÊ½½øÐÐÖØÐÂ½âÎö
+				//éœ€è¦ä¼˜åŒ–ï¼Œè¿™é‡Œæ¯æ¬¡éƒ½å¯¹æ¡ä»¶è¡¨è¾¾å¼è¿›è¡Œé‡æ–°è§£æž
 				ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();//IfStatementObjectSpace.parentspace;	
 				
 				ScpExpressionTreeNode *	ConditionExpressionroot= engine->ana.BuildExressionTreeEx(ConditionExpression);
@@ -122,7 +122,7 @@ int ScpIfStatementObject::ReComputeCondition()
 
 				}			
 				engine->GetCurrentObjectSpace()->lastTestResult = ConditionResult;
-				DebugUtil::TraceW(L"ReComputeCondition ConditionExpression %s ConditionResult %d",ConditionExpression.c_str(),ConditionResult);
+				DebugUtil::TraceA("ReComputeCondition ConditionExpression %s ConditionResult %d",ConditionExpression.c_str(),ConditionResult);
 			}
 		}
 	}
@@ -131,12 +131,12 @@ int ScpIfStatementObject::ReComputeCondition()
 
 bool ScpIfStatementObject::MakeConditionByteCode()
 {
-	std::wstring name = L"tempif";
+	std::string name = "tempif";
 	ULONG idif;
 	idif = engine->bytecode.resourcepool->scpFindResource(name);
 	while (idif != -1)
 	{
-		name += L"0";
+		name +="0";
 		idif = engine->bytecode.resourcepool->scpFindResource(name);
 	}
 	if (idif == -1)
@@ -148,7 +148,7 @@ bool ScpIfStatementObject::MakeConditionByteCode()
 		stream.Release();
 
 		VTPARAMETERS param;
-		param.push_back(L"int");
+		param.push_back("int");
 		param.push_back(name);
 		engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
 		engine->bytecode.bytecodemem->AppendByteCode(&stream);
@@ -156,7 +156,7 @@ bool ScpIfStatementObject::MakeConditionByteCode()
 	}
 	if (!ConditionExpression.empty())
 	{
-		if (ConditionExpression == L"1")
+		if (ConditionExpression == "1")
 		{
 			ConditionResult = 1;
 			ByteCodeMemoryStream stream;
@@ -182,7 +182,7 @@ bool ScpIfStatementObject::MakeConditionByteCode()
 			}
 			else
 			{
-				//ÐèÒªÓÅ»¯£¬ÕâÀïÃ¿´Î¶¼¶ÔÌõ¼þ±í´ïÊ½½øÐÐÖØÐÂ½âÎö
+				//éœ€è¦ä¼˜åŒ–ï¼Œè¿™é‡Œæ¯æ¬¡éƒ½å¯¹æ¡ä»¶è¡¨è¾¾å¼è¿›è¡Œé‡æ–°è§£æž
 				ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();//IfStatementObjectSpace.parentspace;	
 				
 				ScpExpressionTreeNode *	ConditionExpressionroot = engine->ana.BuildExressionTreeEx(ConditionExpression);
@@ -203,7 +203,7 @@ bool ScpIfStatementObject::MakeConditionByteCode()
 
 				}
 				//engine->GetCurrentObjectSpace()->lastTestResult = ConditionResult;
-				DebugUtil::TraceW(L"ReComputeCondition ConditionExpression %s ConditionResult %d", ConditionExpression.c_str(), ConditionResult);
+				DebugUtil::TraceA("ReComputeCondition ConditionExpression %s ConditionResult %d", ConditionExpression.c_str(), ConditionResult);
 			}
 		}
 	}

@@ -41,7 +41,7 @@ ScpMapObject::ScpMapObject()
 ScpMapObject::~ScpMapObject()
 {
 }
-ScpObject * ScpMapObject::Clone(std::wstring strObjName)
+ScpObject * ScpMapObject::Clone(std::string strObjName)
 {
 	ScpMapObject * obj = (ScpMapObject *)new ScpMapObject;
 	if (obj)
@@ -49,7 +49,7 @@ ScpObject * ScpMapObject::Clone(std::wstring strObjName)
 		ITUSEROBJMAP it = scpobjectmap.begin();
 		while (it != scpobjectmap.end())
 		{
-			ScpObject *objvalue = it->second->Clone(L"");
+			ScpObject *objvalue = it->second->Clone("");
 			if (objvalue)
 			{
 				objvalue->AddRef();
@@ -60,9 +60,9 @@ ScpObject * ScpMapObject::Clone(std::wstring strObjName)
 	}
 	return obj;
 }	
-std::wstring ScpMapObject::ToString()
+std::string ScpMapObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpMapObject::Release() 
@@ -73,7 +73,7 @@ void ScpMapObject::Release()
 void ScpMapObject::Show(CScriptEngine * engine)
 {
 }
-bool ScpMapObject::IsInnerFunction(std::wstring & functionname)
+bool ScpMapObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -81,7 +81,7 @@ bool ScpMapObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpMapObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpMapObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -90,12 +90,12 @@ ScpObject * ScpMapObject::CallInnerFunction(std::wstring & functionname,VTPARAME
 	}
 	return NULL;
 }
-BOOL ScpMapObject::MapObject(std::wstring& key,std::wstring& value, CScriptEngine * engine)
+BOOL ScpMapObject::MapObject(std::string& key,std::string& value, CScriptEngine * engine)
 {
 	ScpObject * objkey = engine->GetCurrentObjectSpace()->FindObject(key);
 	ScpObject * objvalue= engine->GetCurrentObjectSpace()->FindObject(value);
-	std::wstring wskeystr = key;
-	std::wstring wsvaluestr = value;
+	std::string wskeystr = key;
+	std::string wsvaluestr = value;
 	if (objkey && objkey->GetType()==ObjString)
 	{
 		wskeystr = ((ScpStringObject *)objkey)->content;
@@ -121,7 +121,7 @@ BOOL ScpMapObject::MapObject(std::wstring& key,std::wstring& value, CScriptEngin
 	}
 	return FALSE;
 }
-BOOL ScpMapObject::UnMapObject(std::wstring& key)
+BOOL ScpMapObject::UnMapObject(std::string& key)
 {
 	ITUSEROBJMAP it =scpobjectmap.find(key);
 	if(it!=scpobjectmap.end())
@@ -150,7 +150,7 @@ BOOL ScpMapObject::UnMapObject(int index)
 	}
 	return FALSE;
 }
-ScpObject* ScpMapObject::GetKeyObject(std::wstring& key,ScpObjectSpace * objectSpace)
+ScpObject* ScpMapObject::GetKeyObject(std::string& key,ScpObjectSpace * objectSpace)
 {
 	ITUSEROBJMAP it =scpobjectmap.find(key);
 	if(it!=scpobjectmap.end())
@@ -159,10 +159,10 @@ ScpObject* ScpMapObject::GetKeyObject(std::wstring& key,ScpObjectSpace * objectS
 	}
 	return NULL;
 }
-ScpObject* ScpMapObject::GetValueObject(std::wstring& key,ScpObjectSpace * objectSpace)
+ScpObject* ScpMapObject::GetValueObject(std::string& key,ScpObjectSpace * objectSpace)
 {
 	ScpObject * objkey = objectSpace->FindObject(key);
-	std::wstring wskeystr = key;
+	std::string wskeystr = key;
 	if (objkey && objkey->GetType() == ObjString)
 	{
 		wskeystr = ((ScpStringObject *)objkey)->content;
@@ -201,7 +201,7 @@ ScpObject * ScpMapObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETERS
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -225,7 +225,7 @@ ScpObject * ScpMapObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETERS
 	}
 	else if (parameters->size() == 2)
 	{
-		std::wstring wsType, wsName;
+		std::string wsType, wsName;
 		wsType = parameters->at(0);
 		wsName = parameters->at(1);
 		StringStripQuote(wsType);
@@ -258,7 +258,7 @@ ScpObject * ScpMapObject::InnerFunction_add(ScpObject * thisObject, VTPARAMETERS
 {
 	if (parameters->size() == 2)
 	{
-		std::wstring wsKey, wsValue;
+		std::string wsKey, wsValue;
 		wsKey = parameters->at(0);
 		wsValue = parameters->at(1);
 		StringStripQuote(wsKey);
@@ -310,7 +310,7 @@ ScpObject * ScpMapObject::InnerFunction_erase(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		if (IsStaticNumber(param0))
 		{

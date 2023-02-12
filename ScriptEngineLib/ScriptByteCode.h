@@ -6,7 +6,7 @@
 #include "ScpResourcePool.h"
 #include "ScpByteCode.h"
 
-//字节码生成类
+//瀛楄妭鐮佺敓鎴愮被
 class CScriptEngine;
 
 class ByteCodeMemoryStream
@@ -31,7 +31,7 @@ public:
 	ScriptByteCode();
 	~ScriptByteCode();
 
-	bool GenByteCodeFromSouceLine(std::wstring& wsSourceLine, ByteCodeMemoryStream& memstream);
+	bool GenByteCodeFromSouceLine(std::string& wsSourceLine, ByteCodeMemoryStream& memstream);
     bool GenByteCodeFromCommand(const unsigned int & commandvalue, VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream, CScriptEngine * engine);
 	bool GenByteCodeObjectDefine(ScpObjectType type,VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
 	bool GenByteCodeClassObjectDefine(ScpObjectType type, VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
@@ -39,21 +39,23 @@ public:
 	bool GenByteCodeFunctionDefine(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream, CScriptEngine * engine);
 	bool GenByteCodeLoad(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
 	bool GenByteCodeImport(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
-	bool GetByteCodeInitRes(std::wstring res, ByteCodeMemoryStream& memstream,ULONG &resid);
-	bool GetByteCodeBinaryOp(std::wstring op, ULONG idret, ULONG idleft, ULONG idright,ByteCodeMemoryStream& memstream);
-	bool GenByteCodeUnaryOp(std::wstring op,ULONG idobj, ByteCodeMemoryStream& memstream);
-	bool GenByteCodeCallInner(std::wstring objectname, std::wstring innerfuncname,VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
+	bool GetByteCodeInitRes(std::string res, ByteCodeMemoryStream& memstream,ULONG &resid);
+	bool GetByteCodeBinaryOp(std::string op, ULONG idret, ULONG idleft, ULONG idright,ByteCodeMemoryStream& memstream);
+	bool GenByteCodeUnaryOp(std::string op,ULONG idobj, ByteCodeMemoryStream& memstream);
+	bool GenByteCodeCallInner(std::string objectname, std::string innerfuncname,VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream, CScriptEngine * engine);
 	bool GenByteCodeIfstatement(ByteCodeMemoryStream & streamcondition, ByteCodeMemoryStream & streamtrueblock, ByteCodeMemoryStream& streamfalseblock,ByteCodeMemoryStream & memstreamif);
 	bool GenByteCodeFunctionBody(ByteCodeMemoryStream & memstreamfunc);
 	bool GetByteCodeCompute(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream, CScriptEngine * engine);
-	bool GenByteCodeCallFunc(std::wstring funcname, VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
+	bool GenByteCodeCallFunc(std::string funcname, VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream);
 	bool GenByteCodeReturn(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream, CScriptEngine * engine);
 	bool GenByteCodeWhilestatement(ByteCodeMemoryStream & streamcondition, ByteCodeMemoryStream & streamwhileblock, ByteCodeMemoryStream & memstreamwhile);
+	bool GetByteCodeLoop(VTPARAMETERS & vtparameters, ByteCodeMemoryStream& memstream, CScriptEngine * engine);
 	void Init();
-	bool DumpToFile(const wchar_t * bytecodefile);
+	bool DumpToFile(const char * bytecodefile);
 
 	ByteCodeMemoryStream * bytecodemem;
 	ScpResourcePool * resourcepool;
+	
 };
 
 #endif //_H_SCRIPTBYTECODE

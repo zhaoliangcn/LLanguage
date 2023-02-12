@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//ÀÊª˙ ˝∂‘œÛ
+//ÈöèÊú∫Êï∞ÂØπË±°
 */
 #ifndef _H_SCPRANDOMNUMBEROBJECT
 #define _H_SCPRANDOMNUMBEROBJECT
@@ -11,7 +11,7 @@
 #include <time.h>
 #ifdef _WIN32
 #include <random>
-using std::tr1::uniform_int ;
+using std::uniform_int ;
 #endif
 class ScpRandomNumberObject :
 	public ScpObject
@@ -20,11 +20,11 @@ public:
 	ScpRandomNumberObject(void);
 	~ScpRandomNumberObject(void);
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	static ScpIntObject GetRandom();
 	static ScpIntObject Refresh(ScpIntObject &currentvalue);

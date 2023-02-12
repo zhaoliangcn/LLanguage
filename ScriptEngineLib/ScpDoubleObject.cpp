@@ -7,6 +7,7 @@
 #include "ScpStringObject.h"
 #include "ScpGlobalObject.h"
 #include "ScpIntObject.h"
+#include "ScpBigIntObject.h"
 #include "../Common/commonutil.hpp"
 #include "ScriptEngine.h"
 #include "commanddefine_uni.h"
@@ -60,25 +61,43 @@ ScpDoubleObject::ScpDoubleObject()
 
 	BindObjectInnerFuction(scpcommand_tan_CN, InnerFunction_tan);
 	BindObjectInnerFuction(scpcommand_tan_EN, InnerFunction_tan);
+
+	BindObjectInnerFuction(scpcommand_pow_CN, InnerFunction_pow);
+	BindObjectInnerFuction(scpcommand_pow_EN, InnerFunction_pow);
+
+	BindObjectInnerFuction(scpcommand_ceil_CN, InnerFunction_ceil);
+	BindObjectInnerFuction(scpcommand_ceil_EN, InnerFunction_ceil);
+
+	BindObjectInnerFuction(scpcommand_floor_CN, InnerFunction_floor);
+	BindObjectInnerFuction(scpcommand_floor_EN, InnerFunction_floor);
+
+	BindObjectInnerFuction(scpcommand_round_CN, InnerFunction_round);
+	BindObjectInnerFuction(scpcommand_round_EN, InnerFunction_round);
+
+	BindObjectInnerFuction(scpcommand_add_CN, InnerFunction_add);
+	BindObjectInnerFuction(scpcommand_add_EN, InnerFunction_add);
+
+	BindObjectInnerFuction(scpcommand_sub_CN, InnerFunction_sub);
+	BindObjectInnerFuction(scpcommand_sub_EN, InnerFunction_sub);
 }
 ScpDoubleObject::~ScpDoubleObject()
 {
 
 }
-ScpObject * ScpDoubleObject::Clone(std::wstring strObjName)
+ScpObject * ScpDoubleObject::Clone(std::string strObjName)
 {
 	ScpObject * tmp=new ScpDoubleObject;
 	((ScpDoubleObject*)tmp)->value=this->value;
 	return tmp;
 }	
-std::wstring ScpDoubleObject::ToString()
+std::string ScpDoubleObject::ToString()
 {
-	std::wstring temp;
-	wchar_t Buffer[512]={0};
+	std::string temp;
+	char Buffer[512]={0};
 #ifdef _WIN32
-    StringCbPrintfW(Buffer,sizeof(Buffer),L"%f",value);
+    StringCbPrintfA(Buffer,sizeof(Buffer),"%f",value);
 #else 
-	swprintf(Buffer,512,L"%f",value);	
+	sprintf(Buffer,"%f",value);	
 #endif
 	temp=Buffer;
 	return temp;
@@ -89,11 +108,11 @@ void ScpDoubleObject::Release()
 }
 void ScpDoubleObject::Show(CScriptEngine * engine)
 {
-	std::wstring text;
-	text=STDSTRINGEXT::Format(L"%08f",value);
+	std::string text;
+	text=STDSTRINGEXT::Format("%08f",value);
 	engine->PrintError(text);
 }
-bool ScpDoubleObject::IsInnerFunction(std::wstring & functionname)
+bool ScpDoubleObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -101,7 +120,7 @@ bool ScpDoubleObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpDoubleObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpDoubleObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -121,7 +140,7 @@ ScpObject * ScpDoubleObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -151,7 +170,7 @@ ScpObject * ScpDoubleObject::InnerFunction_transform(ScpObject * thisObject, VTP
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * obj = (ScpObject*)engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (obj && obj->GetType() == ObjString)
@@ -302,13 +321,152 @@ ScpObject * ScpDoubleObject::InnerFunction_tan(ScpObject * thisObject, VTPARAMET
 	return nullptr;
 }
 
+ScpObject * ScpDoubleObject::InnerFunction_pow(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string param0 = parameters->at(0);
+		StringStripQuote(param0);
+		int c = 0;
+		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
+		if (objparam0 && objparam0->GetType() == ObjInt)
+		{
+			c = ((ScpIntObject *)objparam0)->value;
+		}
+		else if (IsStaticNumber(param0))
+		{
+			c = StringToInt(param0);
+		}
+		else
+		{
+			return nullptr;
+		}
+		ScpDoubleObject *tret = (ScpDoubleObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjDouble);
+		double ret = ((ScpDoubleObject *)thisObject)->value;
+		tret->value = pow(ret, c);
+		tret->istemp = true;
+		return tret;
+	}
+	return nullptr;
+}
+
+ScpObject * ScpDoubleObject::InnerFunction_ceil(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 0)
+	{
+		ScpDoubleObject *td = (ScpDoubleObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjDouble);
+		td->value = ceil(((ScpDoubleObject*)thisObject)->value);
+		td->istemp = true;
+		return td;
+	}
+	return nullptr;
+}
+
+ScpObject * ScpDoubleObject::InnerFunction_floor(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 0)
+	{
+		ScpDoubleObject *td = (ScpDoubleObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjDouble);
+		td->value = floor(((ScpDoubleObject*)thisObject)->value);
+		td->istemp = true;
+		return td;
+	}
+	return nullptr;
+}
+
+ScpObject * ScpDoubleObject::InnerFunction_round(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
+{
+	if (parameters->size() == 0)
+	{
+		ScpDoubleObject *td = (ScpDoubleObject *)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjDouble);
+		td->value = round(((ScpDoubleObject*)thisObject)->value);
+		td->istemp = true;
+		return td;
+	}
+	return nullptr;
+}
+
+ScpObject* ScpDoubleObject::InnerFunction_add(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string param0 = parameters->at(0);
+		StringStripQuote(param0);
+		__int64 c = 0;
+		ScpObject* objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
+		if (objparam0 && objparam0->GetType() == ObjInt)
+		{
+			c = ((ScpIntObject*)objparam0)->value;
+		}
+		else if (objparam0 && objparam0->GetType() == ObjBigInt)
+		{
+			c = ((ScpBigIntObject*)objparam0)->value;
+		}
+		else if (objparam0 && objparam0->GetType() == ObjDouble)
+		{
+			c = ((ScpDoubleObject*)objparam0)->value;
+		}
+		else if (IsStaticNumber(param0))
+		{
+			c = StringToInt64(param0);
+		}
+		else if (IsStaticDoubleNumber(param0))
+		{
+			c = StringToDouble(param0);
+		}
+		else
+		{
+			return nullptr;
+		}
+		((ScpDoubleObject*)thisObject)->value += c;
+	}
+	return thisObject;
+}
+
+ScpObject* ScpDoubleObject::InnerFunction_sub(ScpObject* thisObject, VTPARAMETERS* parameters, CScriptEngine* engine)
+{
+	if (parameters->size() == 1)
+	{
+		std::string param0 = parameters->at(0);
+		StringStripQuote(param0);
+		double c = 0;
+		ScpObject* objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
+		if (objparam0 && objparam0->GetType() == ObjInt)
+		{
+			c = ((ScpIntObject*)objparam0)->value;
+		}
+		else if (objparam0 && objparam0->GetType() == ObjBigInt)
+		{
+			c = ((ScpBigIntObject*)objparam0)->value;
+		}
+		else if (objparam0 && objparam0->GetType() == ObjDouble)
+		{
+			c = ((ScpDoubleObject*)objparam0)->value;
+		}
+		else if (IsStaticNumber(param0))
+		{
+			c = StringToInt(param0);
+		}
+		else if (IsStaticDoubleNumber(param0))
+		{
+			c = StringToDouble(param0);
+		}
+		else
+		{
+			return nullptr;
+		}
+		((ScpDoubleObject*)thisObject)->value -= c;
+	}
+	return thisObject;
+}
+
 ScpObject * __stdcall ScpDoubleObjectFactory(VTPARAMETERS * paramters, CScriptEngine * engine)
 {
 	if (paramters->size() >= 2)
 	{
-		std::wstring &strobj = paramters->at(0);
-		std::wstring &userobjname = paramters->at(1);
-		std::wstring content;
+		std::string &strobj = paramters->at(0);
+		std::string &userobjname = paramters->at(1);
+		std::string content;
 		if (paramters->size() == 3)
 			content = paramters->at(2);
 		ScpDoubleObject *obj = new ScpDoubleObject;

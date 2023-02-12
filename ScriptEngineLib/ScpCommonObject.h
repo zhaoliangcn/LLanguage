@@ -1,29 +1,32 @@
 #ifndef _H_SCPCOMMONOBJECT
 #define _H_SCPCOMMONOBJECT
 
-//ª˘±æ∂‘œÛ
-//”Ô—‘Ãÿ–‘
-#include "ScpTableObject.h"
-#include "ScpArrayObject.h"
-#include "ScpCObject.h"
+//Âü∫Êú¨ÂØπË±°
+//ËØ≠Ë®ÄÁâπÊÄß
+
+
 #include "ScpIntObject.h"
 #include "ScpBigIntObject.h"
 #include "ScpDoubleObject.h"
 #include "ScpStringObject.h"
 #include "ScpStringArrayObject.h"
+#include "ScpCObject.h"
 #include "ScpNullObject.h"
 #include "ScpRegExpObject.h"
 #include "ScpRandomNumberObject.h"
+#include "ScpTableObject.h"
+#include "ScpArrayObject.h"
 #include "ScpJsonObject.h"
+#include "ScpListObject.h"
 #include "ScpStackObject.h"
 #include "ScpQueueObject.h"
-#include "ScpClassObject.h"
-#include "ScpClassInstanceObject.h"
-#include "ScpListObject.h"
-#include "ScpStructObject.h"
 #include "ScpMapObject.h"
 #include "ScpRangeObject.h"
-//≤Ÿ◊˜œµÕ≥œ‡πÿ
+#include "ScpClassObject.h"
+#include "ScpClassInstanceObject.h"
+#include "ScpStructObject.h"
+
+//Êìç‰ΩúÁ≥ªÁªüÁõ∏ÂÖ≥
 #include "ScpFileObject.h"
 #include "ScpDirectoryObject.h"
 #include "ScpTimeObject.h"

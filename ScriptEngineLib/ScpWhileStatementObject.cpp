@@ -17,7 +17,7 @@ ScpWhileStatementObject::ScpWhileStatementObject(CScriptEngine * eg):whilexpress
 int ScpWhileStatementObject::ReComputeConditionResult()
 {
 	ScpObjectSpace *currentObjectSpace = engine->GetCurrentObjectSpace();
-	if(ConditionExpression==L"1")
+	if(ConditionExpression=="1")
 	{
 		ConditionResult=1;
 	}
@@ -53,12 +53,12 @@ int ScpWhileStatementObject::ReComputeConditionResult()
 }
 bool ScpWhileStatementObject::MakeConditionByteCode()
 {
-	std::wstring name = L"tempwhile";
+	std::string name = "tempwhile";
 	ULONG idwhile;
 	idwhile = engine->bytecode.resourcepool->scpFindResource(name);
 	while (idwhile != -1)
 	{
-		name += L"0";
+		name += "0";
 		idwhile = engine->bytecode.resourcepool->scpFindResource(name);
 	}
 	if (idwhile == -1)
@@ -70,7 +70,7 @@ bool ScpWhileStatementObject::MakeConditionByteCode()
 		stream.Release();
 
 		VTPARAMETERS param;
-		param.push_back(L"int");
+		param.push_back("int");
 		param.push_back(name);
 		engine->bytecode.GenByteCodeObjectDefine(ObjInt, param, stream);
 		engine->bytecode.bytecodemem->AppendByteCode(&stream);
@@ -78,7 +78,7 @@ bool ScpWhileStatementObject::MakeConditionByteCode()
 	}
 	if (!ConditionExpression.empty())
 	{
-		if (ConditionExpression == L"1")
+		if (ConditionExpression == "1")
 		{
 			ConditionResult = 1;
 			ByteCodeMemoryStream stream;
@@ -128,7 +128,7 @@ bool ScpWhileStatementObject::MakeConditionByteCode()
 	return false;
 
 }
-void ScpWhileStatementObject::SetCondition(std::wstring condition)
+void ScpWhileStatementObject::SetCondition(std::string condition)
 {
 	ScpStringObject *strobj2=(ScpStringObject *)WhileStatementObjectSpace.FindObject(condition);
 	if(strobj2)
@@ -149,26 +149,26 @@ void ScpWhileStatementObject::Show(CScriptEngine * engine)
 {
 
 }
-ScpObject * ScpWhileStatementObject::Clone(std::wstring strObjName)
+ScpObject * ScpWhileStatementObject::Clone(std::string strObjName)
 {
 	return NULL;
 }
-std::wstring ScpWhileStatementObject::ToString()
+std::string ScpWhileStatementObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp+=ConditionExpression;
-	temp+=L"\r\n";	
+	temp+="\r\n";	
 	return temp;
 }
 void ScpWhileStatementObject::Release() 
 {
 	delete this;
 }
-bool ScpWhileStatementObject::IsInnerFunction(std::wstring & functionname)
+bool ScpWhileStatementObject::IsInnerFunction(std::string & functionname)
 {
 	return false;
 }
-ScpObject * ScpWhileStatementObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpWhileStatementObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	return nullptr;
 }

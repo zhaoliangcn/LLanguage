@@ -23,7 +23,7 @@ void ScpNullObject::Show(CScriptEngine * engine)
 	engine->PrintError(ScpGlobalObject::GetInstance()->GetTypeName(ObjNull));
 
 }
-ScpObject * ScpNullObject::Clone(std::wstring strObjName)
+ScpObject * ScpNullObject::Clone(std::string strObjName)
 {
 	ScpNullObject * obj = new ScpNullObject;
 	if (obj)
@@ -33,9 +33,9 @@ ScpObject * ScpNullObject::Clone(std::wstring strObjName)
 	}
 	return NULL;
 }	
-std::wstring ScpNullObject::ToString()
+std::string ScpNullObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpNullObject::Release() 
@@ -43,12 +43,17 @@ void ScpNullObject::Release()
 	delete this;
 }
 
-bool ScpNullObject::IsInnerFunction(std::wstring & functionname)
+bool ScpNullObject::IsInnerFunction(std::string & functionname)
 {
 	return false;
 }
 
-ScpObject * ScpNullObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpNullObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	return nullptr;
+}
+
+ScpObject* __stdcall ScpNullObjectFactory(VTPARAMETERS* paramters, CScriptEngine* engine)
+{
+	return new ScpNullObject();
 }

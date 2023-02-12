@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//¶ÔÏóÃû³Æ¹ÜÀí£¬ÓÃÓÚÊµÏÖÖĞÓ¢ÎÄ¹Ø¼ü×ÖµÄ¶¯Ì¬ÇĞ»»
+//å¯¹è±¡åç§°ç®¡ç†ï¼Œç”¨äºå®ç°ä¸­è‹±æ–‡å…³é”®å­—çš„åŠ¨æ€åˆ‡æ¢
 */
 #include "ScpObjectNammes.h"
 ScpObjectNames ScpObjectNames::singleton;
@@ -20,10 +20,11 @@ ScpObjectNames::ScpObjectNames(void)
 ScpObjectNames::~ScpObjectNames(void)
 {
 }
-bool ScpObjectNames::IsValidObjectName(std::wstring& objName)
+bool ScpObjectNames::IsValidObjectName(std::string& objName)
 {
 	bool bret=false;
-	bret=!iswdigit(objName.at(0));
+	//ç®€å•çš„åªåˆ¤æ–­äº†èµ·å§‹å­—ç¬¦æ˜¯å¦æ˜¯æ•°å­—
+	bret=!isdigit(objName.at(0));
 	return bret;
 }
 void ScpObjectNames::SelectLanguage(int lang)

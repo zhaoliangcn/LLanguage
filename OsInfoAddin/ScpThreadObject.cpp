@@ -23,8 +23,8 @@ BOOL __stdcall Thread_Wait_Command(VTPARAMETERS * vtparameters, CScriptEngine * 
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 2)
 	{
-		std::wstring userinputobj = vtparameters->at(0);
-		std::wstring strname = vtparameters->at(1);
+		std::string userinputobj = vtparameters->at(0);
+		std::string strname = vtparameters->at(1);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(userinputobj.c_str());
 		if (ObjThread == type)
 		{
@@ -43,8 +43,8 @@ BOOL __stdcall Thread_Run_Command(VTPARAMETERS * vtparameters, CScriptEngine * e
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() >= 2)
 	{
-		std::wstring strobjtype = vtparameters->at(0);
-		std::wstring procobjname = vtparameters->at(1);
+		std::string strobjtype = vtparameters->at(0);
+		std::string procobjname = vtparameters->at(1);
 
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobjtype.c_str());
 		if (ObjThread == type)
@@ -52,7 +52,7 @@ BOOL __stdcall Thread_Run_Command(VTPARAMETERS * vtparameters, CScriptEngine * e
 			ScpThreadObject * threadObj = (ScpThreadObject *)currentObjectSpace->FindObject(procobjname);
 			if (threadObj)
 			{
-				//×¢Òâ¶àÏß³ÌÊ±µÄ¶ÔÏó·ÃÎÊÎÊÌâ
+				//æ³¨æ„å¤šçº¿ç¨‹æ—¶çš„å¯¹è±¡è®¿é—®é—®é¢˜
 				CScriptEngine * pscriptengine = new CScriptEngine;
 				ScpObjectSpace *pcurrentObjectSpace = pscriptengine->GetCurrentObjectSpace();
 				pcurrentObjectSpace->userobject.Copy(&currentObjectSpace->userobject);
@@ -73,7 +73,7 @@ BOOL __stdcall Thread_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngin
 	ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 	if (vtparameters->size() == 1)
 	{
-		std::wstring text = vtparameters->at(0);
+		std::string text = vtparameters->at(0);
 		{
 			ScpObject *obj = (ScpObject *)currentObjectSpace->FindObject(text);
 			if (obj)
@@ -91,8 +91,8 @@ BOOL __stdcall Thread_Shutdown_Command(VTPARAMETERS * vtparameters, CScriptEngin
 	}
 	else if (vtparameters->size() == 2)
 	{
-		std::wstring strobj = vtparameters->at(0);
-		std::wstring text = vtparameters->at(1);
+		std::string strobj = vtparameters->at(0);
+		std::string text = vtparameters->at(1);
 		ScpObjectType type = ScpGlobalObject::GetInstance()->GetType(strobj.c_str());
 		if (ObjThread == type)
 		{
@@ -136,15 +136,15 @@ ScpThreadObject::~ScpThreadObject(void)
 void ScpThreadObject::Show(CScriptEngine * engine) 
 {
 }
-ScpObject * ScpThreadObject::Clone(std::wstring strObjName)
+ScpObject * ScpThreadObject::Clone(std::string strObjName)
 {
 	return NULL;
 }	
-std::wstring ScpThreadObject::ToString()
+std::string ScpThreadObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	temp+=ThreadName;
-	temp+=L"\r\n";
+	temp+="\r\n";
 	temp+=ThreadFuncionName;
 	return temp;
 }
@@ -152,7 +152,7 @@ void ScpThreadObject::Release()
 {
 	delete this;
 }
-bool ScpThreadObject::IsInnerFunction(std::wstring & functionname)
+bool ScpThreadObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -160,7 +160,7 @@ bool ScpThreadObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpThreadObject::CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
+ScpObject * ScpThreadObject::CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -169,7 +169,7 @@ ScpObject * ScpThreadObject::CallInnerFunction(std::wstring & functionname,VTPAR
 	}
 	return NULL;
 }
-void ScpThreadObject::ThreadDefine(std::wstring Name,std::wstring FunctionName)
+void ScpThreadObject::ThreadDefine(std::string Name,std::string FunctionName)
 {
 	ThreadName= Name;
 	ThreadFuncionName =FunctionName;
@@ -203,7 +203,7 @@ ScpObject * ScpThreadObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMET
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -284,7 +284,6 @@ ScpFunctionObject* func=NULL;
 		}
 		//thread->scriptengine->scriptcommand->Do_Call_Command(&thread->RealParameters,thread->scriptengine);
 	}
-	return NULL;
 }
 
 #endif 

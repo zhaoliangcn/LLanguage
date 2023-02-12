@@ -9,16 +9,16 @@ class ScpFunctionObject;
 typedef void * HWND;
 #endif
 const static ScpObjectType	ObjTimer = 41;
-const static std::wstring str_CN_ObjTimer = L"定时器";
+const static char * str_CN_ObjTimer = "定时器";
 
-const static std::wstring str_EN_ObjTimer = L"timer";
+const static char * str_EN_ObjTimer = "timer";
 class ScpTimerObject :
 	public ScpObject
 {
 public:
 	ScpTimerObject(void);
 	~ScpTimerObject(void);
-	void Set(std::wstring timername,ScpFunctionObject * func,ULONG val);
+	void Set(std::string timername,ScpFunctionObject * func,ULONG val);
 #ifdef _WIN32
 	
 	static void   __stdcall   TimerProc(HWND   hwnd,unsigned int   uMsg,UINT_PTR   idEvent,DWORD   dwTime);
@@ -26,14 +26,14 @@ public:
 	void Start();
 	void Stop();
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release() ;
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 	ScpFunctionObject * timerfunc;
-	std::wstring name;
+	std::string name;
 	ULONG interval;
 	ULONG eventid;
 	//TIMERPROC timerproc;

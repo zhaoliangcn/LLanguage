@@ -38,22 +38,22 @@ void ScpClipboardObject::Show(CScriptEngine * engine)
 {
 }
 
-ScpObject * ScpClipboardObject::Clone(std::wstring strObjName)
+ScpObject * ScpClipboardObject::Clone(std::string strObjName)
 {
 	ScpClipboardObject * obj = new ScpClipboardObject;
 	return obj;
 }
 
-std::wstring ScpClipboardObject::ToString()
+std::string ScpClipboardObject::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 
 void ScpClipboardObject::Release()
 {
 }
 
-bool ScpClipboardObject::IsInnerFunction(std::wstring & functionname)
+bool ScpClipboardObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -62,7 +62,7 @@ bool ScpClipboardObject::IsInnerFunction(std::wstring & functionname)
 	return false;
 }
 
-ScpObject * ScpClipboardObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpClipboardObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -81,7 +81,7 @@ ScpObject * ScpClipboardObject::InnerFunction_Get(ScpObject * thisObject, VTPARA
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -103,7 +103,7 @@ ScpObject * ScpClipboardObject::InnerFunction_copy(ScpObject * thisObject, VTPAR
 {
 	if (parameters && parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (obj &&obj->GetType() == ObjString)
@@ -111,7 +111,7 @@ ScpObject * ScpClipboardObject::InnerFunction_copy(ScpObject * thisObject, VTPAR
 			ScpStringObject * strobj = (ScpStringObject *)obj;
 #ifdef _WIN32
 			CClipboard clipboard;
-			clipboard.SetString(NULL, STDSTRINGEXT::WToA(strobj->content));
+			clipboard.SetString(NULL, strobj->content);
 #endif
 			return obj;
 		}
@@ -123,7 +123,7 @@ ScpObject * ScpClipboardObject::InnerFunction_paste(ScpObject * thisObject, VTPA
 {
 	if (parameters && parameters->size() == 1)
 	{
-		std::wstring wsparam = parameters->at(0);
+		std::string wsparam = parameters->at(0);
 		StringStripQuote(wsparam);
 		ScpObject * obj = engine->GetCurrentObjectSpace()->FindObject(wsparam);
 		if (obj &&obj->GetType() == ObjString)
@@ -131,7 +131,7 @@ ScpObject * ScpClipboardObject::InnerFunction_paste(ScpObject * thisObject, VTPA
 			ScpStringObject * strobj = (ScpStringObject *)obj;
 #ifdef _WIN32
 			CClipboard clipboard;
-			strobj->content = STDSTRINGEXT::AToW(clipboard.GetString(NULL));
+			strobj->content = clipboard.GetString(NULL);
 #endif
 			return obj;
 		}

@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//数值与字符串相互转换的辅助函数
+//鏁板�间笌瀛楃涓茬浉浜掕浆鎹㈢殑杈呭姪鍑芥暟
 */
 #ifndef _H_NUMBERHELP
 #define _H_NUMBERHELP
@@ -10,8 +10,11 @@
 #include "commanddefine.h"
 #include <string>
 BOOL IsStaticNumber(std::wstring Expression);
+BOOL IsStaticNumber(std::string Expression);
 BOOL IsStaticDoubleNumber(std::wstring Expression);
+BOOL IsStaticDoubleNumber(std::string Expression);
 BOOL IsStaticString(std::wstring Expression);
+BOOL IsStaticString(std::string Expression);
 int StringToInt(std::string str);
 int StringToInt(std::wstring str);
 double StringToDouble(std::string str);

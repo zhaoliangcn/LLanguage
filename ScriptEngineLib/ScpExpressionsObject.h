@@ -9,15 +9,15 @@ public:
 	ScpExpressionsObject(void);
 	~ScpExpressionsObject(void);
 	virtual void Show(CScriptEngine * engine) ;
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release();
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine);
 	bool Compile(CScriptEngine * engine);
 	ScpObject * Run(CScriptEngine * engine);
 
-	std::wstring orgexpression;
+	std::string orgexpression;
 	ScpObject * result;
 	ScpExpressionTreeNode * rootNode;
 };

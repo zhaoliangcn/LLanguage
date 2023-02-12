@@ -1,5 +1,7 @@
 #include "Cross.h"
 #include "../Common/stdstringext.hpp"
+#ifndef _WIN32
+#include <wchar.h>
 int _wtoi(const wchar_t *wstr)
 {
     std::string temp;
@@ -18,3 +20,13 @@ float _wtof(const wchar_t* wstr)
     temp = STDSTRINGEXT::WToA(wstr);
     return atof(temp.c_str());
 }
+wchar_t * wstringdup(const wchar_t * src)
+{
+	return _wcsdup(src);
+}
+#else
+wchar_t * wstringdup(const wchar_t * src)
+{
+	return _wcsdup(src);
+}
+#endif

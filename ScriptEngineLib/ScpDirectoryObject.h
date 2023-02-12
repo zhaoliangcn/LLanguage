@@ -2,7 +2,6 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//Ä¿Â¼¶ÔÏó
 */
 #ifndef _H_SCPDIRECTORYOBJECT
 #define _H_SCPDIRECTORYOBJECT
@@ -27,31 +26,31 @@ public:
 	~ScpDirectoryObject(void);
 
 	virtual void Show(CScriptEngine * engine);
-	virtual ScpObject * Clone(std::wstring strObjName);
-	virtual std::wstring ToString();
+	virtual ScpObject * Clone(std::string strObjName);
+	virtual std::string ToString();
 	virtual void Release();
 
-	virtual bool IsInnerFunction(std::wstring & functionname);
-	virtual ScpObject * CallInnerFunction(std::wstring & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
+	virtual bool IsInnerFunction(std::string & functionname);
+	virtual ScpObject * CallInnerFunction(std::string & functionname,VTPARAMETERS * parameters,CScriptEngine * engine);
 
 
-	BOOL Open(std::wstring dir);
+	BOOL Open(std::string dir);
 	void ShowAllFiles(CScriptEngine * engine);
 	void ShowAllSubdir(CScriptEngine * engine);
 	void ShowAll(CScriptEngine * engine);
 	void EnumAll();
-	BOOL FindAllFiles(ScpObjectSpace * currentObjectSpace,ScpTableObject * tableobj,std::wstring driectory,std::wstring matchrule);
+	BOOL FindAllFiles(ScpObjectSpace * currentObjectSpace,ScpTableObject * tableobj,std::string driectory,std::string matchrule);
 	ScpTableObject * EnumAllFiles(ScpObjectSpace * currentObjectSpace);
 	ScpTableObject * EnumAllFiles(ScpObjectSpace * currentObjectSpace,ScpObject * reobj);
 	ScpTableObject * EnumAllSubDir(ScpObjectSpace * currentObjectSpace);	
-	static BOOL Copy(std::wstring source,std::wstring dest);
-	static BOOL Move(std::wstring source,std::wstring dest);
+	static BOOL Copy(std::string source,std::string dest);
+	static BOOL Move(std::string source,std::string dest);
 	BOOL Delete();
-	static BOOL Delete(std::wstring dir);
-	static BOOL PathOrFileExist(std::wstring dir);
-	static BOOL IsDir(std::wstring dir);
-	static BOOL Create(std::wstring dir);
-	std::wstring directory;
+	static BOOL Delete(std::string dir);
+	static BOOL PathOrFileExist(std::string dir);
+	static BOOL IsDir(std::string dir);
+	static BOOL Create(std::string dir);
+	std::string directory;
 	VTSTRINGS all;
 	VTSTRINGS allfiles;
 	VTSTRINGS allsubdir;

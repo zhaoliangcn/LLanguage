@@ -8,23 +8,23 @@
 #include "../ScriptEngineLib/ScpBigIntObject.h"
 #include "../ScriptEngineLib/ScpStringObject.h"
 #include "../ScriptEngineLib/ScriptDebugger.h"
-int  ScriptEngineDoString(wchar_t * ScriptString)
+int  ScriptEngineDoString(char * ScriptString)
 {
 	CScriptEngine scriptengine;
-	std::wstring scriptstring = ScriptString;
+	std::string scriptstring = ScriptString;
 	return scriptengine.DoString(scriptstring);
 }
-int  ScriptEngineDoScriptFile(wchar_t * ScriptFileName)
+int  ScriptEngineDoScriptFile(char * ScriptFileName)
 {
 	CScriptEngine scriptengine;
 	return scriptengine.DoScript(ScriptFileName);
 }
-int  ScriptEngineDebugScriptFile(wchar_t * ScriptFileName)
+int  ScriptEngineDebugScriptFile(char * ScriptFileName)
 {
 	CScriptEngine scriptengine;
 	return scriptengine.DoScript(ScriptFileName,RUN_DEBUG);
 }
-int  ScriptEngineDebugMemoryScript(wchar_t * ScriptFileName)
+int  ScriptEngineDebugMemoryScript(char * ScriptFileName)
 {
 	 CScriptEngine scriptengine;
 	return  scriptengine.DebugMemoryScript(ScriptFileName);
@@ -36,7 +36,7 @@ HANDLE  CreateScriptEngine()
 	//printf("sizeof(ScpDoubleObject)=%d\n", sizeof(ScpDoubleObject));
 	//printf("sizeof(ScpBigIntObject)=%d\n", sizeof(ScpBigIntObject));
 	//printf("sizeof(ScpStringObject)=%d\n", sizeof(ScpStringObject));
-	//printf("sizeof(std::wstring)=%d\n", sizeof(std::wstring));
+	//printf("sizeof(std::string)=%d\n", sizeof(std::string));
 	return HANDLE(new (CScriptEngine));
 }
 
@@ -49,7 +49,7 @@ void  ScriptReleaseScript(VTSTRINGS** body)
 	}
 }
 
-bool  ScriptReadScript(const wchar_t *  scriptfilename,VTSTRINGS** body)
+bool  ScriptReadScript(const char *  scriptfilename,VTSTRINGS** body)
 {
 	bool ret=false;
 	try
@@ -82,7 +82,7 @@ void  ScriptSetDebugEvent(HANDLE hScript)
 		}
 	}
 }
-int  ScriptDumpScript(HANDLE hScript,const wchar_t * newscriptfilename)
+int  ScriptDumpScript(HANDLE hScript,const char * newscriptfilename)
 {
 	int ret=0;
 	if(hScript)
@@ -99,7 +99,7 @@ int  ScriptDumpScript(HANDLE hScript,const wchar_t * newscriptfilename)
 	}
 	return ret;
 }
-void  ScriptDumpObject(HANDLE hScript,const wchar_t * objectname)
+void  ScriptDumpObject(HANDLE hScript,const char * objectname)
 {
 	if(hScript)
 	{
@@ -148,7 +148,7 @@ int  ScriptAddBreakPoints(HANDLE hScript,int line)
 	}
 	return ret;
 }
-int  ScriptDoScript(HANDLE hScript,const wchar_t *  scriptfilename,SCRIPTRUNTYPE mode)
+int  ScriptDoScript(HANDLE hScript,const char *  scriptfilename,SCRIPTRUNTYPE mode)
 {
 	int ret=0;
 	if(hScript)
@@ -165,7 +165,7 @@ int  ScriptDoScript(HANDLE hScript,const wchar_t *  scriptfilename,SCRIPTRUNTYPE
 	}
 	return ret;
 }
-int  ScriptDebugMemoryScript(HANDLE hScript,wchar_t * MemoryScript)
+int  ScriptDebugMemoryScript(HANDLE hScript,char * MemoryScript)
 {
 	int ret=0;
 	if(hScript)
@@ -260,7 +260,7 @@ BOOL  ScriptRegisterUIStepCallBack(HANDLE hScript,void * uiclass,UICallBack call
 	}
 	return bRet;
 }
-BOOL  LoadScript(HANDLE hScript,const wchar_t * ScriptFilePathName)
+BOOL  LoadScript(HANDLE hScript,const char * ScriptFilePathName)
 {
 	BOOL bRet=FALSE;
 	if(hScript)
@@ -277,7 +277,7 @@ BOOL  LoadScript(HANDLE hScript,const wchar_t * ScriptFilePathName)
 	}
 	return bRet;
 }
-BOOL  ScriptObjectToWString(HANDLE hScript,wchar_t * ObjectName,wchar_t *ObjectBuffer,size_t BufferSize)
+BOOL  ScriptObjectToWString(HANDLE hScript,char * ObjectName,char *ObjectBuffer,size_t BufferSize)
 {
 	BOOL bRet = FALSE;
 	if(hScript && ObjectBuffer && ObjectName)
@@ -285,13 +285,13 @@ BOOL  ScriptObjectToWString(HANDLE hScript,wchar_t * ObjectName,wchar_t *ObjectB
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			ScpObject * obj  = scriptengine->GetCurrentObjectSpace()->FindObject(std::wstring(ObjectName));
+			ScpObject * obj  = scriptengine->GetCurrentObjectSpace()->FindObject(std::string(ObjectName));
 			if(obj)
 			{
 			#ifdef _WIN32
-				wcscpy_s(ObjectBuffer,BufferSize,obj->ToString().c_str());
+				strcpy_s(ObjectBuffer,BufferSize,obj->ToString().c_str());
 			#else
-					wcscpy(ObjectBuffer,obj->ToString().c_str());
+				strcpy(ObjectBuffer,obj->ToString().c_str());
 			#endif
 			
 				bRet =  TRUE;
@@ -305,7 +305,7 @@ BOOL  ScriptObjectToWString(HANDLE hScript,wchar_t * ObjectName,wchar_t *ObjectB
 	return bRet;
 
 }
-BOOL  ScriptObjectToInt(HANDLE hScript, wchar_t * ObjectName, int * Value)
+BOOL  ScriptObjectToInt(HANDLE hScript, char * ObjectName, int * Value)
 {
 	BOOL bRet = FALSE;
 	if (hScript && Value && ObjectName)
@@ -313,7 +313,7 @@ BOOL  ScriptObjectToInt(HANDLE hScript, wchar_t * ObjectName, int * Value)
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(std::wstring(ObjectName));
+			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(std::string(ObjectName));
 			if (obj && obj->GetType()==ObjInt)
 			{
 				*Value = ((ScpIntObject*)obj)->value;
@@ -328,7 +328,7 @@ BOOL  ScriptObjectToInt(HANDLE hScript, wchar_t * ObjectName, int * Value)
 	return bRet;
 
 }
-BOOL  ScriptObjectToDouble(HANDLE hScript, wchar_t * ObjectName, double * Value)
+BOOL  ScriptObjectToDouble(HANDLE hScript, char * ObjectName, double * Value)
 {
 	BOOL bRet = FALSE;
 	if (hScript && Value && ObjectName)
@@ -336,7 +336,7 @@ BOOL  ScriptObjectToDouble(HANDLE hScript, wchar_t * ObjectName, double * Value)
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(std::wstring(ObjectName));
+			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(std::string(ObjectName));
 			if (obj && obj->GetType() == ObjDouble)
 			{
 				*Value = ((ScpDoubleObject*)obj)->value;
@@ -350,7 +350,7 @@ BOOL  ScriptObjectToDouble(HANDLE hScript, wchar_t * ObjectName, double * Value)
 	}
 	return bRet;
 }
-BOOL  ScriptObjectToInt64(HANDLE hScript, wchar_t * ObjectName, __int64 * Value)
+BOOL  ScriptObjectToInt64(HANDLE hScript, char * ObjectName, __int64 * Value)
 {
 	BOOL bRet = FALSE;
 	if (hScript && Value && ObjectName)
@@ -358,7 +358,7 @@ BOOL  ScriptObjectToInt64(HANDLE hScript, wchar_t * ObjectName, __int64 * Value)
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(std::wstring(ObjectName));
+			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(std::string(ObjectName));
 			if (obj && obj->GetType() == ObjBigInt)
 			{
 				*Value = ((ScpBigIntObject*)obj)->value;
@@ -372,7 +372,7 @@ BOOL  ScriptObjectToInt64(HANDLE hScript, wchar_t * ObjectName, __int64 * Value)
 	}
 	return bRet;
 }
-BOOL  ScriptCallFunction(HANDLE hScript,wchar_t * FunctionAndParameter)
+BOOL  ScriptCallFunction(HANDLE hScript,char * FunctionAndParameter)
 {
 	BOOL bRet = FALSE;
 	if(hScript)
@@ -380,12 +380,12 @@ BOOL  ScriptCallFunction(HANDLE hScript,wchar_t * FunctionAndParameter)
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			std::wstring scriptline  ;
+			std::string scriptline  ;
 			if(scriptengine->GetLanguge()==1)
-				scriptline	= L"call:function,";
+				scriptline	= "call:function,";
 			#ifdef _WIN32
 			else if(scriptengine->GetLanguge() == 0)
-				scriptline = L"µ÷ÓÃ:º¯Êý,";
+				scriptline = "è°ƒç”¨:å‡½æ•°,";
 			#else
 			#endif
 			scriptline+=FunctionAndParameter;
@@ -415,7 +415,7 @@ void  CloseScriptEngine(HANDLE &hScript)
 		}
 	}
 }
-BOOL  ScriptRegisterGlobalCommand(HANDLE hScript, const wchar_t * chscommandstring, const wchar_t * engcommandstring, DWORD commandid, GlobalCommandFunctionPtr Func)
+BOOL  ScriptRegisterGlobalCommand(HANDLE hScript, const char * chscommandstring, const char * engcommandstring, DWORD commandid, GlobalCommandFunctionPtr Func)
 {
 	BOOL bRet = FALSE;
 	if (hScript)
@@ -433,7 +433,7 @@ BOOL  ScriptRegisterGlobalCommand(HANDLE hScript, const wchar_t * chscommandstri
 	return bRet;
 }
 
-int  ScriptDoByteCode(HANDLE hScript, const wchar_t * bytecodefilename, SCRIPTRUNTYPE mode)
+int  ScriptDoByteCode(HANDLE hScript, const char * bytecodefilename, SCRIPTRUNTYPE mode)
 {
 	int ret = 0;
 	if (hScript)
@@ -441,7 +441,7 @@ int  ScriptDoByteCode(HANDLE hScript, const wchar_t * bytecodefilename, SCRIPTRU
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			ret = scriptengine->DoByteCode(STDSTRINGEXT::WToA(bytecodefilename).c_str(), mode);
+			ret = scriptengine->DoByteCode(bytecodefilename, mode);
 		}
 		catch (...)
 		{
@@ -487,7 +487,25 @@ int  ScriptSetJit(HANDLE hScript, int Jit)
 	return ret;
 }
 
-int  ScriptDumpByteCode(HANDLE hScript, const wchar_t * ByteCodeFile)
+int  ScriptSetBuild(HANDLE hScript, int Build)
+{
+	int ret = 0;
+	if (hScript)
+	{
+		try
+		{
+			CScriptEngine* scriptengine = (CScriptEngine*)hScript;
+			scriptengine->Build = Build;
+		}
+		catch (...)
+		{
+
+		}
+	}
+	return ret;
+}
+
+int  ScriptDumpByteCode(HANDLE hScript, const char * ByteCodeFile)
 {
 	int ret = 0;
 	if (hScript)
@@ -505,7 +523,7 @@ int  ScriptDumpByteCode(HANDLE hScript, const wchar_t * ByteCodeFile)
 	return ret;
 }
 
-int  ScriptDoString(HANDLE hScript, const wchar_t * ScriptString)
+int  ScriptDoString(HANDLE hScript, const char * ScriptString)
 {
 	int ret = 0;
 	if (hScript)
@@ -513,7 +531,7 @@ int  ScriptDoString(HANDLE hScript, const wchar_t * ScriptString)
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			std::wstring scriptstr =  ScriptString;
+			std::string scriptstr =  ScriptString;
 			scriptengine->DoString(scriptstr);
 		}
 		catch (...)
@@ -542,7 +560,7 @@ int  ScriptSetDebugger(HANDLE hScript, void * debugger)
 	return ret;
 }
 
-int  ScriptSetScriptFileName(HANDLE hScript, const wchar_t * ScriptFileName)
+int  ScriptSetScriptFileName(HANDLE hScript, const char * ScriptFileName)
 {
 	int ret = 0;
 	if (hScript)
@@ -560,7 +578,7 @@ int  ScriptSetScriptFileName(HANDLE hScript, const wchar_t * ScriptFileName)
 	return ret;
 }
 
-int  ScriptGetObjectType(HANDLE hScript, const wchar_t * ObjectName, wchar_t * ObjectTypeBuffer, int BufferLength)
+int  ScriptGetObjectType(HANDLE hScript, const char * ObjectName, char * ObjectTypeBuffer, int BufferLength)
 {
 	int ret = 0;
 	if (hScript)
@@ -568,8 +586,8 @@ int  ScriptGetObjectType(HANDLE hScript, const wchar_t * ObjectName, wchar_t * O
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			std::wstring name = ObjectName;
-			std::wstring wstype;
+			std::string name = ObjectName;
+			std::string wstype;
 			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(name);
 			if (obj)
 			{
@@ -589,9 +607,9 @@ int  ScriptGetObjectType(HANDLE hScript, const wchar_t * ObjectName, wchar_t * O
 				else
 				{
 				#ifdef _WIN32
-					wcscpy_s(ObjectTypeBuffer, BufferLength, wstype.c_str());
+					strcpy_s(ObjectTypeBuffer, BufferLength, wstype.c_str());
 				#else
-					wcscpy(ObjectTypeBuffer, wstype.c_str());
+					strcpy(ObjectTypeBuffer, wstype.c_str());
 				#endif
 				}
 			}
@@ -605,7 +623,7 @@ int  ScriptGetObjectType(HANDLE hScript, const wchar_t * ObjectName, wchar_t * O
 	return ret;
 }
 
-int  ScriptGetObjectFuncList(HANDLE hScript, const wchar_t * ObjectName, wchar_t * ObjectFuncBuffer, int BufferLength)
+int  ScriptGetObjectFuncList(HANDLE hScript, const char * ObjectName, char * ObjectFuncBuffer, int BufferLength)
 {
 	int ret = -1;
 	if (hScript)
@@ -613,8 +631,8 @@ int  ScriptGetObjectFuncList(HANDLE hScript, const wchar_t * ObjectName, wchar_t
 		try
 		{
 			CScriptEngine * scriptengine = (CScriptEngine*)hScript;
-			std::wstring name = ObjectName;
-			std::wstring wsfunclist;
+			std::string name = ObjectName;
+			std::string wsfunclist;
 			ScpObject * obj = scriptengine->GetCurrentObjectSpace()->FindObject(name);
 			if (obj)
 			{
@@ -627,9 +645,9 @@ int  ScriptGetObjectFuncList(HANDLE hScript, const wchar_t * ObjectName, wchar_t
 				{
 					ret = 0;
 					#ifdef _WIN32
-					wcscpy_s(ObjectFuncBuffer, BufferLength, wsfunclist.c_str());
+					strcpy_s(ObjectFuncBuffer, BufferLength, wsfunclist.c_str());
 					#else
-						wcscpy(ObjectFuncBuffer, wsfunclist.c_str());
+					strcpy(ObjectFuncBuffer, wsfunclist.c_str());
 					#endif
 				}
 			}

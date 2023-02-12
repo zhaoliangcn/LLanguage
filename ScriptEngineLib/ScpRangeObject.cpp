@@ -53,14 +53,14 @@ void ScpRangeObject::Show(CScriptEngine * engine)
 	}
 }
 
-ScpObject * ScpRangeObject::Clone(std::wstring strObjName)
+ScpObject * ScpRangeObject::Clone(std::string strObjName)
 {
 	return nullptr;
 }
 
-std::wstring ScpRangeObject::ToString()
+std::string ScpRangeObject::ToString()
 {
-	return std::wstring();
+	return std::string();
 }
 
 void ScpRangeObject::Release()
@@ -68,7 +68,7 @@ void ScpRangeObject::Release()
 	delete this;
 }
 
-bool ScpRangeObject::IsInnerFunction(std::wstring & functionname)
+bool ScpRangeObject::IsInnerFunction(std::string & functionname)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -77,7 +77,7 @@ bool ScpRangeObject::IsInnerFunction(std::wstring & functionname)
 	return false;
 }
 
-ScpObject * ScpRangeObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpRangeObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (ObjectInnerFunctions.find(functionname) != ObjectInnerFunctions.end())
 	{
@@ -121,7 +121,7 @@ ScpObject * ScpRangeObject::InnerFunction_Get(ScpObject * thisObject, VTPARAMETE
 {
 	if (parameters->size() == 1)
 	{
-		std::wstring param0 = parameters->at(0);
+		std::string param0 = parameters->at(0);
 		StringStripQuote(param0);
 		ScpObject * objparam0 = engine->GetCurrentObjectSpace()->FindObject(param0);
 		if (objparam0 && objparam0->GetType() == ObjString)
@@ -184,9 +184,9 @@ ScpObject * ScpRangeObject::InnerFunction_reset(ScpObject * thisObject, VTPARAME
 {
 	if (parameters->size() == 3)
 	{
-		std::wstring wstart = parameters->at(0);
-		std::wstring wend = parameters->at(1);
-		std::wstring wstep = parameters->at(2);
+		std::string wstart = parameters->at(0);
+		std::string wend = parameters->at(1);
+		std::string wstep = parameters->at(2);
 		ScpObject * objstart = engine->GetCurrentObjectSpace()->FindObject(wstart);
 		ScpObject * objend = engine->GetCurrentObjectSpace()->FindObject(wend);
 		ScpObject * objstep = engine->GetCurrentObjectSpace()->FindObject(wend);
@@ -233,9 +233,9 @@ ScpObject * __stdcall ScpRangeObjectFactory(VTPARAMETERS * paramters, CScriptEng
 {
 	if (paramters->size() == 5)
 	{
-		std::wstring wstart = paramters->at(2);
-		std::wstring wend = paramters->at(3);
-		std::wstring wstep = paramters->at(4);
+		std::string wstart = paramters->at(2);
+		std::string wend = paramters->at(3);
+		std::string wstep = paramters->at(4);
 		ScpRangeObject * range = new ScpRangeObject;
 		if (range)
 		{

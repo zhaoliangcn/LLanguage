@@ -2,13 +2,15 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//È«¾ÖÃüÁîµÄ×éÖ¯¹ÜÀí
-//°ÑÒ»ÐÐ½Å±¾µ±×÷Ò»¸öÃüÁî£¬»òÕßËµÊÇÒ»¸öº¯Êýµ÷ÓÃ
+//å…¨å±€å‘½ä»¤çš„ç»„ç»‡ç®¡ç†
+//æŠŠä¸€è¡Œè„šæœ¬å½“ä½œä¸€ä¸ªå‘½ä»¤ï¼Œæˆ–è€…è¯´æ˜¯ä¸€ä¸ªå‡½æ•°è°ƒç”¨
 */
 #include "ScpGlobalCommandObject.h"
 #include "commanddefine_uni.h"
 #include "ScriptEngine.h"
 #include "ScpObjectNammes.h"
+//#include "../Common/stdstringext.hpp"
+
 ScpGlobalCommandObject::ScpGlobalCommandObject(void)
 {
 #ifdef USE_GOOGLE_HASHMAP
@@ -29,20 +31,20 @@ void ScpGlobalCommandObject::Show(CScriptEngine * engine)
 		
 	engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorGlobalComand);
 }
-ScpObject * ScpGlobalCommandObject::Clone(std::wstring strObjName)
+ScpObject * ScpGlobalCommandObject::Clone(std::string strObjName)
 {
 	return NULL;
 }	
-std::wstring ScpGlobalCommandObject::ToString()
+std::string ScpGlobalCommandObject::ToString()
 {
-	std::wstring temp;
+	std::string temp;
 	return temp;
 }
 void ScpGlobalCommandObject::Release() 
 {
 	delete this;
 }
-bool ScpGlobalCommandObject::IsInnerFunction(std::wstring & functionname)
+bool ScpGlobalCommandObject::IsInnerFunction(std::string & functionname)
 {
 	if (functionname == scpcommand_cn_show || functionname == scpcommand_en_show)
 	{
@@ -50,7 +52,7 @@ bool ScpGlobalCommandObject::IsInnerFunction(std::wstring & functionname)
 	}
 	return false;
 }
-ScpObject * ScpGlobalCommandObject::CallInnerFunction(std::wstring & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
+ScpObject * ScpGlobalCommandObject::CallInnerFunction(std::string & functionname, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
 	if (functionname == scpcommand_cn_show || functionname == scpcommand_en_show)
 	{
@@ -61,6 +63,7 @@ ScpObject * ScpGlobalCommandObject::CallInnerFunction(std::wstring & functionnam
 }
 void ScpGlobalCommandObject::InitBaseCommand()
 {
+	
 	chscommandmap[scpcommand_cn_reserved] = vl_reserved ;
 	chscommandmap[scpcommand_cn_do]=vl_do;
 	chscommandmap[scpcommand_cn_compute]=vl_compute;
@@ -78,13 +81,13 @@ void ScpGlobalCommandObject::InitBaseCommand()
 	chscommandmap[scpcommand_cn_load]=vl_load;
 	chscommandmap[scpcommand_cn_exit]=vl_exit;
 	chscommandmap[scpcommand_cn_continue]=vl_continue;
-	chscommandmap[scpcommand_cn_break]=vl_break;	
+	chscommandmap[scpcommand_cn_break]=vl_break;
 	chscommandmap[scpcommand_cn_switch]=vl_switch;
 	chscommandmap[scpcommand_cn_case]=vl_case;
-	chscommandmap[scpcommand_cn_loop]=vl_loop;	
-	chscommandmap[scpcommand_cn_public]=vl_public;	
+	chscommandmap[scpcommand_cn_loop]=vl_loop;
+	chscommandmap[scpcommand_cn_public]=vl_public;
 	chscommandmap[scpcommand_cn_private]=vl_private;
-	chscommandmap[scpcommand_cn_return]=vl_return;	
+	chscommandmap[scpcommand_cn_return]=vl_return;
 
 
 
@@ -115,7 +118,7 @@ void ScpGlobalCommandObject::InitBaseCommand()
 	engcommandmap[scpcommand_en_private]=vl_private;	
 	engcommandmap[scpcommand_en_return]=vl_return;	
 }
-ULONG ScpGlobalCommandObject::QueryCommand(std::wstring commandstring)
+ULONG ScpGlobalCommandObject::QueryCommand(std::string commandstring)
 {
 	ITCHSCOMMANDMAP it ;
 	it = chscommandmap.find(commandstring);
@@ -130,7 +133,7 @@ ULONG ScpGlobalCommandObject::QueryCommand(std::wstring commandstring)
 	}
 	return QueryExtCommand(commandstring);
 }
-BOOL ScpGlobalCommandObject::RegisterCommand(int lang, std::wstring commandstring,ULONG commandvalue)
+BOOL ScpGlobalCommandObject::RegisterCommand(int lang, std::string commandstring,ULONG commandvalue)
 {
 	ITCHSCOMMANDMAP it ;
 	if(lang ==0)
@@ -153,7 +156,7 @@ BOOL ScpGlobalCommandObject::RegisterCommand(int lang, std::wstring commandstrin
 	}
 	return FALSE;
 }
-BOOL ScpGlobalCommandObject::UnRegisterCommand(int lang, std::wstring commandstring)
+BOOL ScpGlobalCommandObject::UnRegisterCommand(int lang, std::string commandstring)
 {
 	ITCHSCOMMANDMAP it ;
 	if(lang ==0)
@@ -177,7 +180,7 @@ BOOL ScpGlobalCommandObject::UnRegisterCommand(int lang, std::wstring commandstr
 	return FALSE;
 }
 
-bool ScpGlobalCommandObject::RegisterGlobalFunction(std::wstring chscommandstring, std::wstring engcommandstring, DWORD commandid, GlobalCommandFunction Func)
+bool ScpGlobalCommandObject::RegisterGlobalFunction(std::string chscommandstring, std::string engcommandstring, DWORD commandid, GlobalCommandFunction Func)
 {
 	ULONG command = QueryCommand(engcommandstring);
 	if (command == -1)
@@ -196,7 +199,7 @@ bool ScpGlobalCommandObject::RegisterGlobalFunction(std::wstring chscommandstrin
 	return false;
 }
 
-GlobalCommandFunction ScpGlobalCommandObject::GetGlobalCommandFunction(std::wstring commandstring)
+GlobalCommandFunction ScpGlobalCommandObject::GetGlobalCommandFunction(std::string commandstring)
 {
 	ULONG command = QueryCommand(commandstring);
 	return GetGlobalCommandFunction(command);
@@ -209,6 +212,24 @@ GlobalCommandFunction ScpGlobalCommandObject::GetGlobalCommandFunction(DWORD com
 		return idcommnadmap[commandid];
 	}
 	return GlobalCommandFunction();
+}
+
+bool ScpGlobalCommandObject::IsGlobalCommandFunction(std::string commandstring)
+{
+	GlobalCommandFunction func = GetGlobalCommandFunction(commandstring);
+	if(func == nullptr)
+		return false;
+	else
+		return true;
+}
+
+bool ScpGlobalCommandObject::IsGlobalCommandFunction(DWORD commandid)
+{
+	GlobalCommandFunction func = GetGlobalCommandFunction(commandid);
+	if(func == nullptr)
+		return false;
+	else
+		return true;	
 }
 
 BOOL ScpGlobalCommandObject::RegistExtCommand(ExtObjectCommand extobjcmd)
@@ -251,7 +272,7 @@ BOOL ScpGlobalCommandObject::RegistExtCommand(ExtObjectCommand extobjcmd)
 	return TRUE;
 }
 
-ULONG ScpGlobalCommandObject::QueryExtCommand(std::wstring commandstring)
+ULONG ScpGlobalCommandObject::QueryExtCommand(std::string commandstring)
 {
 	for (size_t i = 0; i < extobjcmdlist.size(); i++)
 	{
@@ -267,7 +288,7 @@ ULONG ScpGlobalCommandObject::QueryExtCommand(std::wstring commandstring)
 	return -1;
 }
 
-size_t ScpGlobalCommandObject::GetExtCommandFunctionCount(std::wstring commandstring)
+size_t ScpGlobalCommandObject::GetExtCommandFunctionCount(std::string commandstring)
 {
 	for (size_t i = 0; i < extobjcmdlist.size(); i++)
 	{
@@ -296,7 +317,7 @@ size_t ScpGlobalCommandObject::GetExtCommandFunctionCount(DWORD commandid)
 	return 0;
 }
 
-ExtObjectCommandFunction ScpGlobalCommandObject::GetExtCommandFunctionAddress(std::wstring commandstring, size_t index)
+ExtObjectCommandFunction ScpGlobalCommandObject::GetExtCommandFunctionAddress(std::string commandstring, size_t index)
 {
 	for (size_t i = 0; i < extobjcmdlist.size(); i++)
 	{
@@ -323,4 +344,24 @@ ExtObjectCommandFunction ScpGlobalCommandObject::GetExtCommandFunctionAddress(DW
 		}
 	}
 	return NULL;
+}
+
+bool ScpGlobalCommandObject::IsExtCommandFunction(std::string commandstring, size_t index)
+{
+	ExtObjectCommandFunction func = GetExtCommandFunctionAddress(commandstring, index);
+	if(func == nullptr)
+		return false;
+	else
+		return true;
+	return false;
+}
+
+bool ScpGlobalCommandObject::IsExtCommandFunction(DWORD commandid, size_t index)
+{
+	ExtObjectCommandFunction func = GetExtCommandFunctionAddress(commandid, index);
+	if(func == nullptr)
+		return false;
+	else
+		return true;
+	return false;
 }

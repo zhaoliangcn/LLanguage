@@ -2,7 +2,7 @@
 //author :zhaoliang
 //email:zhaoliangcn@126.com
 //code descriptyon:
-//½çÃæÏûÏ¢»Øµ÷¹ÜÀí£¬ÓÃÓÚÊä³öÏûÏ¢µÄÖØ¶¨Ïò£¬ÒÔÔö¼Ó¶ÔIDEµÄÖ§³Ö
+//ç•Œé¢æ¶ˆæ¯å›è°ƒç®¡ç†ï¼Œç”¨äºè¾“å‡ºæ¶ˆæ¯çš„é‡å®šå‘ï¼Œä»¥å¢åŠ å¯¹IDEçš„æ”¯æŒ
 */
 #include "UIMessage.h"
 CUIMessage::CUIMessage()
@@ -44,14 +44,41 @@ bool CUIMessage::PostUIMessage(const char * message, bool withnewline )
 {
 	if (messagecallback)
 	{
-		messagecallback(UIClass, STDSTRINGEXT::AToW(message).c_str());
-}
+		messagecallback(UIClass,message);
+	}
 	else
 	{
+#ifdef _WIN32
+		//SetConsoleOutputCP(CP_UTF8);
+		UINT cp = GetConsoleOutputCP();
+		if (cp == CP_ACP || cp == 936)
+		{
+			if (withnewline)
+				printf("%s\n", STDSTRINGEXT::UToA(message).c_str());
+			else
+				printf("%s", STDSTRINGEXT::UToA(message).c_str());
+		}
+		else if (cp == CP_UTF8)
+		{
+			if (withnewline)
+				printf("%s\n", message);
+			else
+				printf("%s", message);
+		}
+		else
+		{
+			SetConsoleOutputCP(CP_UTF8);
+			if (withnewline)
+				printf("%s\n", message);
+			else
+				printf("%s", message);
+		}
+#else
 		if (withnewline)
 			printf("%s\n", message);
 		else
 			printf("%s", message);
+#endif
 	}
     return true;
 }
@@ -60,7 +87,7 @@ bool CUIMessage::PostUIMessage(const wchar_t *message, bool withnewline )
 #ifdef _WIN32
 	if (messagecallback)
 	{
-		messagecallback(UIClass, message);
+		messagecallback(UIClass, STDSTRINGEXT::W2UTF(message).c_str());
 	}
 	else
 	{
