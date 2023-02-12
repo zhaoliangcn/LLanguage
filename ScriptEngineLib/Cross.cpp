@@ -22,7 +22,7 @@ float _wtof(const wchar_t* wstr)
 }
 wchar_t * wstringdup(const wchar_t * src)
 {
-	return _wcsdup(src);
+	return wcsdup(src);
 }
 #else
 wchar_t * wstringdup(const wchar_t * src)
