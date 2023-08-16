@@ -12,7 +12,9 @@ git clone https://github.com/zhaoliangcn/llanguage.git --recursive
 
 cd llanguage
 
-./build.sh
+make clean && make
+
+make bin && make test 
 
 cd bin
 
