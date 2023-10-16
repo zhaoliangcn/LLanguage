@@ -96,68 +96,68 @@ ScpCFunctionObject::ScpCFunctionObject()
 	{
 		ffi = 0;
 	}
-	pffi_call =(func_ffi_call) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_call");
+	pffi_call = (func_ffi_call)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_call");
 	if (!pffi_call)
 	{
 		ffi = 0;
 	}
-	pffi_type_void = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_void");
+	pffi_type_void = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_void");
 	if (!pffi_type_void)
 	{
 		ffi = 0;
 	}
-	pffi_type_uint8 = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint8");
+	pffi_type_uint8 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint8");
 	if (!pffi_type_uint8)
 	{
 		ffi = 0;
 	}
-	pffi_type_sint8 = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint8");
+	pffi_type_sint8 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint8");
 	if (!pffi_type_sint8)
 	{
 		ffi = 0;
 	}
-	pffi_type_uint16 = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint16");
+	pffi_type_uint16 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint16");
 	if (!pffi_type_uint16)
 	{
 		ffi = 0;
 	}
-	pffi_type_sint16 = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint16");
+	pffi_type_sint16 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint16");
 	if (!pffi_type_sint16)
 	{
 		ffi = 0;
 	}
-	pffi_type_uint32 =  (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint32");
+	pffi_type_uint32 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint32");
 	if (!pffi_type_uint32)
 	{
 		ffi = 0;
 	}
-	pffi_type_sint32 =  (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint32");
+	pffi_type_sint32 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint32");
 	if (!pffi_type_sint32)
 	{
 		ffi = 0;
 	}
-	pffi_type_uint64 = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint64");
+	pffi_type_uint64 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_uint64");
 	if (!pffi_type_uint64)
 	{
 		ffi = 0;
 	}
-	pffi_type_sint64 = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint64");
+	pffi_type_sint64 = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_sint64");
 	if (!pffi_type_sint64)
 	{
 		ffi = 0;
 	}
 		
-	pffi_type_float = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_float");
+	pffi_type_float = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_float");
 	if (!pffi_type_float)
 	{
 		ffi = 0;
 	}
-	pffi_type_double = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_double");
+	pffi_type_double = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_double");
 	if (!pffi_type_double)
 	{
 		ffi = 0;
 	}
-	pffi_type_pointer = (ffi_type*) dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_pointer");
+	pffi_type_pointer = (ffi_type*)dlsym(dlopen("libffi.so", RTLD_LAZY), "ffi_type_pointer");
 	if (!pffi_type_pointer)
 	{
 		ffi = 0;
@@ -218,7 +218,7 @@ void * ScpCFunctionObject::GetApiAddress(std::string CDLLName,std::string CFunct
 		addr = (void *)GetProcAddress(hmodule,CFunctionName.c_str());			
 	}
 #else
-	addr = dlsym(dlopen(CDLLName.c_str(),RTLD_LAZY),CFunctionName.c_str());
+	addr = (ffi_type*)dlsym(dlopen(CDLLName.c_str(),RTLD_LAZY),CFunctionName.c_str());
 
 #endif
 	return addr;
