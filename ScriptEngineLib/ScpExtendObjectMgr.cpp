@@ -376,11 +376,10 @@ BOOL ScpExtendObjectMgr::LoadExtension(const char * ModuleName, ScpGlobalCommand
 			}
 			else
 			{
-				LoadExtensions(STDSTRINGEXT::W2UTF(pathname).c_str(), scpglobalcommands);
+				bRet = LoadExtensions(STDSTRINGEXT::W2UTF(pathname).c_str(), scpglobalcommands);
 			}
 		}
-		bRet = ::FindNextFileW(hFind, &findFileData);
-		if (!bRet)
+		if (!::FindNextFileW(hFind, &findFileData))
 		{
 			break;
 		}

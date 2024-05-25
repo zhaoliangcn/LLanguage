@@ -192,6 +192,9 @@ bool ScpIfStatementObject::MakeConditionByteCode()
 					ScpObject * retobj = ConditionExpressionroot->MakeByteCode(engine, stream);
 					condition_bytecodemem.AppendByteCode(&stream);
 					stream.Release();
+
+					ConditionResult = ((ScpIntObject*)retobj)->value;
+
 					name = engine->GetCurrentObjectSpace()->GetObjectNameR(retobj);
 					ULONG idret = engine->bytecode.resourcepool->scpFindResource(name);
 					engine->bytecode.GetByteCodeBinaryOp(scpOperationAssign, -1, idif, idret, stream);

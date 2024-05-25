@@ -109,16 +109,27 @@ bool ScpExpressionBlock::GenByteCode(CScriptEngine * engine, ByteCodeMemoryStrea
 					ByteCodeMemoryStream stream;
 					if (engine->Jit )
 					{
+						engine->SetCurrentObjectSpace(&ifstmtobj->IfStatementObjectSpace);
 						ifstmtobj->MakeConditionByteCode();
 						if (ifstmtobj->trueblock)
+						{
+							ifstmtobj->TrueBody = true;
 							ifstmtobj->trueblock->GenByteCode(engine, ifstmtobj->trueblock_bytecodemem);
+						}
+
 						if (ifstmtobj->falseblock)
+						{
+							ifstmtobj->TrueBody = false;
 							ifstmtobj->falseblock->GenByteCode(engine, ifstmtobj->falseblock_bytecodemem);
+						}
+
 
 						engine->bytecode.GenByteCodeIfstatement(ifstmtobj->condition_bytecodemem,
 							ifstmtobj->trueblock_bytecodemem,
 							ifstmtobj->falseblock_bytecodemem,
 							stream);
+
+						engine->SetCurrentObjectSpace(ifstmtobj->IfStatementObjectSpace.parentspace);
 					}
 					ifstmtobj->bytecodemem_ifstmt.AppendByteCode(&stream);
 					stream.Release();

@@ -1562,7 +1562,23 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 			engine->bytecode.GenByteCodeCallInner(objname, InnerFunctionName, vtFuncparameters, stream, engine);
 			memstream.AppendByteCode(&stream);
 			stream.Release();
-			retobj = nodeobject->CallInnerFunction(InnerFunctionName, &vtFuncparameters, engine);
+			if (engine->GetCurrentObjectSpace()->ObjectSpaceType == Space_If)
+			{
+				ScpIfStatementObject * ifstatement = (ScpIfStatementObject *) engine->GetCurrentObjectSpace()->belongto;
+				if (ifstatement->TrueBody && ifstatement->ConditionResult == 1)
+				{
+					retobj = nodeobject->CallInnerFunction(InnerFunctionName, &vtFuncparameters, engine);
+				}		
+				else if (!ifstatement->TrueBody && ifstatement->ConditionResult == 0)
+				{
+					retobj = nodeobject->CallInnerFunction(InnerFunctionName, &vtFuncparameters, engine);
+				}
+			}
+			else
+			{
+				retobj = nodeobject->CallInnerFunction(InnerFunctionName, &vtFuncparameters, engine);
+			}
+
 		}
 		else if (nodeobject->GetType() == ObjFunction)
 		{
@@ -2869,12 +2885,10 @@ ScpObject *  ScpExpressionAnalyser::ParseWhileDefine(const char * ScriptFile, VT
 				}
 				engine->FetchCommand(value, &vtparameters);
 			}
-			else
+			
+			if (whileobj->whilexpressionblock)
 			{
-				if (whileobj->whilexpressionblock)
-				{
-					whileobj->whilexpressionblock->Append(wcommandline, currentcommandline, engine);
-				}
+				whileobj->whilexpressionblock->Append(wcommandline, currentcommandline, engine);
 			}
 	
 			currentcommandline++;
@@ -3020,16 +3034,14 @@ ScpObject *  ScpExpressionAnalyser::ParseIfDefine(const char * ScriptFile, VTSTR
 				}
 				engine->FetchCommand(value, &vtparameters);
 			}
+			
+			if (ifstmtobj->TrueBody)
+			{
+				ifstmtobj->trueblock->Append(wcommandline, currentcommandline, engine);
+			}
 			else
 			{
-				if (ifstmtobj->TrueBody)
-				{
-					ifstmtobj->trueblock->Append(wcommandline, currentcommandline, engine);
-				}
-				else
-				{
-					ifstmtobj->falseblock->Append(wcommandline, currentcommandline, engine);
-				}
+				ifstmtobj->falseblock->Append(wcommandline, currentcommandline, engine);
 			}
 
 			currentcommandline++;

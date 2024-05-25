@@ -456,15 +456,46 @@ BOOL CScriptCommand::Do_Load_Command(VTPARAMETERS * vtparameters, CScriptEngine 
 			}
 			else
 			{
-				std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
-				engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidLoadCommand + Message);
+				size_t i = 0;
+				for (i= 0; i < vtparameters->size(); i++)
+				{
+					std::string content = vtparameters->at(i);
+					StringStripQuote(content);
+					if (!engine->extend_obj_mgr.LoadExtension(content.c_str(), &engine->globalcommand))
+					{
+						std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
+						engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidParameter + Message);						
+					}
+				}
+				if (i != vtparameters->size())
+				{
+					std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
+					engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidLoadCommand + Message);
+					return FALSE;
+				}
 			}
 		}
 	}
 	else
 	{
-		std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
-		engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidParameter + Message);
+		BOOL bErr = FALSE;
+		for (size_t i = 0; i < vtparameters->size(); i++)
+		{
+			std::string content = vtparameters->at(i);
+			StringStripQuote(content);
+			if (!engine->extend_obj_mgr.LoadExtension(content.c_str(), &engine->globalcommand))
+			{
+				std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
+				engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidParameter + Message);
+				bErr = TRUE;				
+			}
+		}
+		if (bErr)
+		{
+			std::string Message = STDSTRINGEXT::Format(" at line(%d)", engine->GetCurrentCommandLine());
+			engine->PrintError(ScpObjectNames::GetSingleInsatnce()->scpErrorInvalidParameter + Message);
+			return FALSE;
+		}
 
 	}
 	return TRUE;
