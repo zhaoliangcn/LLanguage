@@ -193,7 +193,15 @@ int ScpWhileStatementObject::Do(CScriptEngine *engine)
 
 		while(1)
 		{
+			if (!recurseCall)
+			{
+				engine->SetCurrentObjectSpace(WhileStatementObjectSpace.parentspace);
+			}
 			int condition = ReComputeConditionResult();
+			if (!recurseCall)
+			{
+				engine->SetCurrentObjectSpace(&WhileStatementObjectSpace);
+			}
 			if (whilexpressionblock)
 			{
 				if (condition == 1)

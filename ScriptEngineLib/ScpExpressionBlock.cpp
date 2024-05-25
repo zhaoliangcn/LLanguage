@@ -109,8 +109,9 @@ bool ScpExpressionBlock::GenByteCode(CScriptEngine * engine, ByteCodeMemoryStrea
 					ByteCodeMemoryStream stream;
 					if (engine->Jit )
 					{
-						engine->SetCurrentObjectSpace(&ifstmtobj->IfStatementObjectSpace);
+						
 						ifstmtobj->MakeConditionByteCode();
+						engine->SetCurrentObjectSpace(&ifstmtobj->IfStatementObjectSpace);
 						if (ifstmtobj->trueblock)
 						{
 							ifstmtobj->TrueBody = true;
@@ -141,8 +142,9 @@ bool ScpExpressionBlock::GenByteCode(CScriptEngine * engine, ByteCodeMemoryStrea
 					ByteCodeMemoryStream stream;
 					if (engine->Jit)
 					{
-						engine->SetCurrentObjectSpace(&whileobj->WhileStatementObjectSpace);
+						
 						whileobj->MakeConditionByteCode();
+						engine->SetCurrentObjectSpace(&whileobj->WhileStatementObjectSpace);
 						whileobj->whilexpressionblock->GenByteCode(engine, whileobj->whileblock_bytecodemem);
 
 						engine->bytecode.GenByteCodeWhilestatement(whileobj->condition_bytecodemem,

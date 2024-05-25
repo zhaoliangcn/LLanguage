@@ -55,10 +55,11 @@ int ScpIfStatementObject::Do(CScriptEngine *engine)
 	{
 		recurseCall = TRUE;
 	}
-	if(!recurseCall)
+
+	ReComputeCondition();	
+	if (!recurseCall)
 		engine->SetCurrentObjectSpace(&IfStatementObjectSpace);
 	engine->GetCurrentObjectSpace()->lastcommand = vl_compute;
-	ReComputeCondition();	
 	if (ConditionResult == 1)
 	{
 		if (trueblock)
