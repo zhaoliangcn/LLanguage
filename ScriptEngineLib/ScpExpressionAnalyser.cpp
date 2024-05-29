@@ -1585,8 +1585,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 			if (vtFuncparameters.size() > 0)
 			{				
 				ScpFunctionObject * func = (ScpFunctionObject*)nodeobject;
-
-				
+				ScpObjectSpace* parentObjectSpace = func->FunctionObjectSpace->parentspace;
+				func->FunctionObjectSpace->parentspace = engine->GetCurrentObjectSpace();
 				engine->SetCurrentObjectSpace(func->FunctionObjectSpace);
 				func->RealParameters.clear();
 				if (func->RealParameters.size() == 0)
@@ -1716,7 +1716,8 @@ ScpObject * ScpExpressionTreeNode::MakeByteCodePerformFunctionCall(CScriptEngine
 					func->UnBindParameters(engine);
 					func->RealParameters.clear();
 				}
-				engine->SetCurrentObjectSpace(objectSpace);				
+				engine->SetCurrentObjectSpace(objectSpace);			
+				func->FunctionObjectSpace->parentspace = parentObjectSpace;
 				
 				//engine->scriptcommand->Do_Call_Command(&vtFuncparameters, engine);
 				retobj = ((ScpFunctionObject *)nodeobject)->Result;
