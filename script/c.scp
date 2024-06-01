@@ -1,0 +1,10 @@
+#scp
+#scpeng
+
+define:function,main
+	define:int,a,100	
+		while(a>0)
+			a.show()
+			a-=1
+		end
+end
