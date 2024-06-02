@@ -585,7 +585,7 @@ unsigned char *  ScpByteCode::DoCallInner(unsigned char * pByteCode)
 		{
 			ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
 			ScpClassInstanceObject *classInstanceObj = (ScpClassInstanceObject *)object;
-			ScpClassObject * classobj =(ScpClassObject * ) currentObjectSpace->FindObject(classInstanceObj->classname);
+			ScpClassObject * classobj =(ScpClassObject * ) currentObjectSpace->FindObject(classInstanceObj->userclassname);
 			classInstanceObj->UserClassObjectSpace.userobject.DeepCopy(&classobj->UserClassObjectSpace.userobject);
 			classInstanceObj->memberattrmap = classobj->memberattrmap;
 			classInstanceObj->ClassBody = classobj->ClassBody;

@@ -18,7 +18,7 @@ public:
 	ScpClassInstanceObject(void);
 	~ScpClassInstanceObject(void);
 	ScpClassObject * instanceOf;
-	std::string classname;
+//	std::string classname;
 	ScpObjectType realobjtype;
 };
 

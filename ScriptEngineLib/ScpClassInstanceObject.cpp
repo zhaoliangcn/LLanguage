@@ -16,7 +16,7 @@ ScpObject * ScpClassInstanceObject::Clone(std::string strObjName)
 	ScpClassInstanceObject * obj = new ScpClassInstanceObject;
 	if (obj)
 	{
-		obj->classname = classname;
+		obj->userclassname = userclassname;
 		obj->ClassBody = ClassBody;
 		obj->memberattrmap = memberattrmap;
 		obj->realobjtype = realobjtype;

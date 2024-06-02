@@ -602,7 +602,7 @@ BOOL ScpObjectDefine(VTPARAMETERS * vtparameters, CScriptEngine * engine)
 								classobj->ClassBody = ((ScpClassObject *)obj)->ClassBody;
 								classobj->ClassDefine(userobjname);
 								classobj->objecttype = ObjClassInstance;
-								classobj->classname = strobj;
+								//classobj->classname = strobj;
 								classobj->instanceOf = (ScpClassObject *)obj;
 								currentObjectSpace->AddObject(userobjname, classobj);
 							}
