@@ -1527,7 +1527,7 @@ BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
                     {
                         if(tableobj->GetType()==ObjTable)
                         {
-                            obj->FindAllFiles(currentObjectSpace,tableobj,obj->directory,posname);
+                            obj->FindAllFiles(currentObjectSpace,tableobj,obj->directory,posname,true);
                         }
                     }
                 }
@@ -1539,7 +1539,7 @@ BOOL __stdcall Do_Find_Command(VTPARAMETERS * vtparameters,CScriptEngine * engin
                 {
                     if(tableobj->GetType()==ObjTable)
                     {
-                        obj->FindAllFiles(currentObjectSpace,tableobj,strobjname,posname);
+                        obj->FindAllFiles(currentObjectSpace,tableobj,strobjname,posname,true);
                     }
                 }
             }
