@@ -432,7 +432,7 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 		{
 			if (!findfile && is_re_match(chBuf, matchrule))
 			{
-				allfiles.push_back(pathname);
+				allfiles.push_back(chBuf);
 			}
 			myFindAllFiles(chBuf, matchrule, allfiles);
 		}
