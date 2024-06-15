@@ -1,0 +1,37 @@
+#scp
+#scpeng
+
+#本脚本功能：拷贝必应壁纸到指定目录
+
+define:function,myfunc,elem
+	#定义一个文件对象，并关联文件名
+	define:file,f,elem
+	#f.copy("C:\Users\coder\Pictures\")
+	#将文件对象拷贝到指定目录
+	define:string,message
+	if(f.copy("C:\\Users\\coder\\Desktop\\pics"))
+		message+="copy "
+		message+=elem
+		message+=" success"
+		message.show()
+	else
+		message+="copy "
+		message+=elem
+		message+=" fail"
+		message.show()
+	end
+	
+end
+
+define:function,main
+	#定义一个目录对象，并打开
+	define:directory,picdir,"C:\\Users\\coder\\AppData\\Local\\Microsoft\\BingWallpaperApp\\WPImages"
+	#定义一个表对象
+	define:table,allpic
+	#枚举目录下的所有文件，非递归
+	#allpic = picdir.enum("file")
+	allpic = picdir.find("file",".*\.jpg")
+	#allpic.show()
+	#遍历表对象，并以每一个表对象中的每一个条目作为参数调用函数myfunc
+	traverse(allpic,myfunc)
+end
