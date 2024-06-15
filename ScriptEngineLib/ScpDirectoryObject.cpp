@@ -434,7 +434,7 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 			{
 				allfiles.push_back(chBuf);
 			}
-			myFindAllFiles(chBuf, matchrule, allfiles);
+			myFindAllFiles(chBuf, matchrule, allfiles,findfile);
 		}
 		else
 		{
