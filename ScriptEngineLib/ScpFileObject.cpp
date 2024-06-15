@@ -2008,6 +2008,8 @@ ScpObject * ScpFileObject::InnerFunction_write(ScpObject * thisObject, VTPARAMET
 
 ScpObject * ScpFileObject::InnerFunction_copy(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)
 {
+	ScpIntObject* retval = (ScpIntObject*)engine->GetCurrentObjectSpace()->AcquireTempObject(ObjInt);
+	retval->value = 0;
 	if (parameters->size() == 1)
 	{
 		ScpObjectSpace * currentObjectSpace = engine->GetCurrentObjectSpace();
@@ -2020,10 +2022,13 @@ ScpObject * ScpFileObject::InnerFunction_copy(ScpObject * thisObject, VTPARAMETE
 			{
 				destname = ((ScpStringObject *)obj1)->content;
 			}
+		}	
+		if (Copy(((ScpFileObject*)thisObject)->filename, destname))
+		{
+			retval->value = 1;
 		}
-		Copy(((ScpFileObject*)thisObject)->filename, destname);
 	}
-	return nullptr;
+	return retval;
 }
 
 ScpObject * ScpFileObject::InnerFunction_select_open(ScpObject * thisObject, VTPARAMETERS * parameters, CScriptEngine * engine)

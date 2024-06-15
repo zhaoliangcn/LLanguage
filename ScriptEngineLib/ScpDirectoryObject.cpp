@@ -337,8 +337,22 @@ BOOL DeleteDirectory(const char* DirName)
 	delete_dir(DirName);
 #endif
 }
-
-BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& allfiles)
+bool is_re_match(std::string data, std::string matchrule)
+{
+	
+	bool ret = false;
+	try
+	{
+		regex rgx(matchrule);
+		ret = regex_search(data, rgx);
+	}
+	catch (...)
+	{
+		ret = false;
+	}
+	return ret;
+}
+BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& allfiles,bool findfile=true)
 {
 #ifdef _WIN32
 
@@ -347,7 +361,7 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 	BOOL bRet;
 
 	strcpy_s(szFind, MAX_PATH, directory.c_str());
-	strcpy_s(szFind, "\\*.*");
+	strcat(szFind, "\\*.*");
 
 	HANDLE hFind = ::FindFirstFileA(szFind, &findFileData);
 	if (INVALID_HANDLE_VALUE == hFind)
@@ -368,22 +382,15 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 			sprintf_s(pathname, "%s\\%s", directory.c_str(), findFileData.cFileName);
 			if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
+				if (!findfile && is_re_match(pathname, matchrule))
+				{
+					allfiles.push_back(pathname);
+				}
 				myFindAllFiles(pathname, matchrule, allfiles);
 			}
 			else
-			{
-				regex rgx;
-				bool ret = false;
-				try
-				{
-					rgx = matchrule;
-					ret = regex_search(pathname, rgx);
-				}
-				catch (...)
-				{
-					ret = false;
-				}
-				if (ret)
+			{				
+				if (findfile && is_re_match(pathname, matchrule))
 				{
 					allfiles.push_back(pathname);
 				}
@@ -423,22 +430,15 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 		snprintf(chBuf, 4096, "%s/%s", directory.c_str(), ptr->d_name);
 		if (is_dir(chBuf))
 		{
+			if (!findfile && is_re_match(chBuf, matchrule))
+			{
+				allfiles.push_back(pathname);
+			}
 			myFindAllFiles(chBuf, matchrule, allfiles);
 		}
 		else
 		{
-			regex rgx;
-			bool bret = false;
-			try
-			{
-				rgx = matchrule;
-				bret = regex_search(chBuf, rgx);
-			}
-			catch (...)
-			{
-				bret = false;
-			}
-			if (bret)
+			if (findfile && is_re_match(chBuf, matchrule))
 			{
 				allfiles.push_back(chBuf);
 			}
