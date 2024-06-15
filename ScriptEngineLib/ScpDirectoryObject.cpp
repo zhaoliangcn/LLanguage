@@ -352,7 +352,7 @@ bool is_re_match(std::string data, std::string matchrule)
 	}
 	return ret;
 }
-BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& allfiles,bool findfile=true)
+BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& allfiles,bool findfile)
 {
 #ifdef _WIN32
 
@@ -386,7 +386,7 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 				{
 					allfiles.push_back(pathname);
 				}
-				myFindAllFiles(pathname, matchrule, allfiles);
+				myFindAllFiles(pathname, matchrule, allfiles,true);
 			}
 			else
 			{				
@@ -432,7 +432,7 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 		{
 			if (!findfile && is_re_match(chBuf, matchrule))
 			{
-				allfiles.push_back(pathname);
+				allfiles.push_back(chBuf);
 			}
 			myFindAllFiles(chBuf, matchrule, allfiles);
 		}
@@ -706,10 +706,10 @@ BOOL ScpDirectoryObject::Move(std::string source, std::string dest)
 	return (rename(source.c_str(),dest.c_str()) != -1);
 #endif
 }
-BOOL ScpDirectoryObject::FindAllFiles(ScpObjectSpace* currentObjectSpace, ScpTableObject* tableobj, std::string driectory, std::string matchrule)
+BOOL ScpDirectoryObject::FindAllFiles(ScpObjectSpace* currentObjectSpace, ScpTableObject* tableobj, std::string driectory, std::string matchrule, bool findfile)
 {
 	VTSTRINGS allmyfile;
-	myFindAllFiles(driectory, matchrule, allmyfile);
+	myFindAllFiles(driectory, matchrule, allmyfile, findfile);
 	size_t count = allmyfile.size();
 	for (size_t i = 0;i < count;i++)
 	{
@@ -1032,9 +1032,16 @@ ScpObject * ScpDirectoryObject::InnerFunction_find(ScpObject * thisObject, VTPAR
 		if (ObjFile == type)
 		{
 			ScpTableObject* tableobj = new ScpTableObject;
-			((ScpDirectoryObject*)thisObject)->FindAllFiles(engine->GetCurrentObjectSpace(), tableobj, ((ScpDirectoryObject*)thisObject)->directory, matchrule);
+			((ScpDirectoryObject*)thisObject)->FindAllFiles(engine->GetCurrentObjectSpace(), tableobj, ((ScpDirectoryObject*)thisObject)->directory, matchrule,true);
 			return tableobj;
 		}
+		else if(ObjDirectory == type)
+		{
+			ScpTableObject* tableobj = new ScpTableObject;
+			((ScpDirectoryObject*)thisObject)->FindAllFiles(engine->GetCurrentObjectSpace(), tableobj, ((ScpDirectoryObject*)thisObject)->directory, matchrule,false);
+			return tableobj;
+		}
+
 	}
 	return nullptr;
 }

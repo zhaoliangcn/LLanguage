@@ -39,7 +39,7 @@ public:
 	void ShowAllSubdir(CScriptEngine * engine);
 	void ShowAll(CScriptEngine * engine);
 	void EnumAll();
-	BOOL FindAllFiles(ScpObjectSpace * currentObjectSpace,ScpTableObject * tableobj,std::string driectory,std::string matchrule);
+	BOOL FindAllFiles(ScpObjectSpace * currentObjectSpace,ScpTableObject * tableobj,std::string driectory,std::string matchrule, bool findfile);
 	ScpTableObject * EnumAllFiles(ScpObjectSpace * currentObjectSpace);
 	ScpTableObject * EnumAllFiles(ScpObjectSpace * currentObjectSpace,ScpObject * reobj);
 	ScpTableObject * EnumAllSubDir(ScpObjectSpace * currentObjectSpace);	
