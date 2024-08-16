@@ -372,15 +372,15 @@ BOOL myFindAllFiles(std::string directory, std::string matchrule, VTSTRINGS& all
 	//遍历文件夹
 	while (TRUE)
 	{
-		if (findFileData.cFileName[0] != L'.')
+		if (strcmp(findFileData.cFileName, ".") && strcmp(findFileData.cFileName, ".."))
 		{
 			char pathname[MAX_PATH] = { 0 };
 			if (directory.substr(directory.length() - 1, 1) == "\\")
 			{
 				directory = directory.substr(0, directory.length() - 1);
 			}
-			sprintf_s(pathname, "%s\\%s", directory.c_str(), findFileData.cFileName);
-			if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			sprintf_s(pathname, sizeof(pathname), "%s\\%s", directory.c_str(), findFileData.cFileName);
+			if ((findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && !(findFileData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT))
 			{
 				if (!findfile && is_re_match(pathname, matchrule))
 				{
@@ -466,7 +466,7 @@ BOOL copy_dir(std::string source, std::string dest)
 	}
 	do
 	{
-		if (findFileData.cFileName[0] != L'.')
+		if (strcmp(findFileData.cFileName, ".") && strcmp(findFileData.cFileName, ".."))
 		{
 			char pathname[MAX_PATH] = { 0 };
 			sprintf_s(pathname, "%s\\%s", source.c_str(), findFileData.cFileName);
@@ -626,7 +626,7 @@ void ScpDirectoryObject::EnumAll()
 	//遍历文件夹
 	while (TRUE)
 	{
-		if (findFileData.cFileName[0] != L'.')
+		if (strcmp(findFileData.cFileName, ".") && strcmp(findFileData.cFileName, ".."))
 		{
 			char pathname[MAX_PATH] = { 0 };
 			if (directory.substr(directory.length() - 1, 1) == "\\")

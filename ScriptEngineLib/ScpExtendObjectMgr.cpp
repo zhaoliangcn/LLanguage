@@ -367,7 +367,7 @@ BOOL ScpExtendObjectMgr::LoadExtension(const char * ModuleName, ScpGlobalCommand
 	//遍历文件夹
 	while (TRUE)
 	{
-		if (findFileData.cFileName[0] != L'.')
+		if (wcscmp(findFileData.cFileName, L".") && wcscmp(findFileData.cFileName, L".."))
 		{
 			wchar_t pathname[MAX_PATH] = { 0 };
 			swprintf(pathname, L"%s\\%s", ExtensionPath, findFileData.cFileName);
